@@ -1,8 +1,17 @@
 #pragma once
+
+class CTexture;
 class CShader
 {
 protected:
 	ComPtr<ID3D12PipelineState> m_pd3dPipelineState = NULL;
+	ID3D12DescriptorHeap* m_pd3dSrvDescriptorHeap = NULL;
+
+	D3D12_CPU_DESCRIPTOR_HANDLE	m_d3dSrvCPUDescriptorStartHandle;
+	D3D12_GPU_DESCRIPTOR_HANDLE	m_d3dSrvGPUDescriptorStartHandle;
+
+	D3D12_CPU_DESCRIPTOR_HANDLE	m_d3dSrvCPUDescriptorNextHandle;
+	D3D12_GPU_DESCRIPTOR_HANDLE	m_d3dSrvGPUDescriptorNextHandle;
 public:
 	CShader();
 	virtual ~CShader();
@@ -29,6 +38,10 @@ public:
 
 	virtual void OnPrepareRender(ID3D12GraphicsCommandList* pd3dCommandList);
 	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList);
+
+	void CreateSrvDescriptorHeaps(ID3D12Device* pd3dDevice, int nShaderResourceViews);
+	void CreateShaderResourceViews(ID3D12Device* pd3dDevice, CTexture* pTexture, UINT nDescriptorHeapIndex, UINT nRootParameterStartIndex);
+
 };
 
 class CTmpTexturedShader : public CShader

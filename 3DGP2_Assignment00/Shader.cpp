@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "Shader.h"
+#include "Texture.h"
 
 CShader::CShader()
 {
@@ -186,6 +187,7 @@ void CShader::ReleaseUploadBuffers()
 void CShader::OnPrepareRender(ID3D12GraphicsCommandList* pd3dCommandList)
 {
 	if (m_pd3dPipelineState) pd3dCommandList->SetPipelineState(m_pd3dPipelineState.Get());
+	if (m_pd3dSrvDescriptorHeap) pd3dCommandList->SetDescriptorHeaps(1, &m_pd3dSrvDescriptorHeap);
 
 	UpdateShaderVariables(pd3dCommandList);
 }
@@ -193,6 +195,42 @@ void CShader::OnPrepareRender(ID3D12GraphicsCommandList* pd3dCommandList)
 void CShader::Render(ID3D12GraphicsCommandList* pd3dCommandList)
 {
 	OnPrepareRender(pd3dCommandList);
+}
+
+void CShader::CreateSrvDescriptorHeaps(ID3D12Device* pd3dDevice, int nShaderResourceViews)
+{
+	D3D12_DESCRIPTOR_HEAP_DESC d3dDescriptorHeapDesc;
+	d3dDescriptorHeapDesc.NumDescriptors = nShaderResourceViews;
+	d3dDescriptorHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
+	d3dDescriptorHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
+	d3dDescriptorHeapDesc.NodeMask = 0;
+	pd3dDevice->CreateDescriptorHeap(&d3dDescriptorHeapDesc, __uuidof(ID3D12DescriptorHeap), (void**)&m_pd3dSrvDescriptorHeap);
+
+	m_d3dSrvCPUDescriptorStartHandle = m_pd3dSrvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
+	m_d3dSrvGPUDescriptorStartHandle = m_pd3dSrvDescriptorHeap->GetGPUDescriptorHandleForHeapStart();
+
+	m_d3dSrvCPUDescriptorNextHandle = m_d3dSrvCPUDescriptorStartHandle;
+	m_d3dSrvGPUDescriptorNextHandle = m_d3dSrvGPUDescriptorStartHandle;
+}
+
+void CShader::CreateShaderResourceViews(ID3D12Device* pd3dDevice, CTexture* pTexture, UINT nDescriptorHeapIndex, UINT nRootParameterStartIndex)
+{
+	m_d3dSrvCPUDescriptorNextHandle.ptr += (::gnCbvSrvDescriptorIncrementSize * nDescriptorHeapIndex);
+	m_d3dSrvGPUDescriptorNextHandle.ptr += (::gnCbvSrvDescriptorIncrementSize * nDescriptorHeapIndex);
+
+	int nTextures = pTexture->GetTextures();
+	for (int i = 0; i < nTextures; i++)
+	{
+		ID3D12Resource* pShaderResource = pTexture->GetResource(i);
+		D3D12_SHADER_RESOURCE_VIEW_DESC d3dShaderResourceViewDesc = pTexture->GetShaderResourceViewDesc(i);
+		pd3dDevice->CreateShaderResourceView(pShaderResource, &d3dShaderResourceViewDesc, m_d3dSrvCPUDescriptorNextHandle);
+		m_d3dSrvCPUDescriptorNextHandle.ptr += ::gnCbvSrvDescriptorIncrementSize;
+		pTexture->SetGpuDescriptorHandle(i, m_d3dSrvGPUDescriptorNextHandle);
+		m_d3dSrvGPUDescriptorNextHandle.ptr += ::gnCbvSrvDescriptorIncrementSize;
+	}
+
+	int nRootParameters = pTexture->GetRootParameters();
+	for (int i = 0; i < nRootParameters; i++) pTexture->SetRootParameterIndex(i, nRootParameterStartIndex + i);
 }
 
 //-------------------------------------------------------------------------

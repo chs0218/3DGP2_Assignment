@@ -26,15 +26,15 @@ private:
 	int	m_nRootParameters = 0;		// 루트파라미터 번호
 	int* m_pnRootParameterIndices;		// 루트파라미터 인덱스
 	D3D12_GPU_DESCRIPTOR_HANDLE* m_pd3dSrvGpuDescriptorHandles;	// Srv 디스크립터 핸들
-
-	ID3D12DescriptorHeap* m_pd3dSrvDescriptorHeap = NULL;
-
-	D3D12_CPU_DESCRIPTOR_HANDLE	m_d3dSrvCPUDescriptorStartHandle;
-	D3D12_GPU_DESCRIPTOR_HANDLE	m_d3dSrvGPUDescriptorStartHandle;
-
-	D3D12_CPU_DESCRIPTOR_HANDLE	m_d3dSrvCPUDescriptorNextHandle;
-	D3D12_GPU_DESCRIPTOR_HANDLE	m_d3dSrvGPUDescriptorNextHandle;
 public:
+	int GetTextures() { return(m_nTextures); }
+	ID3D12Resource* GetResource(int nIndex) { return(m_ppd3dTextures[nIndex]); }
+	_TCHAR* GetTextureName(int nIndex) { return(m_ppstrTextureNames[nIndex]); }
+	D3D12_GPU_DESCRIPTOR_HANDLE GetGpuDescriptorHandle(int nIndex) { return(m_pd3dSrvGpuDescriptorHandles[nIndex]); }
+	int GetRootParameter(int nIndex) { return(m_pnRootParameterIndices[nIndex]); }
+	int GetRootParameters() { return(m_nRootParameters); }
+
+	void SetGpuDescriptorHandle(int nIndex, D3D12_GPU_DESCRIPTOR_HANDLE d3dSrvGpuDescriptorHandle);
 	void UpdateShaderVariable(ID3D12GraphicsCommandList* pd3dCommandList, int nParameterIndex, int nTextureIndex);
 	void UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList);
 	void ReleaseShaderVariables();
@@ -45,8 +45,5 @@ public:
 	D3D12_SHADER_RESOURCE_VIEW_DESC GetShaderResourceViewDesc(int nIndex);
 
 	void ReleaseUploadBuffers();
-
-	void CreateSrvDescriptorHeaps(ID3D12Device* pd3dDevice, int nShaderResourceViews);
-	void CreateShaderResourceViews(ID3D12Device* pd3dDevice, UINT nDescriptorHeapIndex, UINT nRootParameterStartIndex);
 };
 

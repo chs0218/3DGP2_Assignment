@@ -52,8 +52,6 @@ void CTexture::SetRootParameterIndex(int nIndex, UINT nRootParameterIndex)
 }
 void CTexture::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList)
 {
-	pd3dCommandList->SetDescriptorHeaps(1, &m_pd3dSrvDescriptorHeap);
-
 	if (m_nRootParameters == m_nTextures)
 	{
 		for (int i = 0; i < m_nRootParameters; i++)
@@ -66,6 +64,11 @@ void CTexture::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList)
 
 		if (m_pd3dSrvGpuDescriptorHandles[0].ptr) pd3dCommandList->SetGraphicsRootDescriptorTable(m_pnRootParameterIndices[0], m_pd3dSrvGpuDescriptorHandles[0]);
 	}
+}
+
+void CTexture::SetGpuDescriptorHandle(int nIndex, D3D12_GPU_DESCRIPTOR_HANDLE d3dSrvGpuDescriptorHandle)
+{
+	m_pd3dSrvGpuDescriptorHandles[nIndex] = d3dSrvGpuDescriptorHandle;
 }
 
 void CTexture::UpdateShaderVariable(ID3D12GraphicsCommandList* pd3dCommandList, int nParameterIndex, int nTextureIndex)
@@ -85,40 +88,6 @@ void CTexture::ReleaseUploadBuffers()
 		delete[] m_ppd3dTextureUploadBuffers;
 		m_ppd3dTextureUploadBuffers = NULL;
 	}
-}
-
-void CTexture::CreateSrvDescriptorHeaps(ID3D12Device* pd3dDevice, int nShaderResourceViews)
-{
-	D3D12_DESCRIPTOR_HEAP_DESC d3dDescriptorHeapDesc;
-	d3dDescriptorHeapDesc.NumDescriptors = nShaderResourceViews;
-	d3dDescriptorHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
-	d3dDescriptorHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
-	d3dDescriptorHeapDesc.NodeMask = 0;
-	pd3dDevice->CreateDescriptorHeap(&d3dDescriptorHeapDesc, __uuidof(ID3D12DescriptorHeap), (void**)&m_pd3dSrvDescriptorHeap);
-
-	m_d3dSrvCPUDescriptorStartHandle = m_pd3dSrvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
-	m_d3dSrvGPUDescriptorStartHandle = m_pd3dSrvDescriptorHeap->GetGPUDescriptorHandleForHeapStart();
-
-	m_d3dSrvCPUDescriptorNextHandle = m_d3dSrvCPUDescriptorStartHandle;
-	m_d3dSrvGPUDescriptorNextHandle = m_d3dSrvGPUDescriptorStartHandle;
-}
-
-void CTexture::CreateShaderResourceViews(ID3D12Device* pd3dDevice, UINT nDescriptorHeapIndex, UINT nRootParameterStartIndex)
-{
-	m_d3dSrvCPUDescriptorNextHandle.ptr += (::gnCbvSrvDescriptorIncrementSize * nDescriptorHeapIndex);
-	m_d3dSrvGPUDescriptorNextHandle.ptr += (::gnCbvSrvDescriptorIncrementSize * nDescriptorHeapIndex);
-
-	for (int i = 0; i < m_nTextures; i++)
-	{
-		ID3D12Resource* pShaderResource = m_ppd3dTextures[i];
-		D3D12_SHADER_RESOURCE_VIEW_DESC d3dShaderResourceViewDesc = GetShaderResourceViewDesc(i);
-		pd3dDevice->CreateShaderResourceView(pShaderResource, &d3dShaderResourceViewDesc, m_d3dSrvCPUDescriptorNextHandle);
-		m_d3dSrvCPUDescriptorNextHandle.ptr += ::gnCbvSrvDescriptorIncrementSize;
-		m_pd3dSrvGpuDescriptorHandles[i] = m_d3dSrvGPUDescriptorNextHandle;
-		m_d3dSrvGPUDescriptorNextHandle.ptr += ::gnCbvSrvDescriptorIncrementSize;
-	}
-
-	for (int i = 0; i < m_nRootParameters; i++) m_pnRootParameterIndices[i] = nRootParameterStartIndex + i;
 }
 
 void CTexture::LoadTextureFromDDSFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, const wchar_t* pszFileName, UINT nResourceType, UINT nIndex)

@@ -263,11 +263,6 @@ void CGameFramework::BuildObjects()
 	m_pScene->BuildObjects(m_pd3dDevice.Get(), m_pd3dCommandList.Get());
 
 #ifdef RENDER_TMPTEXTUREDBOX
-	// Shader 持失
-	m_pShader = std::make_unique<CTmpTexturedShader>();
-	m_pShader->CreateShader(m_pd3dDevice.Get(), m_pScene->GetGraphicsRootSignature());
-	m_pShader->CreateShaderVariables(m_pd3dDevice.Get(), m_pd3dCommandList.Get());
-
 	// Mesh 持失
 	std::shared_ptr<CCubeMeshDiffused> pMesh = std::make_shared<CCubeMeshDiffused>(m_pd3dDevice.Get(), m_pd3dCommandList.Get(), 10.0f, 10.0f, 10.0f);
 	CTexture* tmpTexture = new CTexture(8, RESOURCE_TEXTURE2D, 0, 1);
@@ -282,8 +277,13 @@ void CGameFramework::BuildObjects()
 	tmpTexture->LoadTextureFromDDSFile(m_pd3dDevice.Get(), m_pd3dCommandList.Get(), L"Image/Rock01.dds", RESOURCE_TEXTURE2D, 6);
 	tmpTexture->LoadTextureFromDDSFile(m_pd3dDevice.Get(), m_pd3dCommandList.Get(), L"Image/Stone01.dds", RESOURCE_TEXTURE2D, 7);
 
-	tmpTexture->CreateSrvDescriptorHeaps(m_pd3dDevice.Get(), 8);
-	tmpTexture->CreateShaderResourceViews(m_pd3dDevice.Get(), 0, 3);
+	// Shader 持失
+	m_pShader = std::make_unique<CTmpTexturedShader>();
+	m_pShader->CreateShader(m_pd3dDevice.Get(), m_pScene->GetGraphicsRootSignature());
+	m_pShader->CreateShaderVariables(m_pd3dDevice.Get(), m_pd3dCommandList.Get());
+	m_pShader->CreateShaderVariables(m_pd3dDevice.Get(), m_pd3dCommandList.Get());
+	m_pShader->CreateSrvDescriptorHeaps(m_pd3dDevice.Get(), 8);
+	m_pShader->CreateShaderResourceViews(m_pd3dDevice.Get(), tmpTexture, 0, 3);
 
 	// Object 持失
 	m_pObject = std::make_unique<CGameObject>();
