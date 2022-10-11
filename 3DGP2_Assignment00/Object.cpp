@@ -197,11 +197,6 @@ void CTexturedModelingGameObject::LoadFrameHierarchyFromFile(ID3D12Device* pd3dD
 					std::shared_ptr<CTexturedModelingGameObject> pChild = std::make_shared<CTexturedModelingGameObject>();
 					pChild->LoadFrameHierarchyFromFile(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature, this, pInFile);
 					if (pChild) SetChild(pChild);
-#ifdef _WITH_DEBUG_FRAME_HIERARCHY
-					TCHAR pstrDebug[256] = { 0 };
-					_stprintf_s(pstrDebug, 256, _T("(Frame: %p) (Parent: %p)\n"), pChild, pGameObject);
-					OutputDebugString(pstrDebug);
-#endif
 				}
 			}
 		}

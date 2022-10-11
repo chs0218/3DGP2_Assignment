@@ -4,6 +4,13 @@
 // 22/09/20 CMesh 클래스 추가 - Leejh
 //----------------------------------------------------------------------------
 
+#define VERTEXT_POSITION				0x01
+#define VERTEXT_COLOR					0x02
+#define VERTEXT_NORMAL					0x04
+#define VERTEXT_TANGENT					0x08
+#define VERTEXT_TEXTURE_COORD0			0x10
+#define VERTEXT_TEXTURE_COORD1			0x20
+
 class CVertex
 {
 public:
@@ -42,6 +49,7 @@ public:
 class CMesh
 {
 protected:
+	UINT m_nType = 0x00;
 	UINT m_nVertices = 0;
 
 	std::vector<XMFLOAT3> m_pxmf3Positions;
