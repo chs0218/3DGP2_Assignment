@@ -139,7 +139,7 @@ CGameObject* CGameObject::FindFrame(char* pstrFrameName)
 	return nullptr;
 }
 
-void CTexturedModelingGameObject::LoadFrameHierarchyFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, CGameObject* pParent, FILE* pInFile)
+void CGameObject::LoadFrameHierarchyFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, CGameObject* pParent, FILE* pInFile)
 {
 	char pstrToken[64] = { '\0' };
 
@@ -194,7 +194,7 @@ void CTexturedModelingGameObject::LoadFrameHierarchyFromFile(ID3D12Device* pd3dD
 			{
 				for (int i = 0; i < nChilds; i++)
 				{
-					std::shared_ptr<CTexturedModelingGameObject> pChild = std::make_shared<CTexturedModelingGameObject>();
+					std::shared_ptr<CGameObject> pChild = std::make_shared<CGameObject>();
 					pChild->LoadFrameHierarchyFromFile(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature, this, pInFile);
 					if (pChild) SetChild(pChild);
 				}
@@ -207,19 +207,19 @@ void CTexturedModelingGameObject::LoadFrameHierarchyFromFile(ID3D12Device* pd3dD
 	}
 }
 
-std::shared_ptr<CTexturedModelingGameObject> CTexturedModelingGameObject::LoadGeometryFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, char* pstrFileName)
+std::shared_ptr<CGameObject> CGameObject::LoadGeometryFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, char* pstrFileName)
 {
 	FILE* pInFile = NULL;
 	::fopen_s(&pInFile, pstrFileName, "rb");
 	::rewind(pInFile);
 
-	std::shared_ptr<CTexturedModelingGameObject> pGameObject = std::make_shared<CTexturedModelingGameObject>();
+	std::shared_ptr<CGameObject> pGameObject = std::make_shared<CGameObject>();
 	pGameObject->LoadFrameHierarchyFromFile(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature, NULL, pInFile);
 
 	return(pGameObject);
 }
 
-void CTexturedModelingGameObject::LoadMaterialsFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, CGameObject* pParent, FILE* pInFile)
+void CGameObject::LoadMaterialsFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, CGameObject* pParent, FILE* pInFile)
 {
 //	char pstrToken[64] = { '\0' };
 //
