@@ -50,6 +50,23 @@ void CGameObject::ReleaseUploadBuffers()
 		m_pMesh->ReleaseUploadBuffers();
 }
 
+void CGameObject::SetChild(std::shared_ptr<CGameObject> pChild, bool bReferenceUpdate)
+{
+	if (m_pChild)
+	{
+		if (pChild) pChild->m_pSibling = m_pChild->m_pSibling;
+		m_pChild->m_pSibling = pChild;
+	}
+	else
+	{
+		m_pChild = pChild;
+	}
+	if (pChild)
+	{
+		pChild->m_pParent = this;
+	}
+}
+
 void CGameObject::SetTexture(CTexture* pTexture)
 {
 	m_nMaterials = 1;

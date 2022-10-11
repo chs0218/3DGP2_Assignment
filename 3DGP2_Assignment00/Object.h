@@ -56,7 +56,7 @@ public:
 	void ReleaseUploadBuffers();
 
 	char* GetFrameName() { return m_pstrFrameName; }
-	void SetChild(std::shared_ptr<CGameObject> pChild, bool bReferenceUpdate = false) { m_pChild = pChild; }
+	void SetChild(std::shared_ptr<CGameObject> pChild, bool bReferenceUpdate = false);
 	void SetTypes(int n_type) { m_Type = n_type; }
 	void SetTexture(CTexture* pTexture);
 	void SetMaterial(int nMaterial, CMaterial* pMaterial);
