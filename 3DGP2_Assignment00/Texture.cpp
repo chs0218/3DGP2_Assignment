@@ -1,5 +1,7 @@
 #include "stdafx.h"
 #include "Texture.h"
+#include "Object.h"
+#include "Shader.h"
 
 CTexture::CTexture(int nTextures, UINT nTextureType, int nSamplers, int nRootParameters)
 {
@@ -94,6 +96,58 @@ void CTexture::LoadTextureFromDDSFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCo
 {
 	m_pnResourceTypes[nIndex] = nResourceType;
 	m_ppd3dTextures[nIndex] = ::CreateTextureResourceFromDDSFile(pd3dDevice, pd3dCommandList, pszFileName, &m_ppd3dTextureUploadBuffers[nIndex], D3D12_RESOURCE_STATE_GENERIC_READ/*D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE*/);
+}
+
+int CTexture::LoadTextureFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, CGameObject* pParent, FILE* pInFile, CShader* pShader, UINT nIndex)
+{
+	char pstrTextureName[64] = { '\0' };
+
+	BYTE nStrLength = 64;
+	UINT nReads = (UINT)::fread(&nStrLength, sizeof(BYTE), 1, pInFile);
+	nReads = (UINT)::fread(pstrTextureName, sizeof(char), nStrLength, pInFile);
+	pstrTextureName[nStrLength] = '\0';
+
+	bool bDuplicated = false;
+	bool bLoaded = false;
+	if (strcmp(pstrTextureName, "null"))
+	{
+		bLoaded = true;
+		char pstrFilePath[64] = { '\0' };
+		strcpy_s(pstrFilePath, 64, "Model/Textures/");
+
+		bDuplicated = (pstrTextureName[0] == '@');
+		strcpy_s(pstrFilePath + 15, 64 - 15, (bDuplicated) ? (pstrTextureName + 1) : pstrTextureName);
+		strcpy_s(pstrFilePath + 15 + ((bDuplicated) ? (nStrLength - 1) : nStrLength), 64 - 15 - ((bDuplicated) ? (nStrLength - 1) : nStrLength), ".dds");
+
+		size_t nConverted = 0;
+		mbstowcs_s(&nConverted, m_ppstrTextureNames[nIndex], 64, pstrFilePath, _TRUNCATE);
+
+		if (!bDuplicated)
+		{
+			LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, m_ppstrTextureNames[nIndex], RESOURCE_TEXTURE2D, nIndex);
+			pShader->CreateShaderResourceView(pd3dDevice, this, nIndex);
+		}
+		else
+		{
+			if (pParent)
+			{
+				CGameObject* pRootGameObject = pParent;
+				while (pRootGameObject)
+				{
+					if (!pRootGameObject->m_pParent) break;
+					pRootGameObject = pRootGameObject->m_pParent;
+				}
+				D3D12_GPU_DESCRIPTOR_HANDLE d3dSrvGpuDescriptorHandle;
+				int nParameterIndex = pRootGameObject->FindReplicatedTexture(m_ppstrTextureNames[nIndex], &d3dSrvGpuDescriptorHandle);
+				if (nParameterIndex >= 0)
+				{
+					m_pd3dSrvGpuDescriptorHandles[nIndex] = d3dSrvGpuDescriptorHandle;
+					m_pnRootParameterIndices[nIndex] = nParameterIndex;
+				}
+			}
+		}
+	}
+	return(bLoaded);
 }
 
 D3D12_SHADER_RESOURCE_VIEW_DESC CTexture::GetShaderResourceViewDesc(int nIndex)

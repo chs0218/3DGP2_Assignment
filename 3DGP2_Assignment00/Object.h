@@ -7,6 +7,14 @@
 //----------------------------------------------------------------------------
 #define MAX_FRAMENAME 64
 
+#define MATERIAL_ALBEDO_MAP			0x01
+#define MATERIAL_SPECULAR_MAP		0x02
+#define MATERIAL_NORMAL_MAP			0x04
+#define MATERIAL_METALLIC_MAP		0x08
+#define MATERIAL_EMISSION_MAP		0x10
+#define MATERIAL_DETAIL_ALBEDO_MAP	0x20
+#define MATERIAL_DETAIL_NORMAL_MAP	0x40
+
 class CMesh;
 class CCamera;
 class CTexture;
@@ -28,10 +36,6 @@ protected:
 	int	m_nMaterials = 0;
 	CMaterial** m_ppMaterials = NULL;
 
-	CGameObject* m_pParent = nullptr;
-	std::shared_ptr<CGameObject> m_pChild = nullptr;
-	std::shared_ptr<CGameObject> m_pSibling = nullptr;
-
 	std::shared_ptr<CMesh> m_pMesh;
 	BoundingOrientedBox m_xmOOBB;
 
@@ -39,6 +43,10 @@ protected:
 	CB_GAMEOBJECT_INFO* m_pcbMappedGameObject = NULL;
 	int m_Type = 0;
 public:
+	CGameObject* m_pParent = nullptr;
+	std::shared_ptr<CGameObject> m_pChild = nullptr;
+	std::shared_ptr<CGameObject> m_pSibling = nullptr;
+
 	CGameObject();
 	virtual ~CGameObject();
 
@@ -51,6 +59,7 @@ public:
 	void SetChild(std::shared_ptr<CGameObject> pChild, bool bReferenceUpdate = false) { m_pChild = pChild; }
 	void SetTypes(int n_type) { m_Type = n_type; }
 	void SetTexture(CTexture* pTexture);
+	void SetMaterial(int nMaterial, CMaterial* pMaterial);
 
 	virtual void OnInitialize() { }
 	virtual void Animate(float fTimeElapsed, XMFLOAT4X4* pxmf4x4Parent = NULL);
@@ -62,6 +71,7 @@ public:
 	XMFLOAT3 GetLook();
 	XMFLOAT3 GetUp();
 	XMFLOAT3 GetRight();
+	UINT GetMeshType() { return((m_pMesh) ? m_pMesh->GetType() : 0x00); }
 
 	void SetPosition(float x, float y, float z);
 	void SetPosition(XMFLOAT3 xmf3Position);
@@ -77,7 +87,8 @@ public:
 	void UpdateTransform(XMFLOAT4X4* pxmf4x4Parent = NULL);
 	CGameObject* FindFrame(char* pstrFrameName);
 
-	void LoadFrameHierarchyFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, CGameObject* pParent, FILE* pInFile);
-	std::shared_ptr<CGameObject> LoadGeometryFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, char* pstrFileName);
-	void LoadMaterialsFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, CGameObject* pParent, FILE* pInFile);
+	void LoadFrameHierarchyFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, CGameObject* pParent, FILE* pInFile, CShader* pShader);
+	std::shared_ptr<CGameObject> LoadGeometryFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, char* pstrFileName, CShader* pShader);
+	void LoadMaterialsFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, CGameObject* pParent, FILE* pInFile, CShader* pShader);
+	int FindReplicatedTexture(_TCHAR* pstrTextureName, D3D12_GPU_DESCRIPTOR_HANDLE* pd3dSrvGpuDescriptorHandle);
 };
