@@ -92,6 +92,7 @@ public:
 	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, UINT nSubset);
 
 	void LoadMeshFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, char* pstrFileName);
+	UINT GetType() { return(m_nType); }
 };
 
 class CCubeMeshDiffused : public CMesh
