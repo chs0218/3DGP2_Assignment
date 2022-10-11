@@ -25,14 +25,15 @@ protected:
 	XMFLOAT4X4 m_xmf4x4Transform;
 	XMFLOAT4X4 m_xmf4x4World;
 
+	int	m_nMaterials = 0;
+	CMaterial** m_ppMaterials = NULL;
+
 	CGameObject* m_pParent = nullptr;
 	std::shared_ptr<CGameObject> m_pChild = nullptr;
 	std::shared_ptr<CGameObject> m_pSibling = nullptr;
 
 	std::shared_ptr<CMesh> m_pMesh;
 	BoundingOrientedBox m_xmOOBB;
-
-	CTexture* m_pTexture = NULL;
 
 	ComPtr<ID3D12Resource> m_pd3dcbGameObject = NULL;
 	CB_GAMEOBJECT_INFO* m_pcbMappedGameObject = NULL;
@@ -49,7 +50,7 @@ public:
 	char* GetFrameName() { return m_pstrFrameName; }
 	void SetChild(std::shared_ptr<CGameObject> pChild, bool bReferenceUpdate = false) { m_pChild = pChild; }
 	void SetTypes(int n_type) { m_Type = n_type; }
-	void SetTexture(CTexture* pTexture) { m_pTexture = pTexture; }
+	void SetTexture(CTexture* pTexture);
 
 	virtual void OnInitialize() { }
 	virtual void Animate(float fTimeElapsed, XMFLOAT4X4* pxmf4x4Parent = NULL);

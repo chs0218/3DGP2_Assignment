@@ -143,3 +143,41 @@ D3D12_SHADER_RESOURCE_VIEW_DESC CTexture::GetShaderResourceViewDesc(int nIndex)
 	}
 	return(d3dShaderResourceViewDesc);
 }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+CMaterial::CMaterial()
+{
+}
+
+CMaterial::~CMaterial()
+{
+	if (m_pTexture) delete m_pTexture;
+}
+
+void CMaterial::SetTexture(CTexture* pTexture)
+{
+	m_pTexture = pTexture;
+}
+
+void CMaterial::ReleaseUploadBuffers()
+{
+	if (m_pTexture) m_pTexture->ReleaseUploadBuffers();
+}
+
+void CMaterial::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList)
+{
+	/*pd3dCommandList->SetGraphicsRoot32BitConstants(1, 4, &m_xmf4AmbientColor, 16);
+	pd3dCommandList->SetGraphicsRoot32BitConstants(1, 4, &m_xmf4AlbedoColor, 20);
+	pd3dCommandList->SetGraphicsRoot32BitConstants(1, 4, &m_xmf4SpecularColor, 24);
+	pd3dCommandList->SetGraphicsRoot32BitConstants(1, 4, &m_xmf4EmissiveColor, 28);
+
+	pd3dCommandList->SetGraphicsRoot32BitConstants(1, 1, &m_nType, 32);*/
+
+	if (m_pTexture) m_pTexture->UpdateShaderVariables(pd3dCommandList);
+}
+
+void CMaterial::ReleaseShaderVariables()
+{
+	if (m_pTexture) m_pTexture->ReleaseShaderVariables();
+}

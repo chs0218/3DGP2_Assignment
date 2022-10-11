@@ -12,8 +12,14 @@ CGameObject::CGameObject()
 CGameObject::~CGameObject()
 {
 	ReleaseShaderVariables();
-	if (m_pTexture)
-		delete m_pTexture;
+	if (m_nMaterials > 0)
+	{
+		for (int i = 0; i < m_nMaterials; i++)
+		{
+			if (m_ppMaterials[i]) m_ppMaterials[i]->Release();
+		}
+	}
+	if (m_ppMaterials) delete[] m_ppMaterials;
 }
 
 void CGameObject::CreateShaderVariables(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
@@ -44,6 +50,18 @@ void CGameObject::ReleaseUploadBuffers()
 		m_pMesh->ReleaseUploadBuffers();
 }
 
+void CGameObject::SetTexture(CTexture* pTexture)
+{
+	m_nMaterials = 1;
+	m_ppMaterials = new CMaterial*[m_nMaterials];
+	for (int i = 0; i < m_nMaterials; ++i)
+	{
+		m_ppMaterials[i] = new CMaterial();
+		m_ppMaterials[i]->SetTexture(pTexture);
+	}
+
+}
+
 void CGameObject::Animate(float fTimeElapsed, XMFLOAT4X4* pxmf4x4Parent)
 {
 	XMFLOAT3 m_xmf3RevolutionAxis{ 0.0f, 1.0f, 0.0f };
@@ -61,11 +79,17 @@ void CGameObject::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pC
 	{
 		// CGameObject의 정보를 넘길 버퍼가 있고, 해당 버퍼에 대한 CPU 포인터가 있으면 UpdateShaderVariables 함수를 호출한다.
 		UpdateShaderVariables(pd3dCommandList);
-		if (m_pTexture)
-			m_pTexture->UpdateShaderVariables(pd3dCommandList);
-		// 여기서 메쉬의 렌더를 한다.
-		m_pMesh->OnPreRender(pd3dCommandList);
-		m_pMesh->Render(pd3dCommandList, 0);
+
+		for (int i = 0; i < m_nMaterials; ++i)
+		{
+			if (m_ppMaterials[i])
+			{
+				m_ppMaterials[i]->UpdateShaderVariables(pd3dCommandList);
+			}
+			// 여기서 메쉬의 렌더를 한다.
+			m_pMesh->OnPreRender(pd3dCommandList);
+			m_pMesh->Render(pd3dCommandList, i);
+		}
 	}
 
 	if (m_pChild) m_pChild->Render(pd3dCommandList, pCamera);
