@@ -7,6 +7,7 @@
 #include "Camera.h"
 #include "Texture.h"
 
+class CPlayer;
 class CGameFramework
 {
 private:
@@ -56,8 +57,8 @@ private:
 	HANDLE m_hFenceEvent;
 
 	std::unique_ptr<CScene> m_pScene = NULL;
+	std::unique_ptr<CPlayer> m_pPlayer = NULL;
 	std::unique_ptr<CGameObject> m_pObject = NULL;
-	std::unique_ptr<CGameObject> m_ptmpObject = NULL;
 	std::unique_ptr<CShader> m_pShader = NULL;
 	std::unique_ptr<CCamera> m_pCamera = NULL;
 

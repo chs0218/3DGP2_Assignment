@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "GameFramework.h"
+#include "Player.h"
 
 CGameFramework::CGameFramework()
 {
@@ -307,6 +308,13 @@ void CGameFramework::BuildObjects()
 	m_pObject->SetPosition(XMFLOAT3(0.0f, 0.0f, 0.0f));
 	m_pObject->SetScale(3.0f, 3.0f, 3.0f);
 	m_pObject->Rotate(0.0f, 45.0f, 0.0f);
+
+	m_pPlayer = std::make_unique<CPlayer>(m_pd3dDevice.Get(), m_pd3dCommandList.Get(), m_pScene->GetGraphicsRootSignature());
+	m_pPlayer->SetChild(SuperCobraObject);
+	m_pPlayer->PrepareAnimate();
+	m_pPlayer->SetPosition(XMFLOAT3(10.0f, 0.0f, 0.0f));
+	m_pPlayer->SetScale(3.0f, 3.0f, 3.0f);
+	m_pPlayer->Rotate(0.0f, -45.0f, 0.0f);
 	
 #endif // RENDER_TMPTEXTUREDBOX
 
@@ -481,10 +489,9 @@ void CGameFramework::FrameAdvance()
 		m_pObject->UpdateTransform(NULL);
 		m_pObject->Render(m_pd3dCommandList.Get());
 	}
-	if (m_ptmpObject)
+	if (m_pPlayer)
 	{
-		m_ptmpObject->UpdateTransform(NULL);
-		m_ptmpObject->Render(m_pd3dCommandList.Get());
+		m_pPlayer->Render(m_pd3dCommandList.Get());
 	}
 	/*현재 렌더 타겟에 대한 렌더링이 끝나기를 기다린다. GPU가 렌더 타겟(버퍼)을 더 이상 사용하지 않으면 렌더 타겟
 	의 상태는 프리젠트 상태(D3D12_RESOURCE_STATE_PRESENT)로 바뀔 것이다.*/
