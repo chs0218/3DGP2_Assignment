@@ -15,7 +15,6 @@ public:
 	CTexture(int nTextureResources, UINT nResourceType, int nSamplers, int nRootParameters);
 	virtual ~CTexture();
 private:
-	int	m_nReferences = 0;
 	UINT m_nTextureType;		// Texture 타입
 	int	m_nTextures = 0;		// Texture 개수
 	ID3D12Resource** m_ppd3dTextures;	// Texture 리소스
@@ -31,9 +30,6 @@ private:
 	int* m_pnRootParameterIndices;		// 루트파라미터 인덱스
 	D3D12_GPU_DESCRIPTOR_HANDLE* m_pd3dSrvGpuDescriptorHandles;	// Srv 디스크립터 핸들
 public:
-	void AddRef() { m_nReferences++; }
-	void Release() { if (--m_nReferences <= 0) delete this; }
-
 	int GetTextures() { return(m_nTextures); }
 	ID3D12Resource* GetResource(int nIndex) { return(m_ppd3dTextures[nIndex]); }
 	_TCHAR* GetTextureName(int nIndex) { return(m_ppstrTextureNames[nIndex]); }
@@ -60,16 +56,8 @@ class CMaterial
 public:
 	CMaterial();
 	virtual ~CMaterial();
-
-private:
-	int	m_nReferences = 0;
-
 public:
-	void AddRef() { m_nReferences++; }
-	void Release() { if (--m_nReferences <= 0) delete this; }
-
-public:
-	CTexture* m_pTexture = NULL;
+	std::shared_ptr<CTexture> m_pTexture = NULL;
 
 	XMFLOAT4 m_xmf4AlbedoColor = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 	XMFLOAT4 m_xmf4EmissiveColor = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
@@ -77,7 +65,7 @@ public:
 	XMFLOAT4 m_xmf4AmbientColor = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
 
 	void SetMaterialType(UINT nType) { m_nType |= nType; }
-	void SetTexture(CTexture* pTexture);
+	void SetTexture(std::shared_ptr<CTexture> pTexture);
 
 	virtual void UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList);
 	virtual void UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList, CB_GAMEOBJECT_INFO* pInfo);

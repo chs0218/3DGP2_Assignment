@@ -43,7 +43,7 @@ protected:
 	XMFLOAT4X4 m_xmf4x4World;
 
 	int	m_nMaterials = 0;
-	CMaterial** m_ppMaterials = NULL;
+	std::vector<std::shared_ptr<CMaterial>> m_ppMaterials;
 
 	std::shared_ptr<CMesh> m_pMesh;
 	BoundingOrientedBox m_xmOOBB;
@@ -67,8 +67,7 @@ public:
 	char* GetFrameName() { return m_pstrFrameName; }
 	void SetChild(std::shared_ptr<CGameObject> pChild, bool bReferenceUpdate = false);
 	void SetTypes(int n_type) { m_Type = n_type; }
-	void SetTexture(CTexture* pTexture);
-	void SetMaterial(int nMaterial, CMaterial* pMaterial);
+	void SetMaterial(int nMaterial, std::shared_ptr<CMaterial> pMaterial);
 	void SetTransform(XMFLOAT4X4 xmf4x4Transform) { m_xmf4x4Transform = xmf4x4Transform; }
 
 	virtual void OnInitialize() { }

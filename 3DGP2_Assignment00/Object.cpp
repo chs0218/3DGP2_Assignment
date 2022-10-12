@@ -12,14 +12,6 @@ CGameObject::CGameObject()
 CGameObject::~CGameObject()
 {
 	ReleaseShaderVariables();
-	if (m_nMaterials > 0)
-	{
-		for (int i = 0; i < m_nMaterials; i++)
-		{
-			if (m_ppMaterials[i]) m_ppMaterials[i]->Release();
-		}
-	}
-	if (m_ppMaterials) delete[] m_ppMaterials;
 }
 
 void CGameObject::CreateShaderVariables(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
@@ -65,23 +57,9 @@ void CGameObject::SetChild(std::shared_ptr<CGameObject> pChild, bool bReferenceU
 	}
 }
 
-void CGameObject::SetTexture(CTexture* pTexture)
+void CGameObject::SetMaterial(int nMaterial, std::shared_ptr<CMaterial> pMaterial)
 {
-	m_nMaterials = 1;
-	m_ppMaterials = new CMaterial*[m_nMaterials];
-	for (int i = 0; i < m_nMaterials; ++i)
-	{
-		m_ppMaterials[i] = new CMaterial();
-		m_ppMaterials[i]->SetTexture(pTexture);
-	}
-
-}
-
-void CGameObject::SetMaterial(int nMaterial, CMaterial* pMaterial)
-{
-	if (m_ppMaterials[nMaterial]) m_ppMaterials[nMaterial]->Release();
 	m_ppMaterials[nMaterial] = pMaterial;
-	if (m_ppMaterials[nMaterial]) m_ppMaterials[nMaterial]->AddRef();
 }
 
 void CGameObject::Animate(float fTimeElapsed, XMFLOAT4X4* pxmf4x4Parent)
@@ -285,11 +263,11 @@ void CGameObject::LoadMaterialsFromFile(ID3D12Device* pd3dDevice, ID3D12Graphics
 
 	UINT nReads = (UINT)::fread(&m_nMaterials, sizeof(int), 1, pInFile);
 
-	m_ppMaterials = new CMaterial * [m_nMaterials];
+	m_ppMaterials.resize(m_nMaterials);
 	for (int i = 0; i < m_nMaterials; i++) m_ppMaterials[i] = NULL;
 
-	CMaterial* pMaterial = NULL;
-	CTexture* pTexture = NULL;
+	std::shared_ptr<CMaterial> pMaterial = NULL;
+	std::shared_ptr<CTexture> pTexture = NULL;
 
 	for (; ; )
 	{
@@ -301,8 +279,8 @@ void CGameObject::LoadMaterialsFromFile(ID3D12Device* pd3dDevice, ID3D12Graphics
 		{
 			nReads = (UINT)::fread(&nMaterial, sizeof(int), 1, pInFile);
 
-			pMaterial = new CMaterial();
-			pTexture = new CTexture(7, RESOURCE_TEXTURE2D, 0, 1); //0:Albedo, 1:Specular, 2:Metallic, 3:Normal, 4:Emission, 5:DetailAlbedo, 6:DetailNormal
+			pMaterial = std::make_shared<CMaterial>();
+			pTexture = std::make_shared<CTexture>(7, RESOURCE_TEXTURE2D, 0, 1); //0:Albedo, 1:Specular, 2:Metallic, 3:Normal, 4:Emission, 5:DetailAlbedo, 6:DetailNormal
 			pTexture->SetRootParameterIndex(0, 2);
 
 			pMaterial->SetTexture(pTexture);

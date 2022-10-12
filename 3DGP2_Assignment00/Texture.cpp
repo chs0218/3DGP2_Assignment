@@ -206,14 +206,11 @@ CMaterial::CMaterial()
 
 CMaterial::~CMaterial()
 {
-	if (m_pTexture) delete m_pTexture;
 }
 
-void CMaterial::SetTexture(CTexture* pTexture)
+void CMaterial::SetTexture(std::shared_ptr<CTexture> pTexture)
 {
-	if (m_pTexture) m_pTexture->Release();
 	m_pTexture = pTexture;
-	if (m_pTexture) m_pTexture->AddRef();
 }
 
 void CMaterial::ReleaseUploadBuffers()
