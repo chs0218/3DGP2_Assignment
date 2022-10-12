@@ -301,11 +301,13 @@ void CGameFramework::BuildObjects()
 	SuperCobraObject = SuperCobraObject->LoadGeometryFromFile(m_pd3dDevice.Get(), m_pd3dCommandList.Get(), m_pScene->GetGraphicsRootSignature(), "Model\\SuperCobra.bin", m_pShader.get());
 
 	// Object 생성
-	m_pObject = std::make_unique<CGameObject>();
+	m_pObject = std::make_unique<CSuperCobraObject>();
 	m_pObject->SetChild(SuperCobraObject);
+	m_pObject->PrepareAnimate();
 	m_pObject->CreateShaderVariables(m_pd3dDevice.Get(), m_pd3dCommandList.Get());
 	m_pObject->SetPosition(XMFLOAT3(0.0f, 0.0f, 0.0f));
 	m_pObject->SetScale(3.0f, 3.0f, 3.0f);
+
 #endif // RENDER_TMPTEXTUREDBOX
 
 	//씬 객체를 생성하기 위하여 필요한 그래픽 명령 리스트들을 명령 큐에 추가한다. 
