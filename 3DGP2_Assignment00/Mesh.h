@@ -1,8 +1,5 @@
 #pragma once
 #include "stdafx.h"
-//----------------------------------------------------------------------------
-// 22/09/20 CMesh 클래스 추가 - Leejh
-//----------------------------------------------------------------------------
 
 #define VERTEXT_POSITION				0x01
 #define VERTEXT_COLOR					0x02
@@ -11,36 +8,17 @@
 #define VERTEXT_TEXTURE_COORD0			0x10
 #define VERTEXT_TEXTURE_COORD1			0x20
 
-class CVertex
+class CTexturedVertexWithNormal
 {
 public:
 	XMFLOAT3						m_xmf3Position;
-
-public:
-	CVertex() { m_xmf3Position = XMFLOAT3(0.0f, 0.0f, 0.0f); }
-	CVertex(XMFLOAT3 xmf3Position) { m_xmf3Position = xmf3Position; }
-	~CVertex() { }
-};
-
-class CVertexWithNormal : public CVertex
-{
-public:
-	XMFLOAT3						m_xmf3Normal;
-
-public:
-	CVertexWithNormal() { m_xmf3Position = XMFLOAT3(0.0f, 0.0f, 0.0f); m_xmf3Normal = XMFLOAT3(0.0f, 0.0f, 0.0f); }
-	CVertexWithNormal(XMFLOAT3 xmf3Position, XMFLOAT3 xmf3Normal) { m_xmf3Position = xmf3Position; m_xmf3Normal = xmf3Normal; }
-	~CVertexWithNormal() { }
-};
-
-class CTexturedVertexWithNormal : public CVertexWithNormal
-{
-public:
 	XMFLOAT2						m_xmf2TexCoord;
-
+	XMFLOAT3						m_xmf3Normal;
+	XMFLOAT3						m_xmf3Tangent;
+	XMFLOAT3						m_xmf3BiTangent;
 public:
-	CTexturedVertexWithNormal() { m_xmf3Position = XMFLOAT3(0.0f, 0.0f, 0.0f); m_xmf3Normal = XMFLOAT3(0.0f, 0.0f, 0.0f); m_xmf2TexCoord = XMFLOAT2(0.0f, 0.0f); }
-	CTexturedVertexWithNormal(XMFLOAT3 xmf3Position, XMFLOAT3 xmf3Normal, XMFLOAT2 xmf2TexCoord) { m_xmf3Position = xmf3Position; m_xmf3Normal = xmf3Normal; m_xmf2TexCoord = xmf2TexCoord; }
+	CTexturedVertexWithNormal() { m_xmf3Position = XMFLOAT3(0.0f, 0.0f, 0.0f); m_xmf3Normal = XMFLOAT3(0.0f, 0.0f, 0.0f); m_xmf2TexCoord = XMFLOAT2(0.0f, 0.0f); m_xmf3Tangent = XMFLOAT3(0.0f, 0.0f, 0.0f); m_xmf3BiTangent = XMFLOAT3(0.0f, 0.0f, 0.0f); }
+	CTexturedVertexWithNormal(XMFLOAT3 xmf3Position, XMFLOAT2 xmf2TexCoord, XMFLOAT3 xmf3Normal) { m_xmf3Position = xmf3Position; m_xmf2TexCoord = xmf2TexCoord; m_xmf3Normal = xmf3Normal; m_xmf3Tangent = XMFLOAT3(0.0f, 0.0f, 0.0f); m_xmf3BiTangent = XMFLOAT3(0.0f, 0.0f, 0.0f); }
 	~CTexturedVertexWithNormal() { }
 };
 //-----------------------------------------------------------------------------

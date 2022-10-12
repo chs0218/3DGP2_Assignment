@@ -190,40 +190,40 @@ CCubeMeshDiffused::CCubeMeshDiffused(ID3D12Device* pd3dDevice, ID3D12GraphicsCom
 
 	//정점 버퍼는 직육면체의 꼭지점 24개에 대한 정점 데이터를 가진다. 
 	//front
-	pVertices[0] = CTexturedVertexWithNormal(XMFLOAT3(+fx, -fy, +fz), XMFLOAT3(0.0f, 0.0f, 1.0f), XMFLOAT2(0.0f, 1.0f));
-	pVertices[1] = CTexturedVertexWithNormal(XMFLOAT3(+fx, +fy, +fz), XMFLOAT3(0.0f, 0.0f, 1.0f), XMFLOAT2(0.0f, 0.0f));
-	pVertices[2] = CTexturedVertexWithNormal(XMFLOAT3(-fx, +fy, +fz), XMFLOAT3(0.0f, 0.0f, 1.0f), XMFLOAT2(1.0f, 0.0f));
-	pVertices[3] = CTexturedVertexWithNormal(XMFLOAT3(-fx, -fy, +fz), XMFLOAT3(0.0f, 0.0f, 1.0f), XMFLOAT2(1.0f, 1.0f));
+	pVertices[0] = CTexturedVertexWithNormal(XMFLOAT3(+fx, -fy, +fz), XMFLOAT2(0.0f, 1.0f), XMFLOAT3(0.0f, 0.0f, 1.0f));
+	pVertices[1] = CTexturedVertexWithNormal(XMFLOAT3(+fx, +fy, +fz), XMFLOAT2(0.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, 1.0f));
+	pVertices[2] = CTexturedVertexWithNormal(XMFLOAT3(-fx, +fy, +fz), XMFLOAT2(1.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, 1.0f));
+	pVertices[3] = CTexturedVertexWithNormal(XMFLOAT3(-fx, -fy, +fz), XMFLOAT2(1.0f, 1.0f), XMFLOAT3(0.0f, 0.0f, 1.0f));
 
 	// back
-	pVertices[4] = CTexturedVertexWithNormal(XMFLOAT3(-fx, +fy, -fz), XMFLOAT3(0.0f, 0.0f, -1.0f), XMFLOAT2(0.0f, 0.0f));
-	pVertices[5] = CTexturedVertexWithNormal(XMFLOAT3(+fx, +fy, -fz), XMFLOAT3(0.0f, 0.0f, -1.0f), XMFLOAT2(1.0f, 0.0f));
-	pVertices[6] = CTexturedVertexWithNormal(XMFLOAT3(+fx, -fy, -fz), XMFLOAT3(0.0f, 0.0f, -1.0f), XMFLOAT2(1.0f, 1.0f));
-	pVertices[7] = CTexturedVertexWithNormal(XMFLOAT3(-fx, -fy, -fz), XMFLOAT3(0.0f, 0.0f, -1.0f), XMFLOAT2(0.0f, 1.0f));
+	pVertices[4] = CTexturedVertexWithNormal(XMFLOAT3(-fx, +fy, -fz), XMFLOAT2(0.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, -1.0f));
+	pVertices[5] = CTexturedVertexWithNormal(XMFLOAT3(+fx, +fy, -fz), XMFLOAT2(1.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, -1.0f));
+	pVertices[6] = CTexturedVertexWithNormal(XMFLOAT3(+fx, -fy, -fz), XMFLOAT2(1.0f, 1.0f), XMFLOAT3(0.0f, 0.0f, -1.0f));
+	pVertices[7] = CTexturedVertexWithNormal(XMFLOAT3(-fx, -fy, -fz), XMFLOAT2(0.0f, 1.0f), XMFLOAT3(0.0f, 0.0f, -1.0f));
 
 	// top
-	pVertices[8] = CTexturedVertexWithNormal(XMFLOAT3(-fx, +fy, +fz), XMFLOAT3(0.0f, 1.0f, 0.0f), XMFLOAT2(0.0f, 0.0f));
-	pVertices[9] = CTexturedVertexWithNormal(XMFLOAT3(+fx, +fy, +fz), XMFLOAT3(0.0f, 1.0f, 0.0f), XMFLOAT2(1.0f, 0.0f));
-	pVertices[10] = CTexturedVertexWithNormal(XMFLOAT3(+fx, +fy, -fz), XMFLOAT3(0.0f, 1.0f, 0.0f), XMFLOAT2(0.0f, 1.0f));
-	pVertices[11] = CTexturedVertexWithNormal(XMFLOAT3(-fx, +fy, -fz), XMFLOAT3(0.0f, 1.0f, 0.0f), XMFLOAT2(1.0f, 1.0f));
+	pVertices[8] = CTexturedVertexWithNormal(XMFLOAT3(-fx, +fy, +fz), XMFLOAT2(0.0f, 0.0f), XMFLOAT3(0.0f, 1.0f, 0.0f));
+	pVertices[9] = CTexturedVertexWithNormal(XMFLOAT3(+fx, +fy, +fz), XMFLOAT2(1.0f, 0.0f), XMFLOAT3(0.0f, 1.0f, 0.0f));
+	pVertices[10] = CTexturedVertexWithNormal(XMFLOAT3(+fx, +fy, -fz), XMFLOAT2(0.0f, 1.0f), XMFLOAT3(0.0f, 1.0f, 0.0f));
+	pVertices[11] = CTexturedVertexWithNormal(XMFLOAT3(-fx, +fy, -fz), XMFLOAT2(1.0f, 1.0f), XMFLOAT3(0.0f, 1.0f, 0.0f));
 
 	// bottom
-	pVertices[12] = CTexturedVertexWithNormal(XMFLOAT3(+fx, -fy, -fz), XMFLOAT3(0.0f, -1.0f, 0.0f), XMFLOAT2(0.0f, 0.0f));
-	pVertices[13] = CTexturedVertexWithNormal(XMFLOAT3(+fx, -fy, +fz), XMFLOAT3(0.0f, -1.0f, 0.0f), XMFLOAT2(0.0f, 1.0f));
-	pVertices[14] = CTexturedVertexWithNormal(XMFLOAT3(-fx, -fy, +fz), XMFLOAT3(0.0f, -1.0f, 0.0f), XMFLOAT2(1.0f, 1.0f));
-	pVertices[15] = CTexturedVertexWithNormal(XMFLOAT3(-fx, -fy, -fz), XMFLOAT3(0.0f, -1.0f, 0.0f), XMFLOAT2(1.0f, 0.0f));
+	pVertices[12] = CTexturedVertexWithNormal(XMFLOAT3(+fx, -fy, -fz), XMFLOAT2(0.0f, 0.0f), XMFLOAT3(0.0f, -1.0f, 0.0f));
+	pVertices[13] = CTexturedVertexWithNormal(XMFLOAT3(+fx, -fy, +fz), XMFLOAT2(0.0f, 1.0f), XMFLOAT3(0.0f, -1.0f, 0.0f));
+	pVertices[14] = CTexturedVertexWithNormal(XMFLOAT3(-fx, -fy, +fz), XMFLOAT2(1.0f, 1.0f), XMFLOAT3(0.0f, -1.0f, 0.0f));
+	pVertices[15] = CTexturedVertexWithNormal(XMFLOAT3(-fx, -fy, -fz), XMFLOAT2(1.0f, 0.0f), XMFLOAT3(0.0f, -1.0f, 0.0f));
 
 	// left
-	pVertices[17] = CTexturedVertexWithNormal(XMFLOAT3(-fx, +fy, -fz), XMFLOAT3(-1.0f, 0.0f, 0.0f), XMFLOAT2(0.0f, 0.0f));
-	pVertices[16] = CTexturedVertexWithNormal(XMFLOAT3(-fx, +fy, +fz), XMFLOAT3(-1.0f, 0.0f, 0.0f), XMFLOAT2(1.0f, 0.0f));
-	pVertices[18] = CTexturedVertexWithNormal(XMFLOAT3(-fx, -fy, -fz), XMFLOAT3(-1.0f, 0.0f, 0.0f), XMFLOAT2(1.0f, 1.0f));
-	pVertices[19] = CTexturedVertexWithNormal(XMFLOAT3(-fx, -fy, +fz), XMFLOAT3(-1.0f, 0.0f, 0.0f), XMFLOAT2(0.0f, 1.0f));
+	pVertices[17] = CTexturedVertexWithNormal(XMFLOAT3(-fx, +fy, -fz), XMFLOAT2(0.0f, 0.0f), XMFLOAT3(-1.0f, 0.0f, 0.0f));
+	pVertices[16] = CTexturedVertexWithNormal(XMFLOAT3(-fx, +fy, +fz), XMFLOAT2(1.0f, 0.0f), XMFLOAT3(-1.0f, 0.0f, 0.0f));
+	pVertices[18] = CTexturedVertexWithNormal(XMFLOAT3(-fx, -fy, -fz), XMFLOAT2(1.0f, 1.0f), XMFLOAT3(-1.0f, 0.0f, 0.0f));
+	pVertices[19] = CTexturedVertexWithNormal(XMFLOAT3(-fx, -fy, +fz), XMFLOAT2(0.0f, 1.0f), XMFLOAT3(-1.0f, 0.0f, 0.0f));
 
 	// right
-	pVertices[20] = CTexturedVertexWithNormal(XMFLOAT3(+fx, +fy, -fz), XMFLOAT3(1.0f, 0.0f, 0.0f), XMFLOAT2(0.0f, 0.0f));
-	pVertices[21] = CTexturedVertexWithNormal(XMFLOAT3(+fx, +fy, +fz), XMFLOAT3(1.0f, 0.0f, 0.0f), XMFLOAT2(1.0f, 0.0f));
-	pVertices[22] = CTexturedVertexWithNormal(XMFLOAT3(+fx, -fy, +fz), XMFLOAT3(1.0f, 0.0f, 0.0f), XMFLOAT2(1.0f, 1.0f));
-	pVertices[23] = CTexturedVertexWithNormal(XMFLOAT3(+fx, -fy, -fz), XMFLOAT3(1.0f, 0.0f, 0.0f), XMFLOAT2(0.0f, 1.0f));
+	pVertices[20] = CTexturedVertexWithNormal(XMFLOAT3(+fx, +fy, -fz), XMFLOAT2(0.0f, 0.0f), XMFLOAT3(1.0f, 0.0f, 0.0f));
+	pVertices[21] = CTexturedVertexWithNormal(XMFLOAT3(+fx, +fy, +fz), XMFLOAT2(1.0f, 0.0f), XMFLOAT3(1.0f, 0.0f, 0.0f));
+	pVertices[22] = CTexturedVertexWithNormal(XMFLOAT3(+fx, -fy, +fz), XMFLOAT2(1.0f, 1.0f), XMFLOAT3(1.0f, 0.0f, 0.0f));
+	pVertices[23] = CTexturedVertexWithNormal(XMFLOAT3(+fx, -fy, -fz), XMFLOAT2(0.0f, 1.0f), XMFLOAT3(1.0f, 0.0f, 0.0f));
 
 	m_pd3dPositionBuffer = ::CreateBufferResource(pd3dDevice, pd3dCommandList, pVertices, m_nStride * m_nVertices, D3D12_HEAP_TYPE_DEFAULT, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER, &m_pd3dPositionUploadBuffer);
 	
