@@ -36,7 +36,7 @@ void CMesh::OnPreRender(ID3D12GraphicsCommandList* pd3dCommandList)
 
 	// 정점 버퍼 뷰를 파이프라인의 입력 슬롯에 binding 한다.
 	// 첫번째 인자는 입력 슬롯, 두번째는 정점 뷰의 개수, 세번째는 정점 버퍼 뷰의 첫 원소를 가르키는 포인터이다.
-	pd3dCommandList->IASetVertexBuffers(m_nSlot, m_nVertexBufferViews, m_pd3dVertexBufferViews.data());
+	pd3dCommandList->IASetVertexBuffers(m_nSlot, m_pd3dVertexBufferViews.size(), m_pd3dVertexBufferViews.data());
 }
 
 void CMesh::Render(ID3D12GraphicsCommandList* pd3dCommandList, UINT nSubset)

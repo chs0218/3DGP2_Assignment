@@ -226,10 +226,10 @@ void CMaterial::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList
 
 void CMaterial::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList, CB_GAMEOBJECT_INFO* pInfo)
 {
-	pInfo->m_xmf4x4Material.m_cAmbient = XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f);
-	pInfo->m_xmf4x4Material.m_cDiffuse = XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f);
-	pInfo->m_xmf4x4Material.m_cEmissive = XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f);
-	pInfo->m_xmf4x4Material.m_cSpecular = XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f);
+	pInfo->m_xmf4x4Material.m_cAmbient = m_xmf4AmbientColor;
+	pInfo->m_xmf4x4Material.m_cDiffuse = m_xmf4AlbedoColor;
+	pInfo->m_xmf4x4Material.m_cEmissive = m_xmf4EmissiveColor;
+	pInfo->m_xmf4x4Material.m_cSpecular = m_xmf4SpecularColor;
 	pInfo->m_TexMask = m_nType;
 	if (m_pTexture) m_pTexture->UpdateShaderVariables(pd3dCommandList);
 }

@@ -44,6 +44,19 @@ struct VS_OUTPUT
 
 float4 PS_Tmp(VS_OUTPUT input) : SV_TARGET
 {
-	float4 cColor = gtxtTexture[gnTexturesMask].Sample(gSamplerState, input.uv);
+	float4 cAlbedoColor = float4(0.0f, 0.0f, 0.0f, 1.0f);
+	float4 cSpecularColor = float4(0.0f, 0.0f, 0.0f, 1.0f);
+	float4 cNormalColor = float4(0.0f, 0.0f, 0.0f, 1.0f);
+	float4 cMetallicColor = float4(0.0f, 0.0f, 0.0f, 1.0f);
+	float4 cEmissionColor = float4(0.0f, 0.0f, 0.0f, 1.0f);
+
+	if (gnTexturesMask & MATERIAL_ALBEDO_MAP) cAlbedoColor = gtxMappedTexture[0].Sample(gSamplerState, input.uv);
+	if (gnTexturesMask & MATERIAL_SPECULAR_MAP) cSpecularColor = gtxMappedTexture[1].Sample(gSamplerState, input.uv);
+	if (gnTexturesMask & MATERIAL_NORMAL_MAP) cNormalColor = gtxMappedTexture[2].Sample(gSamplerState, input.uv);
+	if (gnTexturesMask & MATERIAL_METALLIC_MAP) cMetallicColor = gtxMappedTexture[3].Sample(gSamplerState, input.uv);
+	if (gnTexturesMask & MATERIAL_EMISSION_MAP) cEmissionColor = gtxMappedTexture[4].Sample(gSamplerState, input.uv);
+
+	float4 cColor = cAlbedoColor + cSpecularColor + cEmissionColor;
+
 	return(cColor);
 }

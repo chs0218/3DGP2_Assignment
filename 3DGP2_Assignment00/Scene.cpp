@@ -27,7 +27,7 @@ void CScene::CreateGraphicsRootSignature(ID3D12Device* pd3dDevice)
 	D3D12_DESCRIPTOR_RANGE pd3dDescriptorRanges[2];
 	pd3dDescriptorRanges[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
 	pd3dDescriptorRanges[0].NumDescriptors = 7;
-	pd3dDescriptorRanges[0].BaseShaderRegister = 0; //t0 ~ t6: gtxtTexture
+	pd3dDescriptorRanges[0].BaseShaderRegister = 0; //t0 ~ t6: MappingTexture
 	pd3dDescriptorRanges[0].RegisterSpace = 0;
 	pd3dDescriptorRanges[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
 

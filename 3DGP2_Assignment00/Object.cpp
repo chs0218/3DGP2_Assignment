@@ -90,9 +90,6 @@ void CGameObject::Animate(float fTimeElapsed, XMFLOAT4X4* pxmf4x4Parent)
 	float  m_fRotationSpeed = 30.0f;
 
 	Rotate(&m_xmf3RevolutionAxis, m_fRotationSpeed * fTimeElapsed);
-
-	if (m_pChild) m_pChild->Animate(fTimeElapsed, &m_xmf4x4Transform);
-	if (m_pSibling) m_pSibling->Animate(fTimeElapsed, pxmf4x4Parent);
 }
 
 void CGameObject::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera)
@@ -154,6 +151,10 @@ void CGameObject::SetPosition(XMFLOAT3 xmf3Position)
 
 void CGameObject::SetScale(float x, float y, float z)
 {
+	XMMATRIX mtxScale = XMMatrixScaling(x, y, z);
+	m_xmf4x4Transform = Matrix4x4::Multiply(mtxScale, m_xmf4x4Transform);
+
+	UpdateTransform(NULL);
 }
 
 void CGameObject::Rotate(float fPitch, float fYaw, float fRoll)
@@ -251,6 +252,7 @@ void CGameObject::LoadFrameHierarchyFromFile(ID3D12Device* pd3dDevice, ID3D12Gra
 			break;
 		}
 	}
+	CreateShaderVariables(pd3dDevice, pd3dCommandList);
 }
 
 std::shared_ptr<CGameObject> CGameObject::LoadGeometryFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, const char* pstrFileName, CShader* pShader)
@@ -295,11 +297,9 @@ void CGameObject::LoadMaterialsFromFile(ID3D12Device* pd3dDevice, ID3D12Graphics
 			pTexture->SetRootParameterIndex(0, 2);
 
 			pMaterial->SetTexture(pTexture);
-			//	pMaterial->SetShader(pShader);
 			SetMaterial(nMaterial, pMaterial);
 
 			UINT nMeshType = GetMeshType();
-			//if (nMeshType & VERTEXT_NORMAL_TEXTURE) pMaterial->SetStandardShader();
 		}
 		else if (!strcmp(pstrToken, "<AlbedoColor>:"))
 		{

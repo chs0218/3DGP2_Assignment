@@ -48,24 +48,8 @@ using Microsoft::WRL::ComPtr;
 #define FRAME_BUFFER_WIDTH 800
 #define FRAME_BUFFER_HEIGHT 600
 
-#define RENDER_TMPTEXTUREDBOX
+//#define RENDER_TMPTEXTUREDBOX
 
-enum class PLAYERSTATE_TYPE
-{
-	IDLE,
-	WALK,
-	RUN,
-	EVASION
-};
-
-enum class MESSAGE_TYPE
-{
-	Msg_Key_Down_Evasion,
-	Msg_Key_Up_Evasion,
-	Msg_Key_Down_Run,
-	Msg_Key_Up_Run,
-	Msg_None,
-};
 //----------------------------------------------------------------------------
 // 22/09/21 CreateBufferResource 함수 정의 - ChoiHS
 //----------------------------------------------------------------------------
