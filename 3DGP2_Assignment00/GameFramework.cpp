@@ -297,12 +297,12 @@ void CGameFramework::BuildObjects()
 	m_pShader->CreateShaderVariables(m_pd3dDevice.Get(), m_pd3dCommandList.Get());
 	m_pShader->CreateSrvDescriptorHeaps(m_pd3dDevice.Get(), 60);
 
-	std::shared_ptr<CGameObject> miObject = std::make_shared<CGameObject>();
-	miObject = miObject->LoadGeometryFromFile(m_pd3dDevice.Get(), m_pd3dCommandList.Get(), m_pScene->GetGraphicsRootSignature(), "Model\\SuperCobra.bin", m_pShader.get());
+	std::shared_ptr<CGameObject> SuperCobraObject = std::make_shared<CGameObject>();
+	SuperCobraObject = SuperCobraObject->LoadGeometryFromFile(m_pd3dDevice.Get(), m_pd3dCommandList.Get(), m_pScene->GetGraphicsRootSignature(), "Model\\SuperCobra.bin", m_pShader.get());
 
 	// Object »ý¼º
 	m_pObject = std::make_unique<CGameObject>();
-	m_pObject->SetChild(miObject);
+	m_pObject->SetChild(SuperCobraObject);
 	m_pObject->CreateShaderVariables(m_pd3dDevice.Get(), m_pd3dCommandList.Get());
 	m_pObject->SetPosition(XMFLOAT3(0.0f, 0.0f, 0.0f));
 	m_pObject->SetScale(3.0f, 3.0f, 3.0f);
