@@ -255,41 +255,13 @@ void CGameFramework::BuildObjects()
 	m_pScene = std::make_unique<CScene>();
 	m_pScene->BuildObjects(m_pd3dDevice.Get(), m_pd3dCommandList.Get());
 
-#ifdef RENDER_TMPTEXTUREDBOX
-	// Mesh 생성
-	std::shared_ptr<CCubeMeshDiffused> pMesh = std::make_shared<CCubeMeshDiffused>(m_pd3dDevice.Get(), m_pd3dCommandList.Get(), 10.0f, 10.0f, 10.0f);
-	CTexture* tmpTexture = new CTexture(8, RESOURCE_TEXTURE2D, 0, 1);
-
-	// Texture 생성
-	tmpTexture->LoadTextureFromDDSFile(m_pd3dDevice.Get(), m_pd3dCommandList.Get(), L"Image/Floor.dds", RESOURCE_TEXTURE2D, 0);
-	tmpTexture->LoadTextureFromDDSFile(m_pd3dDevice.Get(), m_pd3dCommandList.Get(), L"Image/Ceiling.dds", RESOURCE_TEXTURE2D, 1);
-	tmpTexture->LoadTextureFromDDSFile(m_pd3dDevice.Get(), m_pd3dCommandList.Get(), L"Image/Lava(Diffuse).dds", RESOURCE_TEXTURE2D, 2);
-	tmpTexture->LoadTextureFromDDSFile(m_pd3dDevice.Get(), m_pd3dCommandList.Get(), L"Image/Lava(Emissive).dds", RESOURCE_TEXTURE2D, 3);
-	tmpTexture->LoadTextureFromDDSFile(m_pd3dDevice.Get(), m_pd3dCommandList.Get(), L"Image/Metal01.dds", RESOURCE_TEXTURE2D, 4);
-	tmpTexture->LoadTextureFromDDSFile(m_pd3dDevice.Get(), m_pd3dCommandList.Get(), L"Image/Metal02.dds", RESOURCE_TEXTURE2D, 5);
-	tmpTexture->LoadTextureFromDDSFile(m_pd3dDevice.Get(), m_pd3dCommandList.Get(), L"Image/Rock01.dds", RESOURCE_TEXTURE2D, 6);
-	tmpTexture->LoadTextureFromDDSFile(m_pd3dDevice.Get(), m_pd3dCommandList.Get(), L"Image/Stone01.dds", RESOURCE_TEXTURE2D, 7);
-
 	// Shader 생성
-	m_pShader = std::make_unique<CTmpTexturedShader>();
-	m_pShader->CreateShader(m_pd3dDevice.Get(), m_pScene->GetGraphicsRootSignature());
-	m_pShader->CreateShaderVariables(m_pd3dDevice.Get(), m_pd3dCommandList.Get());
-	m_pShader->CreateSrvDescriptorHeaps(m_pd3dDevice.Get(), 8);
-	m_pShader->CreateShaderResourceViews(m_pd3dDevice.Get(), tmpTexture, 0, 3);
-
-	// Object 생성
-	m_pObject = std::make_unique<CGameObject>();
-	m_pObject->SetMesh(pMesh);
-	m_pObject->CreateShaderVariables(m_pd3dDevice.Get(), m_pd3dCommandList.Get());
-	m_pObject->SetPosition(XMFLOAT3(0.0f, 0.0f, 0.0f));
-	m_pObject->SetTexture(tmpTexture);
-	m_pObject->SetTypes(6);
-#else
 	m_pShader = std::make_unique<CTmpTexturedShader>();
 	m_pShader->CreateShader(m_pd3dDevice.Get(), m_pScene->GetGraphicsRootSignature());
 	m_pShader->CreateShaderVariables(m_pd3dDevice.Get(), m_pd3dCommandList.Get());
 	m_pShader->CreateSrvDescriptorHeaps(m_pd3dDevice.Get(), 1);
 
+	// Mesh 생성
 	std::shared_ptr<CGameObject> SuperCobraObject = std::make_shared<CGameObject>();
 	SuperCobraObject = SuperCobraObject->LoadGeometryFromFile(m_pd3dDevice.Get(), m_pd3dCommandList.Get(), m_pScene->GetGraphicsRootSignature(), "Model/Mi24.bin", m_pShader.get());
 
@@ -307,8 +279,6 @@ void CGameFramework::BuildObjects()
 	m_pPlayer->SetScale(20.0f, 20.0f, 20.0f);
 
 	m_pCamera = m_pPlayer->GetCamera();
-
-#endif // RENDER_TMPTEXTUREDBOX
 
 	//씬 객체를 생성하기 위하여 필요한 그래픽 명령 리스트들을 명령 큐에 추가한다. 
 	m_pd3dCommandList->Close();
