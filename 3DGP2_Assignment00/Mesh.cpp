@@ -426,7 +426,7 @@ void CTexturedModelingMesh::LoadTexturedMeshFromFile(ID3D12Device* pd3dDevice, I
 			{
 				// 서브 메쉬 인덱스 개수
 				m_pnSubSetIndices.resize(m_nSubMeshes);
-				m_pnSubSetIndices.resize(m_nSubMeshes);
+				m_ppnSubSetIndices.resize(m_nSubMeshes);
 
 
 				// 서브 메쉬 인덱스 버퍼
