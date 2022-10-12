@@ -307,6 +307,7 @@ void CGameFramework::BuildObjects()
 	m_pObject->CreateShaderVariables(m_pd3dDevice.Get(), m_pd3dCommandList.Get());
 	m_pObject->SetPosition(XMFLOAT3(0.0f, 0.0f, 0.0f));
 	m_pObject->SetScale(3.0f, 3.0f, 3.0f);
+	m_pObject->Rotate(0.0f, 45.0f, 0.0f);
 
 #endif // RENDER_TMPTEXTUREDBOX
 

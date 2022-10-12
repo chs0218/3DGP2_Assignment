@@ -74,7 +74,7 @@ public:
 	virtual void OnInitialize() { }
 	virtual void Animate(float fTimeElapsed, XMFLOAT4X4* pxmf4x4Parent = NULL);
 
-	virtual void OnPrepareRender() { }
+	virtual void OnPrepareRender() {}
 	virtual void PrepareAnimate() {}
 	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera = NULL);
 
