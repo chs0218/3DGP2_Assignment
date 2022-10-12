@@ -8,6 +8,7 @@
 
 class CShader;
 class CGameObject;
+struct CB_GAMEOBJECT_INFO;
 class CTexture
 {
 public:
@@ -75,6 +76,7 @@ public:
 	void SetTexture(CTexture* pTexture);
 
 	virtual void UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList);
+	virtual void UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList, CB_GAMEOBJECT_INFO* pInfo);
 	virtual void ReleaseShaderVariables();
 
 	virtual void ReleaseUploadBuffers();

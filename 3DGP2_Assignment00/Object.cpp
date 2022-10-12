@@ -38,11 +38,6 @@ void CGameObject::ReleaseShaderVariables()
 void CGameObject::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList)
 {
 	XMStoreFloat4x4(&m_pcbMappedGameObject->m_xmf4x4World, XMMatrixTranspose(XMLoadFloat4x4(&m_xmf4x4World)));
-	m_pcbMappedGameObject->m_xmf4x4Material.m_cAmbient = XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f);
-	m_pcbMappedGameObject->m_xmf4x4Material.m_cDiffuse = XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f);
-	m_pcbMappedGameObject->m_xmf4x4Material.m_cEmissive = XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f);
-	m_pcbMappedGameObject->m_xmf4x4Material.m_cSpecular = XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f);
-	m_pcbMappedGameObject->m_TexMask = m_Type;
 	D3D12_GPU_VIRTUAL_ADDRESS d3dGpuVirtualAddress = m_pd3dcbGameObject->GetGPUVirtualAddress();
 	pd3dCommandList->SetGraphicsRootConstantBufferView(0, d3dGpuVirtualAddress);
 }
@@ -111,7 +106,7 @@ void CGameObject::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pC
 		{
 			if (m_ppMaterials[i])
 			{
-				m_ppMaterials[i]->UpdateShaderVariables(pd3dCommandList);
+				m_ppMaterials[i]->UpdateShaderVariables(pd3dCommandList, m_pcbMappedGameObject);
 			}
 			// 여기서 메쉬의 렌더를 한다.
 			m_pMesh->OnPreRender(pd3dCommandList);
