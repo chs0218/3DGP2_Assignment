@@ -38,10 +38,13 @@ void CGameObject::ReleaseShaderVariables()
 void CGameObject::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList)
 {
 	XMStoreFloat4x4(&m_pcbMappedGameObject->m_xmf4x4World, XMMatrixTranspose(XMLoadFloat4x4(&m_xmf4x4World)));
-	m_pcbMappedGameObject->n_Material = m_Type;
+	m_pcbMappedGameObject->m_xmf4x4Material.m_cAmbient = XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f);
+	m_pcbMappedGameObject->m_xmf4x4Material.m_cDiffuse = XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f);
+	m_pcbMappedGameObject->m_xmf4x4Material.m_cEmissive = XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f);
+	m_pcbMappedGameObject->m_xmf4x4Material.m_cSpecular = XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f);
+	m_pcbMappedGameObject->m_TexMask = m_Type;
 	D3D12_GPU_VIRTUAL_ADDRESS d3dGpuVirtualAddress = m_pd3dcbGameObject->GetGPUVirtualAddress();
 	pd3dCommandList->SetGraphicsRootConstantBufferView(0, d3dGpuVirtualAddress);
-	// 추가적으로 ResourceIndexInfo를 설정해야함
 }
 
 void CGameObject::ReleaseUploadBuffers()

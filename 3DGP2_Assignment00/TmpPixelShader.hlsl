@@ -1,8 +1,26 @@
+#define MATERIAL_ALBEDO_MAP			0x01
+#define MATERIAL_SPECULAR_MAP		0x02
+#define MATERIAL_NORMAL_MAP			0x04
+#define MATERIAL_METALLIC_MAP		0x08
+#define MATERIAL_EMISSION_MAP		0x10
+#define MATERIAL_DETAIL_ALBEDO_MAP	0x20
+#define MATERIAL_DETAIL_NORMAL_MAP	0x40
+
+struct MATERIAL
+{
+	float4 m_cAmbient;
+	float4 m_cDiffuse;
+	float4 m_cSpecular; //a = power
+	float4 m_cEmissive;
+};
+
 cbuffer cbGameObjectInfo : register(b0)
 {
 	matrix gmtxGameObject : packoffset(c0);
-	int m_nType : packoffset(c4);
+	MATERIAL gMaterial : packoffset(c4);
+	uint gnTexturesMask : packoffset(c8);
 }
+
 
 cbuffer cbCameraInfo : register(b1)
 {
@@ -10,18 +28,22 @@ cbuffer cbCameraInfo : register(b1)
 	matrix gmtxProjection : packoffset(c4);
 }
 
+Texture2D gtxMappedTexture[7] : register(t0);
 Texture2D gtxtTexture[8] : register(t7);
 SamplerState gSamplerState : register(s0);
 
 struct VS_OUTPUT
 {
 	float4 position : SV_POSITION;
-	float3 normal : NORMAL;
+	float3 positionW : POSITION;
+	float3 normalW : NORMAL;
+	float3 tangentW : TANGENT;
+	float3 bitangentW : BITANGENT;
 	float2 uv : TEXCOORD;
 };
 
 float4 PS_Tmp(VS_OUTPUT input) : SV_TARGET
 {
-	float4 cColor = gtxtTexture[m_nType].Sample(gSamplerState, input.uv);
+	float4 cColor = gtxtTexture[gnTexturesMask].Sample(gSamplerState, input.uv);
 	return(cColor);
 }
