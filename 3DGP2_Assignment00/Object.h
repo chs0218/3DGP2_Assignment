@@ -63,6 +63,7 @@ public:
 	void ReleaseShaderVariables();
 	void UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList);
 	void ReleaseUploadBuffers();
+	void PrintFrameInfo(CGameObject* pGameObject, CGameObject* pParent);
 
 	char* GetFrameName() { return m_pstrFrameName; }
 	void SetChild(std::shared_ptr<CGameObject> pChild, bool bReferenceUpdate = false);

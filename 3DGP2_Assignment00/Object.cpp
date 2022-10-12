@@ -16,9 +16,9 @@ CGameObject::~CGameObject()
 
 void CGameObject::CreateShaderVariables(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
 {
-	UINT ncbElementBytes = ((sizeof(CB_GAMEOBJECT_INFO) + 255) & ~255);
+	/*UINT ncbElementBytes = ((sizeof(CB_GAMEOBJECT_INFO) + 255) & ~255);
 	m_pd3dcbGameObject = ::CreateBufferResource(pd3dDevice, pd3dCommandList, NULL, ncbElementBytes, D3D12_HEAP_TYPE_UPLOAD, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER, NULL);
-	m_pd3dcbGameObject->Map(0, NULL, (void**)&m_pcbMappedGameObject);
+	m_pd3dcbGameObject->Map(0, NULL, (void**)&m_pcbMappedGameObject);*/
 }
 
 void CGameObject::ReleaseShaderVariables()
@@ -29,9 +29,13 @@ void CGameObject::ReleaseShaderVariables()
 
 void CGameObject::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList)
 {
-	XMStoreFloat4x4(&m_pcbMappedGameObject->m_xmf4x4World, XMMatrixTranspose(XMLoadFloat4x4(&m_xmf4x4World)));
+	/*XMStoreFloat4x4(&m_pcbMappedGameObject->m_xmf4x4World, XMMatrixTranspose(XMLoadFloat4x4(&m_xmf4x4World)));
 	D3D12_GPU_VIRTUAL_ADDRESS d3dGpuVirtualAddress = m_pd3dcbGameObject->GetGPUVirtualAddress();
-	pd3dCommandList->SetGraphicsRootConstantBufferView(0, d3dGpuVirtualAddress);
+	pd3dCommandList->SetGraphicsRootConstantBufferView(0, d3dGpuVirtualAddress);*/
+
+	XMFLOAT4X4 xmf4x4World;
+	XMStoreFloat4x4(&xmf4x4World, XMMatrixTranspose(XMLoadFloat4x4(&m_xmf4x4World)));
+	pd3dCommandList->SetGraphicsRoot32BitConstants(0, 16, &xmf4x4World, 0);
 }
 
 void CGameObject::ReleaseUploadBuffers()
@@ -74,12 +78,11 @@ void CGameObject::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pC
 	{
 		// CGameObject의 정보를 넘길 버퍼가 있고, 해당 버퍼에 대한 CPU 포인터가 있으면 UpdateShaderVariables 함수를 호출한다.
 		UpdateShaderVariables(pd3dCommandList);
-
 		for (int i = 0; i < m_nMaterials; ++i)
 		{
 			if (m_ppMaterials[i])
 			{
-				m_ppMaterials[i]->UpdateShaderVariables(pd3dCommandList, m_pcbMappedGameObject);
+				m_ppMaterials[i]->UpdateShaderVariables(pd3dCommandList);
 			}
 			// 여기서 메쉬의 렌더를 한다.
 			m_pMesh->OnPreRender(pd3dCommandList);
@@ -239,7 +242,6 @@ void CGameObject::LoadFrameHierarchyFromFile(ID3D12Device* pd3dDevice, ID3D12Gra
 			break;
 		}
 	}
-	CreateShaderVariables(pd3dDevice, pd3dCommandList);
 }
 
 std::shared_ptr<CGameObject> CGameObject::LoadGeometryFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, const char* pstrFileName, CShader* pShader)
@@ -250,8 +252,27 @@ std::shared_ptr<CGameObject> CGameObject::LoadGeometryFromFile(ID3D12Device* pd3
 
 	std::shared_ptr<CGameObject> pGameObject = std::make_shared<CGameObject>();
 	pGameObject->LoadFrameHierarchyFromFile(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature, NULL, pInFile, pShader);
+#define _WITH_DEBUG_FRAME_HIERARCHY
+#ifdef _WITH_DEBUG_FRAME_HIERARCHY
+	TCHAR pstrDebug[256] = { 0 };
+	_stprintf_s(pstrDebug, 256, _T("Frame Hierarchy\n"));
+	OutputDebugString(pstrDebug);
+
+	CGameObject::PrintFrameInfo(pGameObject.get(), NULL);
+#endif
 
 	return(pGameObject);
+}
+
+void CGameObject::PrintFrameInfo(CGameObject* pGameObject, CGameObject* pParent)
+{
+	TCHAR pstrDebug[256] = { 0 };
+
+	_stprintf_s(pstrDebug, 256, _T("(Frame: %p) (Parent: %p)\n"), pGameObject, pParent);
+	OutputDebugString(pstrDebug);
+
+	if (pGameObject->m_pSibling) CGameObject::PrintFrameInfo(pGameObject->m_pSibling.get(), pParent);
+	if (pGameObject->m_pChild) CGameObject::PrintFrameInfo(pGameObject->m_pChild.get(), pGameObject);
 }
 
 void CGameObject::LoadMaterialsFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, CGameObject* pParent, FILE* pInFile, CShader* pShader)
@@ -384,8 +405,8 @@ int CGameObject::FindReplicatedTexture(_TCHAR* pstrTextureName, D3D12_GPU_DESCRI
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void CSuperCobraObject::PrepareAnimate()
 {
-	m_pMainRotorFrame = FindFrame("MainRotor");
-	m_pTailRotorFrame = FindFrame("TailRotor");
+	m_pMainRotorFrame = FindFrame("Top_Rotor");
+	m_pTailRotorFrame = FindFrame("Tail_Rotor");
 }
 
 void CSuperCobraObject::Animate(float fTimeElapsed, XMFLOAT4X4* pxmf4x4Parent)

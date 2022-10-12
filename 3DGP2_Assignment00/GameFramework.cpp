@@ -295,20 +295,19 @@ void CGameFramework::BuildObjects()
 	m_pShader = std::make_unique<CTmpTexturedShader>();
 	m_pShader->CreateShader(m_pd3dDevice.Get(), m_pScene->GetGraphicsRootSignature());
 	m_pShader->CreateShaderVariables(m_pd3dDevice.Get(), m_pd3dCommandList.Get());
-	m_pShader->CreateSrvDescriptorHeaps(m_pd3dDevice.Get(), 60);
+	m_pShader->CreateSrvDescriptorHeaps(m_pd3dDevice.Get(), 1);
 
 	std::shared_ptr<CGameObject> SuperCobraObject = std::make_shared<CGameObject>();
-	SuperCobraObject = SuperCobraObject->LoadGeometryFromFile(m_pd3dDevice.Get(), m_pd3dCommandList.Get(), m_pScene->GetGraphicsRootSignature(), "Model\\SuperCobra.bin", m_pShader.get());
+	SuperCobraObject = SuperCobraObject->LoadGeometryFromFile(m_pd3dDevice.Get(), m_pd3dCommandList.Get(), m_pScene->GetGraphicsRootSignature(), "Model/Mi24.bin", m_pShader.get());
 
 	// Object 생성
 	m_pObject = std::make_unique<CSuperCobraObject>();
 	m_pObject->SetChild(SuperCobraObject);
 	m_pObject->PrepareAnimate();
-	m_pObject->CreateShaderVariables(m_pd3dDevice.Get(), m_pd3dCommandList.Get());
 	m_pObject->SetPosition(XMFLOAT3(0.0f, 0.0f, 0.0f));
 	m_pObject->SetScale(3.0f, 3.0f, 3.0f);
 	m_pObject->Rotate(0.0f, 45.0f, 0.0f);
-
+	
 #endif // RENDER_TMPTEXTUREDBOX
 
 	//씬 객체를 생성하기 위하여 필요한 그래픽 명령 리스트들을 명령 큐에 추가한다. 
@@ -317,15 +316,6 @@ void CGameFramework::BuildObjects()
 	m_pd3dCommandQueue->ExecuteCommandLists(1, ppd3dCommandLists->GetAddressOf());
 
 	WaitForGpuComplete();
-
-#ifdef RENDER_TMPTEXTUREDBOX
-	m_pShader->ReleaseUploadBuffers();
-	tmpTexture->ReleaseUploadBuffers();
-	m_pObject->ReleaseUploadBuffers();
-#else
-	m_pShader->ReleaseUploadBuffers();
-	m_pObject->ReleaseUploadBuffers();
-#endif
 	m_GameTimer.Reset();
 }
 
@@ -487,8 +477,15 @@ void CGameFramework::FrameAdvance()
 	if (m_pShader)
 		m_pShader->Render(m_pd3dCommandList.Get());
 	if (m_pObject)
+	{
+		m_pObject->UpdateTransform(NULL);
 		m_pObject->Render(m_pd3dCommandList.Get());
-
+	}
+	if (m_ptmpObject)
+	{
+		m_ptmpObject->UpdateTransform(NULL);
+		m_ptmpObject->Render(m_pd3dCommandList.Get());
+	}
 	/*현재 렌더 타겟에 대한 렌더링이 끝나기를 기다린다. GPU가 렌더 타겟(버퍼)을 더 이상 사용하지 않으면 렌더 타겟
 	의 상태는 프리젠트 상태(D3D12_RESOURCE_STATE_PRESENT)로 바뀔 것이다.*/
 	d3dResourceBarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;

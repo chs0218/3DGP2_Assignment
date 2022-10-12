@@ -57,6 +57,7 @@ private:
 
 	std::unique_ptr<CScene> m_pScene = NULL;
 	std::unique_ptr<CGameObject> m_pObject = NULL;
+	std::unique_ptr<CGameObject> m_ptmpObject = NULL;
 	std::unique_ptr<CShader> m_pShader = NULL;
 	std::unique_ptr<CCamera> m_pCamera = NULL;
 

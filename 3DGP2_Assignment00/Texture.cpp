@@ -122,10 +122,21 @@ int CTexture::LoadTextureFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsComman
 		size_t nConverted = 0;
 		mbstowcs_s(&nConverted, m_ppstrTextureNames[nIndex], 64, pstrFilePath, _TRUNCATE);
 
+#define _WITH_DISPLAY_TEXTURE_NAME
+
+#ifdef _WITH_DISPLAY_TEXTURE_NAME
+		static int nTextures = 0, nRepeatedTextures = 0;
+		TCHAR pstrDebug[256] = { 0 };
+		_stprintf_s(pstrDebug, 256, _T("Texture Name: %d %c %s\n"), (pstrTextureName[0] == '@') ? nRepeatedTextures++ : nTextures++, (pstrTextureName[0] == '@') ? '@' : ' ', m_ppstrTextureNames[nIndex]);
+		OutputDebugString(pstrDebug);
+#endif
 		if (!bDuplicated)
 		{
 			LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, m_ppstrTextureNames[nIndex], RESOURCE_TEXTURE2D, nIndex);
 			pShader->CreateShaderResourceView(pd3dDevice, this, nIndex);
+#ifdef _WITH_STANDARD_TEXTURE_MULTIPLE_DESCRIPTORS
+			m_pnRootParameterIndices[nIndex] = PARAMETER_STANDARD_TEXTURE + nIndex;
+#endif
 		}
 		else
 		{
@@ -220,16 +231,12 @@ void CMaterial::ReleaseUploadBuffers()
 
 void CMaterial::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList)
 {
-	if (m_pTexture) m_pTexture->UpdateShaderVariables(pd3dCommandList);
-}
+	pd3dCommandList->SetGraphicsRoot32BitConstants(0, 4, &m_xmf4AmbientColor, 16);
+	pd3dCommandList->SetGraphicsRoot32BitConstants(0, 4, &m_xmf4AlbedoColor, 20);
+	pd3dCommandList->SetGraphicsRoot32BitConstants(0, 4, &m_xmf4SpecularColor, 24);
+	pd3dCommandList->SetGraphicsRoot32BitConstants(0, 4, &m_xmf4EmissiveColor, 28);
 
-void CMaterial::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList, CB_GAMEOBJECT_INFO* pInfo)
-{
-	pInfo->m_xmf4x4Material.m_cAmbient = m_xmf4AmbientColor;
-	pInfo->m_xmf4x4Material.m_cDiffuse = m_xmf4AlbedoColor;
-	pInfo->m_xmf4x4Material.m_cEmissive = m_xmf4EmissiveColor;
-	pInfo->m_xmf4x4Material.m_cSpecular = m_xmf4SpecularColor;
-	pInfo->m_TexMask = m_nType;
+	pd3dCommandList->SetGraphicsRoot32BitConstants(0, 1, &m_nType, 32);
 	if (m_pTexture) m_pTexture->UpdateShaderVariables(pd3dCommandList);
 }
 

@@ -36,6 +36,7 @@ public:
 	D3D12_GPU_DESCRIPTOR_HANDLE GetGpuDescriptorHandle(int nIndex) { return(m_pd3dSrvGpuDescriptorHandles[nIndex]); }
 	int GetRootParameter(int nIndex) { return(m_pnRootParameterIndices[nIndex]); }
 	int GetRootParameters() { return(m_nRootParameters); }
+	UINT GetTextureType() { return(m_nTextureType); }
 
 	void SetGpuDescriptorHandle(int nIndex, D3D12_GPU_DESCRIPTOR_HANDLE d3dSrvGpuDescriptorHandle);
 	void UpdateShaderVariable(ID3D12GraphicsCommandList* pd3dCommandList, int nParameterIndex, int nTextureIndex);
@@ -68,7 +69,6 @@ public:
 	void SetTexture(std::shared_ptr<CTexture> pTexture);
 
 	virtual void UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList);
-	virtual void UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList, CB_GAMEOBJECT_INFO* pInfo);
 	virtual void ReleaseShaderVariables();
 
 	virtual void ReleaseUploadBuffers();
