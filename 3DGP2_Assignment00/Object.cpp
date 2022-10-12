@@ -424,8 +424,6 @@ void CSuperCobraObject::Animate(float fTimeElapsed, XMFLOAT4X4* pxmf4x4Parent)
 	}
 
 	CGameObject::Animate(fTimeElapsed, pxmf4x4Parent);
-
-	UpdateTransform(NULL);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

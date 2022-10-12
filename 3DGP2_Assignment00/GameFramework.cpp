@@ -417,6 +417,7 @@ void CGameFramework::AnimateObjects()
 	if (m_pObject)
 	{
 		m_pObject->Animate(m_GameTimer.GetFrameTimeElapsed());
+		m_pObject->UpdateTransform(NULL);
 	}
 }
 
