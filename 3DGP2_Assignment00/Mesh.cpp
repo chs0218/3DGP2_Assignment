@@ -43,7 +43,7 @@ void CMesh::Render(ID3D12GraphicsCommandList* pd3dCommandList, UINT nSubset)
 {
 	// 메쉬를 렌더링하는 함수이다.
 	
-	if (m_nSubMeshes > 0)
+	if ((m_nSubMeshes > 0) && (nSubset < m_nSubMeshes))
 	{
 		pd3dCommandList->IASetIndexBuffer(&m_pd3dIndexBufferViews[nSubset]);
 		pd3dCommandList->DrawIndexedInstanced(m_pnSubSetIndices[nSubset], 1, 0, 0, 0);
@@ -256,21 +256,24 @@ CCubeMeshDiffused::CCubeMeshDiffused(ID3D12Device* pd3dDevice, ID3D12GraphicsCom
 	m_pnIndices[30] = 20; m_pnIndices[31] = 21; m_pnIndices[32] = 22;
 	m_pnIndices[33] = 20; m_pnIndices[34] = 22; m_pnIndices[35] = 23;
 
-	m_nSubMeshes = 1;
+	m_nSubMeshes = 6;
 
 	m_ppd3dIndexBuffers.resize(m_nSubMeshes);
 	m_ppd3dIndexUploadBuffers.resize(m_nSubMeshes);
 	m_pd3dIndexBufferViews.resize(m_nSubMeshes);
 	m_pnSubSetIndices.resize(m_nSubMeshes);
 
-	m_pnSubSetIndices[0] = m_nIndices;
-	//인덱스 버퍼를 생성한다. 
-	m_ppd3dIndexBuffers[0] = ::CreateBufferResource(pd3dDevice, pd3dCommandList, m_pnIndices.data(), sizeof(UINT) * m_nIndices, D3D12_HEAP_TYPE_DEFAULT, D3D12_RESOURCE_STATE_INDEX_BUFFER, &m_ppd3dIndexUploadBuffers[0]);
+	for (int i = 0; i < m_nSubMeshes; ++i)
+	{
+		m_pnSubSetIndices[i] = 6;
+		//인덱스 버퍼를 생성한다. 
+		m_ppd3dIndexBuffers[i] = ::CreateBufferResource(pd3dDevice, pd3dCommandList, &m_pnIndices[i * 6], sizeof(UINT) * 6, D3D12_HEAP_TYPE_DEFAULT, D3D12_RESOURCE_STATE_INDEX_BUFFER, &m_ppd3dIndexUploadBuffers[i]);
 
-	//인덱스 버퍼 뷰를 생성한다. 
-	m_pd3dIndexBufferViews[0].BufferLocation = m_ppd3dIndexBuffers[0]->GetGPUVirtualAddress();
-	m_pd3dIndexBufferViews[0].Format = DXGI_FORMAT_R32_UINT;
-	m_pd3dIndexBufferViews[0].SizeInBytes = sizeof(UINT) * m_nIndices;
+		//인덱스 버퍼 뷰를 생성한다. 
+		m_pd3dIndexBufferViews[i].BufferLocation = m_ppd3dIndexBuffers[i]->GetGPUVirtualAddress();
+		m_pd3dIndexBufferViews[i].Format = DXGI_FORMAT_R32_UINT;
+		m_pd3dIndexBufferViews[i].SizeInBytes = sizeof(UINT) * 6;
+	}
 }
 
 CCubeMeshDiffused::~CCubeMeshDiffused()
