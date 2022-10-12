@@ -319,6 +319,9 @@ void CGameFramework::BuildObjects()
 	m_pShader->ReleaseUploadBuffers();
 	tmpTexture->ReleaseUploadBuffers();
 	m_pObject->ReleaseUploadBuffers();
+#else
+	m_pShader->ReleaseUploadBuffers();
+	m_pObject->ReleaseUploadBuffers();
 #endif
 	m_GameTimer.Reset();
 }

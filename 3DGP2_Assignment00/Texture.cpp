@@ -211,7 +211,9 @@ CMaterial::~CMaterial()
 
 void CMaterial::SetTexture(CTexture* pTexture)
 {
+	if (m_pTexture) m_pTexture->Release();
 	m_pTexture = pTexture;
+	if (m_pTexture) m_pTexture->AddRef();
 }
 
 void CMaterial::ReleaseUploadBuffers()
