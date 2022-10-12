@@ -16,21 +16,21 @@ protected:
 	XMFLOAT3					m_xmf3Up = XMFLOAT3(0.0f, 1.0f, 0.0f);
 	XMFLOAT3					m_xmf3Look = XMFLOAT3(0.0f, 0.0f, 1.0f);
 
-	XMFLOAT3					m_xmf3Velocity = XMFLOAT3(0.0f, 0.0f, 0.0f);
-	XMFLOAT3     				m_xmf3Gravity = XMFLOAT3(0.0f, 0.0f, 0.0f);
+	XMFLOAT3 m_xmf3Velocity = XMFLOAT3(0.0f, 0.0f, 0.0f);
+	XMFLOAT3 m_xmf3Gravity = XMFLOAT3(0.0f, 0.0f, 0.0f);
+			 
+	float m_fPitch = 0.0f;
+	float m_fYaw = 0.0f;
+	float m_fRoll = 0.0f;
+		  
+	float m_fMaxVelocityXZ = 0.0f;
+	float m_fMaxVelocityY = 0.0f;
+	float m_fFriction = 0.0f;
+			 
+	LPVOID m_pPlayerUpdatedContext = NULL;
+	LPVOID m_pCameraUpdatedContext = NULL;
 
-	float           			m_fPitch = 0.0f;
-	float           			m_fYaw = 0.0f;
-	float           			m_fRoll = 0.0f;
-
-	float           			m_fMaxVelocityXZ = 0.0f;
-	float           			m_fMaxVelocityY = 0.0f;
-	float           			m_fFriction = 0.0f;
-
-	LPVOID						m_pPlayerUpdatedContext = NULL;
-	LPVOID						m_pCameraUpdatedContext = NULL;
-
-	//CCamera* m_pCamera = NULL;
+	CCamera* m_pCamera = NULL;
 public:
 	CPlayer(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, void* pContext = NULL, int nMeshes = 1);
 	virtual ~CPlayer();
@@ -52,10 +52,10 @@ public:
 	float GetPitch() const { return(m_fPitch); }
 	float GetRoll() const { return(m_fRoll); }
 
-	/*CCamera* GetCamera() { return(m_pCamera); }
-	void SetCamera(CCamera* pCamera) { m_pCamera = pCamera; }*/
+	CCamera* GetCamera() { return(m_pCamera); }
+	void SetCamera(CCamera* pCamera) { m_pCamera = pCamera; }
 
-	void Move(ULONG nDirection, float fDistance, bool bVelocity = false);
+	void Move(DWORD dwDirection, float fDistance, bool bUpdateVelocity);
 	void Move(const XMFLOAT3& xmf3Shift, bool bVelocity = false);
 	void Move(float fxOffset = 0.0f, float fyOffset = 0.0f, float fzOffset = 0.0f);
 	void Rotate(float x, float y, float z);
@@ -72,10 +72,19 @@ public:
 	virtual void ReleaseShaderVariables();
 	virtual void UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList);
 
-	/*CCamera* OnChangeCamera(DWORD nNewCameraMode, DWORD nCurrentCameraMode);
+	CCamera* OnChangeCamera(DWORD nNewCameraMode, DWORD nCurrentCameraMode);
 
-	virtual CCamera* ChangeCamera(DWORD nNewCameraMode, float fTimeElapsed) { return(NULL); }*/
+	virtual CCamera* ChangeCamera(DWORD nNewCameraMode, float fTimeElapsed) { return(NULL); }
 	virtual void OnPrepareRender();
-	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera = NULL);
+	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList);
 };
 
+class CAirplanePlayer : public CPlayer
+{
+public:
+	CAirplanePlayer(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, void* pContext = NULL, int nMeshes = 1);
+	virtual ~CAirplanePlayer();
+
+	virtual CCamera* ChangeCamera(DWORD nNewCameraMode, float fTimeElapsed);
+	virtual void OnPrepareRender();
+};

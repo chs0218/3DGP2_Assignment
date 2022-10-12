@@ -48,7 +48,6 @@ using Microsoft::WRL::ComPtr;
 #define FRAME_BUFFER_WIDTH 800
 #define FRAME_BUFFER_HEIGHT 600
 
-//#define RENDER_TMPTEXTUREDBOX
 
 //----------------------------------------------------------------------------
 // 22/09/21 CreateBufferResource 함수 정의 - ChoiHS

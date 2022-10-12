@@ -60,10 +60,10 @@ private:
 	std::unique_ptr<CPlayer> m_pPlayer = NULL;
 	std::unique_ptr<CGameObject> m_pObject = NULL;
 	std::unique_ptr<CShader> m_pShader = NULL;
-	std::unique_ptr<CCamera> m_pCamera = NULL;
+	CCamera* m_pCamera = NULL;
 
 	CGameTimer					m_GameTimer;
-
+	POINT						m_ptOldCursorPos;
 	_TCHAR						m_pszFrameRate[50];
 public:
 	CGameFramework();

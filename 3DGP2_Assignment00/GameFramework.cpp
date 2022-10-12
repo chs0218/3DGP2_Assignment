@@ -251,14 +251,6 @@ void CGameFramework::BuildObjects()
 {
 	m_pd3dCommandList->Reset(m_pd3dCommandAllocator.Get(), NULL);
 
-	// 카메라 설정
-	m_pCamera = std::make_unique<CCamera>();
-	m_pCamera->SetViewport(0, 0, m_nWndClientWidth, m_nWndClientHeight, 0.0f, 1.0f);
-	m_pCamera->SetScissorRect(0, 0, m_nWndClientWidth, m_nWndClientHeight);
-	m_pCamera->GenerateProjectionMatrix(1.0f, 500.0f, float(m_nWndClientWidth) / float(m_nWndClientHeight), 90.0f);
-	m_pCamera->GenerateViewMatrix(XMFLOAT3(0.0f, 22.5f, -37.5f), XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT3(0.0f, 1.0f, 0.0f));
-	m_pCamera->CreateShaderVariables(m_pd3dDevice.Get(), m_pd3dCommandList.Get());
-
 	// CScene 생성(RootSignature 생성)
 	m_pScene = std::make_unique<CScene>();
 	m_pScene->BuildObjects(m_pd3dDevice.Get(), m_pd3dCommandList.Get());
@@ -309,13 +301,13 @@ void CGameFramework::BuildObjects()
 	m_pObject->SetScale(3.0f, 3.0f, 3.0f);
 	m_pObject->Rotate(0.0f, 45.0f, 0.0f);
 
-	m_pPlayer = std::make_unique<CPlayer>(m_pd3dDevice.Get(), m_pd3dCommandList.Get(), m_pScene->GetGraphicsRootSignature());
+	m_pPlayer = std::make_unique<CAirplanePlayer>(m_pd3dDevice.Get(), m_pd3dCommandList.Get(), m_pScene->GetGraphicsRootSignature());
 	m_pPlayer->SetChild(SuperCobraObject);
 	m_pPlayer->PrepareAnimate();
-	m_pPlayer->SetPosition(XMFLOAT3(10.0f, 0.0f, 0.0f));
-	m_pPlayer->SetScale(3.0f, 3.0f, 3.0f);
-	m_pPlayer->Rotate(0.0f, -45.0f, 0.0f);
-	
+	m_pPlayer->SetScale(20.0f, 20.0f, 20.0f);
+
+	m_pCamera = m_pPlayer->GetCamera();
+
 #endif // RENDER_TMPTEXTUREDBOX
 
 	//씬 객체를 생성하기 위하여 필요한 그래픽 명령 리스트들을 명령 큐에 추가한다. 
@@ -337,9 +329,12 @@ void CGameFramework::OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM
 	{
 	case WM_LBUTTONDOWN:
 	case WM_RBUTTONDOWN:
+		::SetCapture(hWnd);
+		::GetCursorPos(&m_ptOldCursorPos);
 		break;
 	case WM_LBUTTONUP:
 	case WM_RBUTTONUP:
+		::ReleaseCapture();
 		break;
 	case WM_MOUSEMOVE:
 		break;
@@ -360,10 +355,15 @@ void CGameFramework::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPA
 			break;
 		case VK_RETURN:
 			break;
-		case VK_F8:
+		case VK_F1:
+		case VK_F2:
+		case VK_F3:
+			m_pCamera = m_pPlayer->ChangeCamera((DWORD)(wParam - VK_F1 + 1), m_GameTimer.GetFrameTimeElapsed());
 			break;
 		case VK_F9:
 			ChangeSwapChainState();
+			break;
+		case VK_F10:
 			break;
 		default:
 			break;
@@ -409,6 +409,43 @@ LRESULT CALLBACK CGameFramework::OnProcessingWindowMessage(HWND hWnd, UINT nMess
 
 void CGameFramework::ProcessInput()
 {
+	static UCHAR pKeysBuffer[256];
+	bool bProcessedByScene = false;
+	if (GetKeyboardState(pKeysBuffer) && m_pScene) bProcessedByScene = m_pScene->ProcessInput(pKeysBuffer);
+	if (!bProcessedByScene)
+	{
+		DWORD dwDirection = 0;
+		if (pKeysBuffer[VK_UP] & 0xF0) dwDirection |= DIR_FORWARD;
+		if (pKeysBuffer[VK_DOWN] & 0xF0) dwDirection |= DIR_BACKWARD;
+		if (pKeysBuffer[VK_LEFT] & 0xF0) dwDirection |= DIR_LEFT;
+		if (pKeysBuffer[VK_RIGHT] & 0xF0) dwDirection |= DIR_RIGHT;
+		if (pKeysBuffer[VK_PRIOR] & 0xF0) dwDirection |= DIR_UP;
+		if (pKeysBuffer[VK_NEXT] & 0xF0) dwDirection |= DIR_DOWN;
+
+		float cxDelta = 0.0f, cyDelta = 0.0f;
+		POINT ptCursorPos;
+		if (GetCapture() == m_hWnd)
+		{
+			SetCursor(NULL);
+			GetCursorPos(&ptCursorPos);
+			cxDelta = (float)(ptCursorPos.x - m_ptOldCursorPos.x) / 3.0f;
+			cyDelta = (float)(ptCursorPos.y - m_ptOldCursorPos.y) / 3.0f;
+			SetCursorPos(m_ptOldCursorPos.x, m_ptOldCursorPos.y);
+		}
+
+		if ((dwDirection != 0) || (cxDelta != 0.0f) || (cyDelta != 0.0f))
+		{
+			if (cxDelta || cyDelta)
+			{
+				if (pKeysBuffer[VK_RBUTTON] & 0xF0)
+					m_pPlayer->Rotate(cyDelta, 0.0f, -cxDelta);
+				else
+					m_pPlayer->Rotate(cyDelta, cxDelta, 0.0f);
+			}
+			if (dwDirection) m_pPlayer->Move(dwDirection, 10.0f * m_GameTimer.GetFrameTimeElapsed(), true);
+		}
+	}
+	m_pPlayer->Update(m_GameTimer.GetFrameTimeElapsed());
 }
 
 void CGameFramework::AnimateObjects()
@@ -481,7 +518,7 @@ void CGameFramework::FrameAdvance()
 	m_pd3dCommandList->OMSetRenderTargets(1, &d3dRtvCPUDescriptorHandle, TRUE, &d3dDsvCPUDescriptorHandle);
 
 	//렌더링 코드는 여기에 추가될 것이다. 
-	m_pScene->Render(m_pd3dCommandList.Get(), m_pCamera.get());
+	m_pScene->Render(m_pd3dCommandList.Get(), m_pPlayer->GetCamera());
 	if (m_pShader)
 		m_pShader->Render(m_pd3dCommandList.Get());
 	if (m_pObject)
