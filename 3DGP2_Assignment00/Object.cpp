@@ -183,7 +183,13 @@ void CGameObject::UpdateTransform(XMFLOAT4X4* pxmf4x4Parent)
 
 CGameObject* CGameObject::FindFrame(char* pstrFrameName)
 {
-	return nullptr;
+	CGameObject* pFrameObject = NULL;
+	if (!strncmp(m_pstrFrameName, pstrFrameName, strlen(pstrFrameName))) return(this);
+
+	if (m_pSibling) if (pFrameObject = m_pSibling->FindFrame(pstrFrameName)) return(pFrameObject);
+	if (m_pChild) if (pFrameObject = m_pChild->FindFrame(pstrFrameName)) return(pFrameObject);
+
+	return(NULL);
 }
 
 void CGameObject::LoadFrameHierarchyFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, CGameObject* pParent, FILE* pInFile, CShader* pShader)
