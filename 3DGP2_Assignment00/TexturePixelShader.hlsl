@@ -16,10 +16,11 @@ struct MATERIAL
 
 cbuffer cbGameObjectInfo : register(b0)
 {
-	matrix		gmtxGameObject : packoffset(c0);
-	MATERIAL	gMaterial : packoffset(c4);
-	uint		gnTexturesMask : packoffset(c8);
+	matrix gmtxGameObject : packoffset(c0);
+	MATERIAL gMaterial : packoffset(c4);
+	uint gnTexturesMask : packoffset(c8);
 }
+
 
 cbuffer cbCameraInfo : register(b1)
 {
@@ -28,13 +29,16 @@ cbuffer cbCameraInfo : register(b1)
 }
 
 Texture2D gtxMappedTexture[7] : register(t0);
-Texture2D gtxtTexture[8] : register(t7);
+Texture2D gtxtSkyBoxTexture : register(t7);
 SamplerState gSamplerState : register(s0);
 
 struct VS_OUTPUT
 {
 	float4 position : SV_POSITION;
-	float3 normal : NORMAL;
+	float3 positionW : POSITION;
+	float3 normalW : NORMAL;
+	float3 tangentW : TANGENT;
+	float3 bitangentW : BITANGENT;
 	float2 uv : TEXCOORD;
 };
 
@@ -53,5 +57,6 @@ float4 PS_Tex(VS_OUTPUT input) : SV_TARGET
 	if (gnTexturesMask & MATERIAL_EMISSION_MAP) cEmissionColor = gtxMappedTexture[4].Sample(gSamplerState, input.uv);
 
 	float4 cColor = cAlbedoColor + cSpecularColor + cEmissionColor;
+
 	return(cColor);
 }

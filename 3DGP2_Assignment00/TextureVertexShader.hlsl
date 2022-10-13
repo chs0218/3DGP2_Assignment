@@ -1,7 +1,16 @@
+struct MATERIAL
+{
+	float4 m_cAmbient;
+	float4 m_cDiffuse;
+	float4 m_cSpecular; //a = power
+	float4 m_cEmissive;
+};
+
 cbuffer cbGameObjectInfo : register(b0)
 {
 	matrix gmtxGameObject : packoffset(c0);
-	int m_nType : packoffset(c4);
+	MATERIAL gMaterial : packoffset(c4);
+	uint gnTexturesMask : packoffset(c8);
 }
 
 cbuffer cbCameraInfo : register(b1)
@@ -13,8 +22,8 @@ cbuffer cbCameraInfo : register(b1)
 struct VS_INPUT
 {
 	float3 position : POSITION;
-	float3 normal : NORMAL;
 	float2 uv : TEXCOORD;
+	float3 normal : NORMAL;
 	float3 tangent : TANGENT;
 	float3 bitangent : BITANGENT;
 };

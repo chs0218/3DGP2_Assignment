@@ -256,7 +256,7 @@ void CGameFramework::BuildObjects()
 	m_pScene->BuildObjects(m_pd3dDevice.Get(), m_pd3dCommandList.Get());
 
 	// Shader »ý¼º
-	m_pShader = std::make_unique<CTmpTexturedShader>();
+	m_pShader = std::make_unique<CModeledTexturedShader>();
 	m_pShader->CreateShader(m_pd3dDevice.Get(), m_pScene->GetGraphicsRootSignature());
 	m_pShader->CreateShaderVariables(m_pd3dDevice.Get(), m_pd3dCommandList.Get());
 	m_pShader->CreateCbvSrvDescriptorHeaps(m_pd3dDevice.Get(), 0, 1);

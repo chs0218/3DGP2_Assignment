@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "Object.h"
 #include "Shader.h"
+#include "Camera.h"
 
 CGameObject::CGameObject()
 {
@@ -13,25 +14,12 @@ CGameObject::~CGameObject()
 	ReleaseShaderVariables();
 }
 
-void CGameObject::CreateShaderVariables(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
-{
-	/*UINT ncbElementBytes = ((sizeof(CB_GAMEOBJECT_INFO) + 255) & ~255);
-	m_pd3dcbGameObject = ::CreateBufferResource(pd3dDevice, pd3dCommandList, NULL, ncbElementBytes, D3D12_HEAP_TYPE_UPLOAD, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER, NULL);
-	m_pd3dcbGameObject->Map(0, NULL, (void**)&m_pcbMappedGameObject);*/
-}
-
 void CGameObject::ReleaseShaderVariables()
 {
-	if (m_pd3dcbGameObject)
-		m_pd3dcbGameObject->Unmap(0, NULL);
 }
 
 void CGameObject::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList)
 {
-	/*XMStoreFloat4x4(&m_pcbMappedGameObject->m_xmf4x4World, XMMatrixTranspose(XMLoadFloat4x4(&m_xmf4x4World)));
-	D3D12_GPU_VIRTUAL_ADDRESS d3dGpuVirtualAddress = m_pd3dcbGameObject->GetGPUVirtualAddress();
-	pd3dCommandList->SetGraphicsRootConstantBufferView(0, d3dGpuVirtualAddress);*/
-
 	XMFLOAT4X4 xmf4x4World;
 	XMStoreFloat4x4(&xmf4x4World, XMMatrixTranspose(XMLoadFloat4x4(&m_xmf4x4World)));
 	pd3dCommandList->SetGraphicsRoot32BitConstants(0, 16, &xmf4x4World, 0);
@@ -439,4 +427,119 @@ void CSuperCobraObject::Animate(float fTimeElapsed, XMFLOAT4X4* pxmf4x4Parent)
 	CGameObject::Animate(fTimeElapsed, pxmf4x4Parent);
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+CSkyBox::CSkyBox(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature)
+{
+	m_nMeshes = 6;
+	m_ppMeshes.resize(m_nMeshes);
+
+	std::shared_ptr<CTexturedRectMesh> pSkyBoxMesh = std::make_shared<CTexturedRectMesh>(pd3dDevice, pd3dCommandList, 20.0f, 20.0f, 0.0f, 0.0f, 0.0f, +10.0f);
+	SetMesh(0, pSkyBoxMesh);
+	pSkyBoxMesh.reset();
+	pSkyBoxMesh = std::make_shared<CTexturedRectMesh>(pd3dDevice, pd3dCommandList, 20.0f, 20.0f, 0.0f, 0.0f, 0.0f, -10.0f);
+	SetMesh(1, pSkyBoxMesh);
+	pSkyBoxMesh.reset();
+	pSkyBoxMesh = std::make_shared<CTexturedRectMesh>(pd3dDevice, pd3dCommandList, 0.0f, 20.0f, 20.0f, -10.0f, 0.0f, 0.0f);
+	SetMesh(2, pSkyBoxMesh);
+	pSkyBoxMesh.reset();
+	pSkyBoxMesh = std::make_shared<CTexturedRectMesh>(pd3dDevice, pd3dCommandList, 0.0f, 20.0f, 20.0f, +10.0f, 0.0f, 0.0f);
+	SetMesh(3, pSkyBoxMesh);
+	pSkyBoxMesh.reset();
+	pSkyBoxMesh = std::make_shared<CTexturedRectMesh>(pd3dDevice, pd3dCommandList, 20.0f, 0.0f, 20.0f, 0.0f, +10.0f, 0.0f);
+	SetMesh(4, pSkyBoxMesh);
+	pSkyBoxMesh.reset();
+	pSkyBoxMesh = std::make_shared<CTexturedRectMesh>(pd3dDevice, pd3dCommandList, 20.0f, 0.0f, 20.0f, 0.0f, -10.0f, 0.0f);
+	SetMesh(5, pSkyBoxMesh);
+
+	CreateShaderVariables(pd3dDevice, pd3dCommandList);
+
+	std::shared_ptr<CTexture> pSkyBoxTexture = std::make_shared<CTexture>(6, RESOURCE_TEXTURE2D, 0, 1);
+
+	pSkyBoxTexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Image/SkyBox_Front_0.dds", RESOURCE_TEXTURE2D, 0);
+	pSkyBoxTexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Image/SkyBox_Back_0.dds", RESOURCE_TEXTURE2D, 1);
+	pSkyBoxTexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Image/SkyBox_Left_0.dds", RESOURCE_TEXTURE2D, 2);
+	pSkyBoxTexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Image/SkyBox_Right_0.dds", RESOURCE_TEXTURE2D, 3);
+	pSkyBoxTexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Image/SkyBox_Top_0.dds", RESOURCE_TEXTURE2D, 4);
+	pSkyBoxTexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Image/SkyBox_Bottom_0.dds", RESOURCE_TEXTURE2D, 5);
+
+	UINT ncbElementBytes = ((sizeof(CB_GAMEOBJECT_INFO) + 255) & ~255); //256ÀÇ ¹è¼ö
+
+	std::shared_ptr<CSkyBoxShader> pSkyBoxShader = std::make_shared<CSkyBoxShader>();
+	pSkyBoxShader->CreateShader(pd3dDevice, pd3dGraphicsRootSignature);
+	pSkyBoxShader->CreateShaderVariables(pd3dDevice, pd3dCommandList);
+	pSkyBoxShader->CreateCbvSrvDescriptorHeaps(pd3dDevice, 1, 6);
+	pSkyBoxShader->CreateConstantBufferViews(pd3dDevice, 1, m_pd3dcbGameObject.Get(), ncbElementBytes);
+	pSkyBoxShader->CreateShaderResourceViews(pd3dDevice, pSkyBoxTexture.get(), 0, 3);
+
+	SetShader(pSkyBoxShader);
+
+	SetCbvGPUDescriptorHandle(pSkyBoxShader->GetGPUCbvDescriptorStartHandle());
+}
+
+CSkyBox::~CSkyBox()
+{
+}
+
+void CSkyBox::CreateShaderVariables(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
+{
+	UINT ncbElementBytes = ((sizeof(CB_GAMEOBJECT_INFO) + 255) & ~255);
+	m_pd3dcbGameObject = ::CreateBufferResource(pd3dDevice, pd3dCommandList, NULL, ncbElementBytes, D3D12_HEAP_TYPE_UPLOAD, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER, NULL);
+	m_pd3dcbGameObject->Map(0, NULL, (void**)&m_pcbMappedGameObject);
+}
+
+void CSkyBox::ReleaseShaderVariables()
+{
+	if (m_pd3dcbGameObject)
+		m_pd3dcbGameObject->Unmap(0, NULL);
+}
+
+void CSkyBox::SetMesh(int nIndex, std::shared_ptr<CMesh> pMesh)
+{
+	if (m_ppMeshes.data())
+	{
+		if (m_ppMeshes[nIndex]) m_ppMeshes[nIndex].reset();
+		m_ppMeshes[nIndex] = pMesh;
+	}
+}
+
+void CSkyBox::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera)
+{
+	XMFLOAT3 xmf3CameraPos = pCamera->GetPosition();
+	SetPosition(xmf3CameraPos.x, xmf3CameraPos.y, xmf3CameraPos.z);
+
+	OnPrepareRender();
+
+	if (m_ppMaterials[0])
+	{
+		if (m_ppMaterials[0]->m_pShader)
+		{
+			m_ppMaterials[0]->m_pShader->Render(pd3dCommandList);
+			m_ppMaterials[0]->m_pShader->UpdateShaderVariables(pd3dCommandList);
+
+			UpdateShaderVariables(pd3dCommandList);
+		}
+	}
+
+	pd3dCommandList->SetGraphicsRootDescriptorTable(2, m_d3dCbvGPUDescriptorHandle);
+
+	if (m_ppMeshes.data())
+	{
+		for (int i = 0; i < m_ppMeshes.size(); i++)
+		{
+			if (m_ppMaterials[0])
+			{
+				if (m_ppMaterials[0]->m_pTexture) m_ppMaterials[0]->m_pTexture->UpdateShaderVariable(pd3dCommandList, 0, i);
+			}
+			if (m_ppMeshes[i]) m_ppMeshes[i]->Render(pd3dCommandList, 0);
+		}
+	}
+}
+
+void CSkyBox::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList)
+{
+	XMStoreFloat4x4(&m_pcbMappedGameObject->m_xmf4x4World, XMMatrixTranspose(XMLoadFloat4x4(&m_xmf4x4World)));
+	D3D12_GPU_VIRTUAL_ADDRESS d3dGpuVirtualAddress = m_pd3dcbGameObject->GetGPUVirtualAddress();
+	pd3dCommandList->SetGraphicsRootConstantBufferView(0, d3dGpuVirtualAddress);
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
