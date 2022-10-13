@@ -280,8 +280,6 @@ void CGameFramework::BuildObjects()
 
 	m_pCamera = m_pPlayer->GetCamera();
 
-	m_pSkyBox = std::make_unique<CSkyBox>(m_pd3dDevice.Get(), m_pd3dCommandList.Get(), m_pScene->GetGraphicsRootSignature());
-
 	//씬 객체를 생성하기 위하여 필요한 그래픽 명령 리스트들을 명령 큐에 추가한다. 
 	m_pd3dCommandList->Close();
 	ComPtr<ID3D12CommandList> ppd3dCommandLists[] = { m_pd3dCommandList };
@@ -497,8 +495,6 @@ void CGameFramework::FrameAdvance()
 	//렌더링 코드는 여기에 추가될 것이다. 
 	m_pScene->Render(m_pd3dCommandList.Get(), m_pCamera);
 
-	if (m_pSkyBox)
-		m_pSkyBox->Render(m_pd3dCommandList.Get(), m_pCamera);
 	if (m_pShader)
 		m_pShader->Render(m_pd3dCommandList.Get());
 	if (m_pObject)

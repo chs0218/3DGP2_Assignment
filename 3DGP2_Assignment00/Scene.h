@@ -6,6 +6,7 @@ class CCamera;
 //-----------------------------------------------------------------------------
 // 22/09/20 CScene 클래스 추가 - Leejh
 //-----------------------------------------------------------------------------
+class CSkyBox;
 class CScene
 {
 public:
@@ -30,6 +31,7 @@ private:
 
 	float m_fElapsedTime = 0.0f;
 
+	std::unique_ptr<CSkyBox> m_pSkyBox = NULL;
 	XMFLOAT4 m_fClearColor = {0.0f, 0.0f, 0.0f, 0.0f};
 };
 

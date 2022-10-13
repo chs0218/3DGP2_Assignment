@@ -1,8 +1,6 @@
 #include "stdafx.h"
 #include "Scene.h"
-
-#define MAX_SRV_COUNT 32
-#define MAX_LIGHT_COUNT 16
+#include "Object.h"
 
 CScene::CScene()
 {
@@ -97,6 +95,8 @@ void CScene::CreateGraphicsRootSignature(ID3D12Device* pd3dDevice)
 void CScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
 {
 	CreateGraphicsRootSignature(pd3dDevice);
+
+	m_pSkyBox = std::make_unique<CSkyBox>(pd3dDevice, pd3dCommandList, GetGraphicsRootSignature());
 }
 
 void CScene::ReleaseObjects()
@@ -118,4 +118,7 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 
 	pCamera->SetViewportsAndScissorRects(pd3dCommandList);
 	pCamera->UpdateShaderVariables(pd3dCommandList);
+
+	if (m_pSkyBox)
+		m_pSkyBox->Render(pd3dCommandList, pCamera);
 }
