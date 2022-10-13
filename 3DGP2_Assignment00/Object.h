@@ -69,7 +69,7 @@ public:
 
 	char* GetFrameName() { return m_pstrFrameName; }
 	void SetChild(std::shared_ptr<CGameObject> pChild, bool bReferenceUpdate = false);
-	void SetShader(std::shared_ptr<CShader> pShader);
+	void SetShader(std::shared_ptr<CShader> pShader, std::shared_ptr<CTexture> pTexture = NULL);
 	void SetMaterial(int nMaterial, std::shared_ptr<CMaterial> pMaterial);
 	void SetTransform(XMFLOAT4X4 xmf4x4Transform) { m_xmf4x4Transform = xmf4x4Transform; }
 	void SetCbvGPUDescriptorHandle(D3D12_GPU_DESCRIPTOR_HANDLE d3dCbvGPUDescriptorHandle) { m_d3dCbvGPUDescriptorHandle = d3dCbvGPUDescriptorHandle; }

@@ -48,7 +48,7 @@ void CGameObject::SetChild(std::shared_ptr<CGameObject> pChild, bool bReferenceU
 	}
 }
 
-void CGameObject::SetShader(std::shared_ptr<CShader> pShader)
+void CGameObject::SetShader(std::shared_ptr<CShader> pShader, std::shared_ptr<CTexture> pTexture)
 {
 	if (!m_ppMaterials.data())
 	{
@@ -56,6 +56,8 @@ void CGameObject::SetShader(std::shared_ptr<CShader> pShader)
 		m_ppMaterials.resize(m_nMaterials);
 		std::shared_ptr<CMaterial> pMaterial = std::make_shared<CMaterial>();
 		pMaterial->SetShader(pShader);
+		if (pTexture)
+			pMaterial->SetTexture(pTexture);
 		m_ppMaterials[0] = pMaterial;
 	}
 }
@@ -433,26 +435,6 @@ CSkyBox::CSkyBox(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dComman
 	m_nMeshes = 6;
 	m_ppMeshes.resize(m_nMeshes);
 
-	std::shared_ptr<CTexturedRectMesh> pSkyBoxMesh = std::make_shared<CTexturedRectMesh>(pd3dDevice, pd3dCommandList, 20.0f, 20.0f, 0.0f, 0.0f, 0.0f, +10.0f);
-	SetMesh(0, pSkyBoxMesh);
-	pSkyBoxMesh.reset();
-	pSkyBoxMesh = std::make_shared<CTexturedRectMesh>(pd3dDevice, pd3dCommandList, 20.0f, 20.0f, 0.0f, 0.0f, 0.0f, -10.0f);
-	SetMesh(1, pSkyBoxMesh);
-	pSkyBoxMesh.reset();
-	pSkyBoxMesh = std::make_shared<CTexturedRectMesh>(pd3dDevice, pd3dCommandList, 0.0f, 20.0f, 20.0f, -10.0f, 0.0f, 0.0f);
-	SetMesh(2, pSkyBoxMesh);
-	pSkyBoxMesh.reset();
-	pSkyBoxMesh = std::make_shared<CTexturedRectMesh>(pd3dDevice, pd3dCommandList, 0.0f, 20.0f, 20.0f, +10.0f, 0.0f, 0.0f);
-	SetMesh(3, pSkyBoxMesh);
-	pSkyBoxMesh.reset();
-	pSkyBoxMesh = std::make_shared<CTexturedRectMesh>(pd3dDevice, pd3dCommandList, 20.0f, 0.0f, 20.0f, 0.0f, +10.0f, 0.0f);
-	SetMesh(4, pSkyBoxMesh);
-	pSkyBoxMesh.reset();
-	pSkyBoxMesh = std::make_shared<CTexturedRectMesh>(pd3dDevice, pd3dCommandList, 20.0f, 0.0f, 20.0f, 0.0f, -10.0f, 0.0f);
-	SetMesh(5, pSkyBoxMesh);
-
-	CreateShaderVariables(pd3dDevice, pd3dCommandList);
-
 	std::shared_ptr<CTexture> pSkyBoxTexture = std::make_shared<CTexture>(6, RESOURCE_TEXTURE2D, 0, 1);
 
 	pSkyBoxTexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Image/SkyBox_Front_0.dds", RESOURCE_TEXTURE2D, 0);
@@ -462,18 +444,28 @@ CSkyBox::CSkyBox(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dComman
 	pSkyBoxTexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Image/SkyBox_Top_0.dds", RESOURCE_TEXTURE2D, 4);
 	pSkyBoxTexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Image/SkyBox_Bottom_0.dds", RESOURCE_TEXTURE2D, 5);
 
-	UINT ncbElementBytes = ((sizeof(CB_GAMEOBJECT_INFO) + 255) & ~255); //256의 배수
-
-	std::shared_ptr<CSkyBoxShader> pSkyBoxShader = std::make_shared<CSkyBoxShader>();
+	// Shader 생성
+	std::shared_ptr<CShader> pSkyBoxShader = std::make_shared<CSkyBoxShader>();
 	pSkyBoxShader->CreateShader(pd3dDevice, pd3dGraphicsRootSignature);
 	pSkyBoxShader->CreateShaderVariables(pd3dDevice, pd3dCommandList);
-	pSkyBoxShader->CreateCbvSrvDescriptorHeaps(pd3dDevice, 1, 6);
-	pSkyBoxShader->CreateConstantBufferViews(pd3dDevice, 1, m_pd3dcbGameObject.Get(), ncbElementBytes);
+	pSkyBoxShader->CreateCbvSrvDescriptorHeaps(pd3dDevice, 0, 6);
 	pSkyBoxShader->CreateShaderResourceViews(pd3dDevice, pSkyBoxTexture.get(), 0, 3);
 
-	SetShader(pSkyBoxShader);
+	std::shared_ptr<CTexturedRectMesh> pSkyBoxFrontMesh = std::make_shared<CTexturedRectMesh>(pd3dDevice, pd3dCommandList, 20.0f, 20.0f, 0.0f, 0.0f, 0.0f, +10.0f);
+	std::shared_ptr<CTexturedRectMesh> pSkyBoxBackMesh = std::make_shared<CTexturedRectMesh>(pd3dDevice, pd3dCommandList, 20.0f, 20.0f, 0.0f, 0.0f, 0.0f, -10.0f);
+	std::shared_ptr<CTexturedRectMesh> pSkyBoxLeftMesh = std::make_shared<CTexturedRectMesh>(pd3dDevice, pd3dCommandList, 0.0f, 20.0f, 20.0f, -10.0f, 0.0f, 0.0f);
+	std::shared_ptr<CTexturedRectMesh> pSkyBoxRightMesh = std:: make_shared<CTexturedRectMesh>(pd3dDevice, pd3dCommandList, 0.0f, 20.0f, 20.0f, +10.0f, 0.0f, 0.0f);
+	std::shared_ptr<CTexturedRectMesh> pSkyBoxTopMesh = std::make_shared<CTexturedRectMesh>(pd3dDevice, pd3dCommandList, 20.0f, 0.0f, 20.0f, 0.0f, +10.0f, 0.0f);
+	std::shared_ptr<CTexturedRectMesh> pSkyBoxBottomMesh = std::make_shared<CTexturedRectMesh>(pd3dDevice, pd3dCommandList, 20.0f, 0.0f, 20.0f, 0.0f, -10.0f, 0.0f);
 
-	SetCbvGPUDescriptorHandle(pSkyBoxShader->GetGPUCbvDescriptorStartHandle());
+	SetMesh(0, pSkyBoxFrontMesh);
+	SetMesh(1, pSkyBoxBackMesh);
+	SetMesh(2, pSkyBoxLeftMesh);
+	SetMesh(3, pSkyBoxRightMesh);
+	SetMesh(4, pSkyBoxTopMesh);
+	SetMesh(5, pSkyBoxBottomMesh);
+
+	SetShader(pSkyBoxShader, pSkyBoxTexture);
 }
 
 CSkyBox::~CSkyBox()
@@ -497,7 +489,6 @@ void CSkyBox::SetMesh(int nIndex, std::shared_ptr<CMesh> pMesh)
 {
 	if (m_ppMeshes.data())
 	{
-		if (m_ppMeshes[nIndex]) m_ppMeshes[nIndex].reset();
 		m_ppMeshes[nIndex] = pMesh;
 	}
 }
@@ -506,6 +497,7 @@ void CSkyBox::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamer
 {
 	XMFLOAT3 xmf3CameraPos = pCamera->GetPosition();
 	SetPosition(xmf3CameraPos.x, xmf3CameraPos.y, xmf3CameraPos.z);
+	UpdateTransform(NULL);
 
 	OnPrepareRender();
 
@@ -514,32 +506,31 @@ void CSkyBox::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamer
 		if (m_ppMaterials[0]->m_pShader)
 		{
 			m_ppMaterials[0]->m_pShader->Render(pd3dCommandList);
-			m_ppMaterials[0]->m_pShader->UpdateShaderVariables(pd3dCommandList);
-
-			UpdateShaderVariables(pd3dCommandList);
 		}
 	}
 
-	pd3dCommandList->SetGraphicsRootDescriptorTable(2, m_d3dCbvGPUDescriptorHandle);
+	UpdateShaderVariables(pd3dCommandList);
 
 	if (m_ppMeshes.data())
 	{
 		for (int i = 0; i < m_ppMeshes.size(); i++)
 		{
-			if (m_ppMaterials[0])
+			if (m_ppMaterials[0]->m_pTexture)
 			{
-				if (m_ppMaterials[0]->m_pTexture) m_ppMaterials[0]->m_pTexture->UpdateShaderVariable(pd3dCommandList, 0, i);
+				m_ppMaterials[0]->m_pTexture->UpdateShaderVariable(pd3dCommandList, 0, i);
 			}
-			if (m_ppMeshes[i]) m_ppMeshes[i]->Render(pd3dCommandList, 0);
+			// 여기서 메쉬의 렌더를 한다.
+			m_ppMeshes[i]->OnPreRender(pd3dCommandList);
+			m_ppMeshes[i]->Render(pd3dCommandList, i);
 		}
 	}
 }
 
 void CSkyBox::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList)
 {
-	XMStoreFloat4x4(&m_pcbMappedGameObject->m_xmf4x4World, XMMatrixTranspose(XMLoadFloat4x4(&m_xmf4x4World)));
-	D3D12_GPU_VIRTUAL_ADDRESS d3dGpuVirtualAddress = m_pd3dcbGameObject->GetGPUVirtualAddress();
-	pd3dCommandList->SetGraphicsRootConstantBufferView(0, d3dGpuVirtualAddress);
+	XMFLOAT4X4 xmf4x4World;
+	XMStoreFloat4x4(&xmf4x4World, XMMatrixTranspose(XMLoadFloat4x4(&m_xmf4x4World)));
+	pd3dCommandList->SetGraphicsRoot32BitConstants(0, 16, &xmf4x4World, 0);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////

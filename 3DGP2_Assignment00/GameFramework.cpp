@@ -264,7 +264,7 @@ void CGameFramework::BuildObjects()
 	// Mesh 생성
 	std::shared_ptr<CGameObject> SuperCobraObject = std::make_shared<CGameObject>();
 	SuperCobraObject = SuperCobraObject->LoadGeometryFromFile(m_pd3dDevice.Get(), m_pd3dCommandList.Get(), m_pScene->GetGraphicsRootSignature(), "Model/Mi24.bin", m_pShader.get());
-
+	
 	// Object 생성
 	m_pObject = std::make_unique<CSuperCobraObject>();
 	m_pObject->SetChild(SuperCobraObject);
@@ -279,6 +279,8 @@ void CGameFramework::BuildObjects()
 	m_pPlayer->SetScale(20.0f, 20.0f, 20.0f);
 
 	m_pCamera = m_pPlayer->GetCamera();
+
+	m_pSkyBox = std::make_unique<CSkyBox>(m_pd3dDevice.Get(), m_pd3dCommandList.Get(), m_pScene->GetGraphicsRootSignature());
 
 	//씬 객체를 생성하기 위하여 필요한 그래픽 명령 리스트들을 명령 큐에 추가한다. 
 	m_pd3dCommandList->Close();
@@ -425,6 +427,11 @@ void CGameFramework::AnimateObjects()
 		m_pObject->Animate(m_GameTimer.GetFrameTimeElapsed());
 		m_pObject->UpdateTransform(NULL);
 	}
+	if (m_pPlayer)
+	{
+		m_pPlayer->Animate(m_GameTimer.GetFrameTimeElapsed());
+		m_pPlayer->UpdateTransform(NULL);
+	}
 }
 
 void CGameFramework::WaitForGpuComplete()
@@ -488,7 +495,10 @@ void CGameFramework::FrameAdvance()
 	m_pd3dCommandList->OMSetRenderTargets(1, &d3dRtvCPUDescriptorHandle, TRUE, &d3dDsvCPUDescriptorHandle);
 
 	//렌더링 코드는 여기에 추가될 것이다. 
-	m_pScene->Render(m_pd3dCommandList.Get(), m_pPlayer->GetCamera());
+	m_pScene->Render(m_pd3dCommandList.Get(), m_pCamera);
+
+	if (m_pSkyBox)
+		m_pSkyBox->Render(m_pd3dCommandList.Get(), m_pCamera);
 	if (m_pShader)
 		m_pShader->Render(m_pd3dCommandList.Get());
 	if (m_pObject)
@@ -498,6 +508,7 @@ void CGameFramework::FrameAdvance()
 	}
 	if (m_pPlayer)
 	{
+		m_pPlayer->UpdateTransform(NULL);
 		m_pPlayer->Render(m_pd3dCommandList.Get());
 	}
 	/*현재 렌더 타겟에 대한 렌더링이 끝나기를 기다린다. GPU가 렌더 타겟(버퍼)을 더 이상 사용하지 않으면 렌더 타겟

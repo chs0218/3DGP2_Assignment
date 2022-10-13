@@ -60,6 +60,7 @@ private:
 	std::unique_ptr<CPlayer> m_pPlayer = NULL;
 	std::unique_ptr<CGameObject> m_pObject = NULL;
 	std::unique_ptr<CShader> m_pShader = NULL;
+	std::unique_ptr<CGameObject> m_pSkyBox = NULL;
 	CCamera* m_pCamera = NULL;
 
 	CGameTimer					m_GameTimer;

@@ -42,7 +42,6 @@ void CMesh::OnPreRender(ID3D12GraphicsCommandList* pd3dCommandList)
 void CMesh::Render(ID3D12GraphicsCommandList* pd3dCommandList, UINT nSubset)
 {
 	// 메쉬를 렌더링하는 함수이다.
-	
 	if ((m_nSubMeshes > 0) && (nSubset < m_nSubMeshes))
 	{
 		pd3dCommandList->IASetIndexBuffer(&m_pd3dIndexBufferViews[nSubset]);
