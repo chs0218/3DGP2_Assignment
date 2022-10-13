@@ -526,11 +526,95 @@ void CSkyBox::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamer
 	}
 }
 
-void CSkyBox::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList)
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+CHeightMapTerrain::CHeightMapTerrain(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, LPCTSTR pFileName, int nWidth, int nLength, int nBlockWidth, int nBlockLength, XMFLOAT3 xmf3Scale, XMFLOAT4 xmf4Color)
 {
-	XMFLOAT4X4 xmf4x4World;
-	XMStoreFloat4x4(&xmf4x4World, XMMatrixTranspose(XMLoadFloat4x4(&m_xmf4x4World)));
-	pd3dCommandList->SetGraphicsRoot32BitConstants(0, 16, &xmf4x4World, 0);
+	m_nWidth = nWidth;
+	m_nLength = nLength;
+
+	int cxQuadsPerBlock = nBlockWidth - 1;
+	int czQuadsPerBlock = nBlockLength - 1;
+
+	m_xmf3Scale = xmf3Scale;
+
+	m_pHeightMapImage = new CHeightMapImage(pFileName, nWidth, nLength, xmf3Scale);
+
+	long cxBlocks = (m_nWidth - 1) / cxQuadsPerBlock;
+	long czBlocks = (m_nLength - 1) / czQuadsPerBlock;
+
+	m_nMeshes = cxBlocks * czBlocks;
+	m_ppMeshes.resize(m_nMeshes);
+	for (int i = 0; i < m_nMeshes; i++)	m_ppMeshes[i] = NULL;
+
+	std::shared_ptr<CHeightMapGridMesh> pHeightMapGridMesh = NULL;
+	for (int z = 0, zStart = 0; z < czBlocks; z++)
+	{
+		for (int x = 0, xStart = 0; x < cxBlocks; x++)
+		{
+			xStart = x * (nBlockWidth - 1);
+			zStart = z * (nBlockLength - 1);
+			pHeightMapGridMesh = std::make_shared<CHeightMapGridMesh>(pd3dDevice, pd3dCommandList, xStart, zStart, nBlockWidth, nBlockLength, xmf3Scale, xmf4Color, m_pHeightMapImage);
+			SetMesh(x + (z * cxBlocks), pHeightMapGridMesh);
+		}
+	}
+
+	CreateShaderVariables(pd3dDevice, pd3dCommandList);
+
+	std::shared_ptr<CTexture> pTerrainTexture = std::make_shared<CTexture>(3, RESOURCE_TEXTURE2D, 0, 3);
+
+	pTerrainTexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Image/Base_Texture.dds", RESOURCE_TEXTURE2D, 0);
+	pTerrainTexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Image/Detail_Texture_7.dds", RESOURCE_TEXTURE2D, 1);
+	pTerrainTexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Image/HeightMap(Alpha).dds", RESOURCE_TEXTURE2D, 2);
+
+	std::shared_ptr<CTerrainShader> pTerrainShader = std::make_shared<CTerrainShader>();
+	pTerrainShader->CreateShader(pd3dDevice, pd3dGraphicsRootSignature);
+	pTerrainShader->CreateShaderVariables(pd3dDevice, pd3dCommandList);
+	pTerrainShader->CreateCbvSrvDescriptorHeaps(pd3dDevice, 0, 3);
+	pTerrainShader->CreateShaderResourceViews(pd3dDevice, pTerrainTexture.get(), 0, 4);
+
+	SetShader(pTerrainShader, pTerrainTexture);
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+CHeightMapTerrain::~CHeightMapTerrain(void)
+{
+	if (m_pHeightMapImage) delete m_pHeightMapImage;
+}
+
+void CHeightMapTerrain::SetMesh(int nIndex, std::shared_ptr<CMesh> pMesh)
+{
+	if (m_ppMeshes.data())
+	{
+		m_ppMeshes[nIndex] = pMesh;
+	}
+}
+
+void CHeightMapTerrain::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera)
+{
+	UpdateTransform(NULL);
+	OnPrepareRender();
+
+	if (m_ppMaterials[0])
+	{
+		if (m_ppMaterials[0]->m_pShader)
+		{
+			m_ppMaterials[0]->m_pShader->Render(pd3dCommandList);
+		}
+
+		if (m_ppMaterials[0]->m_pTexture)
+		{
+			m_ppMaterials[0]->m_pTexture->UpdateShaderVariables(pd3dCommandList);
+		}
+	}
+
+	UpdateShaderVariables(pd3dCommandList);
+
+	if (m_ppMeshes.data())
+	{
+		for (int i = 0; i < m_ppMeshes.size(); i++)
+		{
+			// 여기서 메쉬의 렌더를 한다.
+			m_ppMeshes[i]->OnPreRender(pd3dCommandList);
+			m_ppMeshes[i]->Render(pd3dCommandList, i);
+		}
+	}
+}

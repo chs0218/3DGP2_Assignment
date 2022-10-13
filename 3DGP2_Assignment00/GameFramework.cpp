@@ -269,7 +269,7 @@ void CGameFramework::BuildObjects()
 	m_pObject = std::make_unique<CSuperCobraObject>();
 	m_pObject->SetChild(SuperCobraObject);
 	m_pObject->PrepareAnimate();
-	m_pObject->SetPosition(XMFLOAT3(0.0f, 0.0f, 0.0f));
+	m_pObject->SetPosition(XMFLOAT3(1030.0f, 200.0f, 1400.0f));
 	m_pObject->SetScale(3.0f, 3.0f, 3.0f);
 	m_pObject->Rotate(0.0f, 45.0f, 0.0f);
 
@@ -277,6 +277,7 @@ void CGameFramework::BuildObjects()
 	m_pPlayer->SetChild(SuperCobraObject);
 	m_pPlayer->PrepareAnimate();
 	m_pPlayer->SetScale(20.0f, 20.0f, 20.0f);
+	m_pPlayer->SetPosition(XMFLOAT3(1030.0f, 200.0f, 1400.0f));
 
 	m_pCamera = m_pPlayer->GetCamera();
 
