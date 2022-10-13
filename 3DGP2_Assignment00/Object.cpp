@@ -1,12 +1,11 @@
 #include "stdafx.h"
 #include "Object.h"
-
+#include "Shader.h"
 
 CGameObject::CGameObject()
 {
 	m_xmf4x4World = Matrix4x4::Identity();
 	m_xmf4x4Transform = Matrix4x4::Identity();
-	m_Type = 0;
 }
 
 CGameObject::~CGameObject()
@@ -61,6 +60,18 @@ void CGameObject::SetChild(std::shared_ptr<CGameObject> pChild, bool bReferenceU
 	}
 }
 
+void CGameObject::SetShader(std::shared_ptr<CShader> pShader)
+{
+	if (!m_ppMaterials.data())
+	{
+		m_nMaterials = 1;
+		m_ppMaterials.resize(m_nMaterials);
+		std::shared_ptr<CMaterial> pMaterial = std::make_shared<CMaterial>();
+		pMaterial->SetShader(pShader);
+		m_ppMaterials[0] = pMaterial;
+	}
+}
+
 void CGameObject::SetMaterial(int nMaterial, std::shared_ptr<CMaterial> pMaterial)
 {
 	m_ppMaterials[nMaterial] = pMaterial;
@@ -75,6 +86,7 @@ void CGameObject::Animate(float fTimeElapsed, XMFLOAT4X4* pxmf4x4Parent)
 void CGameObject::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera)
 {
 	OnPrepareRender();
+	
 	if (m_pMesh)
 	{
 		// CGameObject의 정보를 넘길 버퍼가 있고, 해당 버퍼에 대한 CPU 포인터가 있으면 UpdateShaderVariables 함수를 호출한다.
@@ -83,6 +95,7 @@ void CGameObject::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pC
 		{
 			if (m_ppMaterials[i])
 			{
+				if (m_ppMaterials[i]->m_pShader) m_ppMaterials[0]->m_pShader->Render(pd3dCommandList);
 				m_ppMaterials[i]->UpdateShaderVariables(pd3dCommandList);
 			}
 			// 여기서 메쉬의 렌더를 한다.

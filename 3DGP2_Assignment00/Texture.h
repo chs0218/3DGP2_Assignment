@@ -65,6 +65,7 @@ public:
 	XMFLOAT4 m_xmf4SpecularColor = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
 	XMFLOAT4 m_xmf4AmbientColor = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
 
+	void SetShader(std::shared_ptr<CShader> pShader);
 	void SetMaterialType(UINT nType) { m_nType |= nType; }
 	void SetTexture(std::shared_ptr<CTexture> pTexture);
 
@@ -81,6 +82,8 @@ public:
 	float							m_fSpecularHighlight = 0.0f;
 	float							m_fMetallic = 0.0f;
 	float							m_fGlossyReflection = 0.0f;
+
+	std::shared_ptr<CShader> m_pShader;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

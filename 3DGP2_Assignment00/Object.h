@@ -18,6 +18,7 @@
 class CMesh;
 class CCamera;
 class CTexture;
+class CShader;
 
 struct MATERIAL
 {
@@ -50,7 +51,6 @@ protected:
 
 	ComPtr<ID3D12Resource> m_pd3dcbGameObject = NULL;
 	CB_GAMEOBJECT_INFO* m_pcbMappedGameObject = NULL;
-	int m_Type = 0;
 public:
 	CGameObject* m_pParent = nullptr;
 	std::shared_ptr<CGameObject> m_pChild = nullptr;
@@ -67,7 +67,7 @@ public:
 
 	char* GetFrameName() { return m_pstrFrameName; }
 	void SetChild(std::shared_ptr<CGameObject> pChild, bool bReferenceUpdate = false);
-	void SetTypes(int n_type) { m_Type = n_type; }
+	void SetShader(std::shared_ptr<CShader> pShader);
 	void SetMaterial(int nMaterial, std::shared_ptr<CMaterial> pMaterial);
 	void SetTransform(XMFLOAT4X4 xmf4x4Transform) { m_xmf4x4Transform = xmf4x4Transform; }
 

@@ -219,6 +219,11 @@ CMaterial::~CMaterial()
 {
 }
 
+void CMaterial::SetShader(std::shared_ptr<CShader> pShader)
+{
+	m_pShader = pShader;
+}
+
 void CMaterial::SetTexture(std::shared_ptr<CTexture> pTexture)
 {
 	m_pTexture = pTexture;
