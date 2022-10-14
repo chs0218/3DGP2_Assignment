@@ -8,7 +8,7 @@ struct VS_OUTPUT
 	float2 uv : TEXCOORD;
 };
 
-[earlydepthstencil]
+//[earlydepthstencil]
 float4 PS_Standard(VS_OUTPUT input) : SV_TARGET
 {
 	float4 cColor = gtxtSkyBoxTexture.Sample(gSamplerState, input.uv);

@@ -3,6 +3,7 @@
 class CTexture;
 class CCamera;
 class CGameObject;
+class CTexturedRectMesh;
 
 class CShader
 {
@@ -104,6 +105,10 @@ class CBillboardObjectsShader : public CShader
 protected:
 	std::vector<std::shared_ptr<CGameObject>> m_ppObjects;
 	int	m_nObjects = 0;
+
+	std::shared_ptr<CGameObject>  pGrassObject[2], pTreeObject[3], pFlowerObject[2];
+	std::shared_ptr<CTexturedRectMesh> pGrassMesh, pTreeMesh[3], pFlowerMesh;
+	std::shared_ptr<CTexture> pGrassTexture[2], pTreeTexture[3], pFlowerTexture[2];
 public:
 	CBillboardObjectsShader();
 	virtual ~CBillboardObjectsShader();

@@ -287,6 +287,7 @@ void CGameFramework::BuildObjects()
 	m_pd3dCommandQueue->ExecuteCommandLists(1, ppd3dCommandLists->GetAddressOf());
 
 	WaitForGpuComplete();
+	m_pPlayer->ReleaseUploadBuffers();
 	m_GameTimer.Reset();
 }
 
@@ -503,11 +504,14 @@ void CGameFramework::FrameAdvance()
 		/*m_pObject->UpdateTransform(NULL);
 		m_pObject->Render(m_pd3dCommandList.Get());*/
 	}
+
 	if (m_pPlayer)
 	{
 		m_pPlayer->UpdateTransform(NULL);
 		m_pPlayer->Render(m_pd3dCommandList.Get());
 	}
+
+
 	/*현재 렌더 타겟에 대한 렌더링이 끝나기를 기다린다. GPU가 렌더 타겟(버퍼)을 더 이상 사용하지 않으면 렌더 타겟
 	의 상태는 프리젠트 상태(D3D12_RESOURCE_STATE_PRESENT)로 바뀔 것이다.*/
 	d3dResourceBarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;

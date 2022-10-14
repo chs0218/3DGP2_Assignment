@@ -136,7 +136,7 @@ void CScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 	m_pShader = std::make_unique<CBillboardObjectsShader>();
 	CShader* pShader = m_pShader.get();
 	static_cast<CBillboardObjectsShader*>(pShader)->CreateShader(pd3dDevice, GetGraphicsRootSignature());
-	static_cast<CBillboardObjectsShader*>(pShader)->BuildObjects(pd3dDevice, pd3dCommandList);
+	static_cast<CBillboardObjectsShader*>(pShader)->BuildObjects(pd3dDevice, pd3dCommandList, m_pTerrain.get());
 }
 
 void CScene::ReleaseObjects()
