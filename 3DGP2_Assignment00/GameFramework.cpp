@@ -414,7 +414,7 @@ void CGameFramework::ProcessInput()
 				else
 					m_pPlayer->Rotate(cyDelta, cxDelta, 0.0f);
 			}
-			if (dwDirection) m_pPlayer->Move(dwDirection, 10.0f * m_GameTimer.GetFrameTimeElapsed(), true);
+			if (dwDirection) m_pPlayer->Move(dwDirection, 100.0f * m_GameTimer.GetFrameTimeElapsed(), true);
 		}
 	}
 	m_pPlayer->Update(m_GameTimer.GetFrameTimeElapsed());
