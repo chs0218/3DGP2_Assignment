@@ -73,6 +73,29 @@ void CGameObject::Animate(float fTimeElapsed, XMFLOAT4X4* pxmf4x4Parent)
 	if (m_pChild) m_pChild->Animate(fTimeElapsed, &m_xmf4x4World);
 }
 
+void CGameObject::SetLookAt(const XMFLOAT3& xmf3Target, const XMFLOAT3& xmf3Up)
+{
+	XMFLOAT3 xmf3Position(m_xmf4x4Transform._41, m_xmf4x4Transform._42, m_xmf4x4Transform._43);
+	XMFLOAT4X4 mtxLookAt = Matrix4x4::LookAtLH(xmf3Position, xmf3Target, xmf3Up);
+	m_xmf4x4Transform._11 = mtxLookAt._11; m_xmf4x4Transform._12 = mtxLookAt._21; m_xmf4x4Transform._13 = mtxLookAt._31;
+	m_xmf4x4Transform._21 = mtxLookAt._12; m_xmf4x4Transform._22 = mtxLookAt._22; m_xmf4x4Transform._23 = mtxLookAt._32;
+	m_xmf4x4Transform._31 = mtxLookAt._13; m_xmf4x4Transform._32 = mtxLookAt._23; m_xmf4x4Transform._33 = mtxLookAt._33;
+
+	UpdateTransform(NULL);
+}
+
+void CGameObject::SetTexture(std::shared_ptr<CTexture> pTexture)
+{
+	if (!m_ppMaterials.data())
+	{
+		m_nMaterials = 1;
+		m_ppMaterials.resize(m_nMaterials);
+		std::shared_ptr<CMaterial> pMaterial = std::make_shared<CMaterial>();
+		pMaterial->SetTexture(pTexture);
+		m_ppMaterials[0] = pMaterial;
+	}
+}
+
 void CGameObject::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera)
 {
 	OnPrepareRender();
@@ -470,19 +493,6 @@ CSkyBox::CSkyBox(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dComman
 
 CSkyBox::~CSkyBox()
 {
-}
-
-void CSkyBox::CreateShaderVariables(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
-{
-	UINT ncbElementBytes = ((sizeof(CB_GAMEOBJECT_INFO) + 255) & ~255);
-	m_pd3dcbGameObject = ::CreateBufferResource(pd3dDevice, pd3dCommandList, NULL, ncbElementBytes, D3D12_HEAP_TYPE_UPLOAD, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER, NULL);
-	m_pd3dcbGameObject->Map(0, NULL, (void**)&m_pcbMappedGameObject);
-}
-
-void CSkyBox::ReleaseShaderVariables()
-{
-	if (m_pd3dcbGameObject)
-		m_pd3dcbGameObject->Unmap(0, NULL);
 }
 
 void CSkyBox::SetMesh(int nIndex, std::shared_ptr<CMesh> pMesh)

@@ -500,8 +500,8 @@ void CGameFramework::FrameAdvance()
 		m_pShader->Render(m_pd3dCommandList.Get());
 	if (m_pObject)
 	{
-		m_pObject->UpdateTransform(NULL);
-		m_pObject->Render(m_pd3dCommandList.Get());
+		/*m_pObject->UpdateTransform(NULL);
+		m_pObject->Render(m_pd3dCommandList.Get());*/
 	}
 	if (m_pPlayer)
 	{

@@ -119,5 +119,7 @@
     <FxCompile Include="TexturePixelShader.hlsl" />
     <FxCompile Include="TerrainVertexShader.hlsl" />
     <FxCompile Include="TerrainPixelShader.hlsl" />
+    <FxCompile Include="StandardVertexShader.hlsl" />
+    <FxCompile Include="StandardPixelShader.hlsl" />
   </ItemGroup>
 </Project>

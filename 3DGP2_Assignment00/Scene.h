@@ -2,7 +2,7 @@
 #include "Camera.h"
 
 class CCamera;
-
+class CShader;
 //-----------------------------------------------------------------------------
 // 22/09/20 CScene 클래스 추가 - Leejh
 //-----------------------------------------------------------------------------
@@ -34,6 +34,7 @@ private:
 
 	std::unique_ptr<CSkyBox> m_pSkyBox = NULL;
 	std::unique_ptr<CHeightMapTerrain> m_pTerrain = NULL;
+	std::unique_ptr<CShader> m_pShader = NULL;
 	XMFLOAT4 m_fClearColor = {0.0f, 0.0f, 0.0f, 0.0f};
 };
 

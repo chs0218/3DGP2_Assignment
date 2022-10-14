@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "Shader.h"
 #include "Texture.h"
+#include "Object.h"
+#include "Camera.h"
 
 CShader::CShader()
 {
@@ -8,6 +10,7 @@ CShader::CShader()
 
 CShader::~CShader()
 {
+	ReleaseShaderVariables();
 }
 
 D3D12_SHADER_BYTECODE CShader::CreateVertexShader(ID3DBlob** ppd3dShaderBlob)
@@ -178,6 +181,7 @@ void CShader::UpdateShaderVariable(ID3D12GraphicsCommandList* pd3dCommandList, X
 
 void CShader::ReleaseShaderVariables()
 {
+	if (m_pd3dCbvSrvDescriptorHeap) m_pd3dCbvSrvDescriptorHeap->Release();
 }
 
 void CShader::ReleaseUploadBuffers()
@@ -193,6 +197,11 @@ void CShader::OnPrepareRender(ID3D12GraphicsCommandList* pd3dCommandList)
 }
 
 void CShader::Render(ID3D12GraphicsCommandList* pd3dCommandList)
+{
+	OnPrepareRender(pd3dCommandList);
+}
+
+void CShader::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera)
 {
 	OnPrepareRender(pd3dCommandList);
 }
@@ -349,12 +358,12 @@ void CSkyBoxShader::CreateShader(ID3D12Device* pd3dDevice, ID3D12RootSignature* 
 
 D3D12_SHADER_BYTECODE CSkyBoxShader::CreateVertexShader(ID3DBlob** ppd3dShaderBlob)
 {
-	return(CShader::ReadCompiledShaderFile(L"TmpVertexShader.cso", ppd3dShaderBlob));
+	return(CShader::ReadCompiledShaderFile(L"StandardVertexShader.cso", ppd3dShaderBlob));
 }
 
 D3D12_SHADER_BYTECODE CSkyBoxShader::CreatePixelShader(ID3DBlob** ppd3dShaderBlob)
 {
-	return(CShader::ReadCompiledShaderFile(L"TmpPixelShader.cso", ppd3dShaderBlob));
+	return(CShader::ReadCompiledShaderFile(L"StandardPixelShader.cso", ppd3dShaderBlob));
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -397,4 +406,134 @@ D3D12_SHADER_BYTECODE CTerrainShader::CreatePixelShader(ID3DBlob** ppd3dShaderBl
 void CTerrainShader::CreateShader(ID3D12Device* pd3dDevice, ID3D12RootSignature* pd3dGraphicsRootSignature)
 {
 	CShader::CreateShader(pd3dDevice, pd3dGraphicsRootSignature);
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+CBillboardObjectsShader::CBillboardObjectsShader()
+{
+}
+
+CBillboardObjectsShader::~CBillboardObjectsShader()
+{
+}
+
+D3D12_RASTERIZER_DESC CBillboardObjectsShader::CreateRasterizerState()
+{
+	D3D12_RASTERIZER_DESC d3dRasterizerDesc;
+	::ZeroMemory(&d3dRasterizerDesc, sizeof(D3D12_RASTERIZER_DESC));
+	d3dRasterizerDesc.FillMode = D3D12_FILL_MODE_SOLID;
+	d3dRasterizerDesc.CullMode = D3D12_CULL_MODE_BACK;
+	d3dRasterizerDesc.FrontCounterClockwise = FALSE;
+	d3dRasterizerDesc.DepthBias = 0;
+	d3dRasterizerDesc.DepthBiasClamp = 0.0f;
+	d3dRasterizerDesc.SlopeScaledDepthBias = 0.0f;
+	d3dRasterizerDesc.DepthClipEnable = TRUE;
+	d3dRasterizerDesc.MultisampleEnable = FALSE;
+	d3dRasterizerDesc.AntialiasedLineEnable = FALSE;
+	d3dRasterizerDesc.ForcedSampleCount = 0;
+	d3dRasterizerDesc.ConservativeRaster = D3D12_CONSERVATIVE_RASTERIZATION_MODE_OFF;
+
+	return(d3dRasterizerDesc);
+}
+
+D3D12_BLEND_DESC CBillboardObjectsShader::CreateBlendState()
+{
+	D3D12_BLEND_DESC d3dBlendDesc;
+	::ZeroMemory(&d3dBlendDesc, sizeof(D3D12_BLEND_DESC));
+	d3dBlendDesc.AlphaToCoverageEnable = TRUE;
+	d3dBlendDesc.IndependentBlendEnable = FALSE;
+	d3dBlendDesc.RenderTarget[0].BlendEnable = TRUE;
+	d3dBlendDesc.RenderTarget[0].LogicOpEnable = FALSE;
+	d3dBlendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA;
+	d3dBlendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_INV_SRC_ALPHA;
+	d3dBlendDesc.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
+	d3dBlendDesc.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_ONE;
+	d3dBlendDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ZERO;
+	d3dBlendDesc.RenderTarget[0].BlendOpAlpha = D3D12_BLEND_OP_ADD;
+	d3dBlendDesc.RenderTarget[0].LogicOp = D3D12_LOGIC_OP_NOOP;
+	d3dBlendDesc.RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
+
+	return(d3dBlendDesc);
+}
+
+void CBillboardObjectsShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, void* pContext)
+{
+	std::shared_ptr<CGameObject> pTreeObject = std::make_shared<CGameObject>();
+	std::shared_ptr<CTexturedRectMesh> pTreeMesh01 = std::make_shared<CTexturedRectMesh>(pd3dDevice, pd3dCommandList, 24.0f, 36.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+	
+	std::shared_ptr<CTexture> pTreeTexture = std::make_shared<CTexture>(1, RESOURCE_TEXTURE2D, 0, 1);
+	//pTreeTexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Image/Tree01.dds", RESOURCE_TEXTURE2D, 0);
+	//pTreeTexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Image/Tree02.dds", RESOURCE_TEXTURE2D, 0);
+	//pTreeTexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Image/Tree03.dds", RESOURCE_TEXTURE2D, 0);
+	//pTreeTexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Image/Flower01.dds", RESOURCE_TEXTURE2D, 0);
+	//pTreeTexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Image/Flower02.dds", RESOURCE_TEXTURE2D, 0);
+	//pTreeTexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Image/Grass01.dds", RESOURCE_TEXTURE2D, 0);
+	//pTreeTexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Image/Grass02.dds", RESOURCE_TEXTURE2D, 0);
+
+	pTreeObject->SetTexture(pTreeTexture);
+	pTreeObject->SetMesh(pTreeMesh01);
+	pTreeObject->SetPosition(XMFLOAT3(1030.0f, 200.0f, 1400.0f));
+
+	CreateCbvSrvDescriptorHeaps(pd3dDevice, 0, 1);
+	CreateShaderResourceViews(pd3dDevice, pTreeTexture.get(), 0, 3);
+
+	m_nObjects = 1;
+	m_ppObjects.push_back(pTreeObject);
+}
+
+void CBillboardObjectsShader::AnimateObjects(float fTimeElapsed)
+{
+}
+
+void CBillboardObjectsShader::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera)
+{
+	XMFLOAT3 xmf3CameraPosition = pCamera->GetPosition();
+	for (int i = 0; i < m_nObjects; i++)
+	{
+		if (m_ppObjects[i]) m_ppObjects[i]->SetLookAt(xmf3CameraPosition, XMFLOAT3(0.0f, 1.0f, 0.0f));
+	}
+	CShader::Render(pd3dCommandList, pCamera);
+
+	for (int i = 0; i < m_nObjects; i++)
+	{
+		if (m_ppObjects[i]) m_ppObjects[i]->Render(pd3dCommandList, pCamera);
+	}
+}
+
+D3D12_INPUT_LAYOUT_DESC CBillboardObjectsShader::CreateInputLayout()
+{
+	UINT nInputElementDescs = 2;
+	D3D12_INPUT_ELEMENT_DESC* pd3dInputElementDescs = new D3D12_INPUT_ELEMENT_DESC[nInputElementDescs];
+
+	pd3dInputElementDescs[0] = { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
+	pd3dInputElementDescs[1] = { "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
+
+	D3D12_INPUT_LAYOUT_DESC d3dInputLayoutDesc;
+	d3dInputLayoutDesc.pInputElementDescs = pd3dInputElementDescs;
+	d3dInputLayoutDesc.NumElements = nInputElementDescs;
+
+	return(d3dInputLayoutDesc);
+}
+
+void CBillboardObjectsShader::ReleaseUploadBuffers()
+{
+	if (m_ppObjects.data())
+	{
+		for (int i = 0; i < m_nObjects; i++) if (m_ppObjects[i]) m_ppObjects[i]->ReleaseShaderVariables();
+	}
+}
+
+void CBillboardObjectsShader::CreateShader(ID3D12Device* pd3dDevice, ID3D12RootSignature* pd3dGraphicsRootSignature)
+{
+	CShader::CreateShader(pd3dDevice, pd3dGraphicsRootSignature);
+}
+
+D3D12_SHADER_BYTECODE CBillboardObjectsShader::CreateVertexShader(ID3DBlob** ppd3dShaderBlob)
+{
+	return(CShader::ReadCompiledShaderFile(L"StandardVertexShader.cso", ppd3dShaderBlob));
+}
+
+D3D12_SHADER_BYTECODE CBillboardObjectsShader::CreatePixelShader(ID3DBlob** ppd3dShaderBlob)
+{
+	return(CShader::ReadCompiledShaderFile(L"StandardPixelShader.cso", ppd3dShaderBlob));
 }

@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "Scene.h"
 #include "Object.h"
+#include "Shader.h"
 
 CScene::CScene()
 {
@@ -132,6 +133,10 @@ void CScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 	XMFLOAT4 xmf4Color(0.0f, 0.5f, 0.0f, 0.0f);
 	m_pTerrain = std::make_unique<CHeightMapTerrain>(pd3dDevice, pd3dCommandList, GetGraphicsRootSignature(), _T("Image/HeightMap.raw"), 257, 257, 257, 257, xmf3Scale, xmf4Color);
 	m_pSkyBox = std::make_unique<CSkyBox>(pd3dDevice, pd3dCommandList, GetGraphicsRootSignature());
+	m_pShader = std::make_unique<CBillboardObjectsShader>();
+	CShader* pShader = m_pShader.get();
+	static_cast<CBillboardObjectsShader*>(pShader)->CreateShader(pd3dDevice, GetGraphicsRootSignature());
+	static_cast<CBillboardObjectsShader*>(pShader)->BuildObjects(pd3dDevice, pd3dCommandList);
 }
 
 void CScene::ReleaseObjects()
@@ -158,4 +163,6 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 		m_pSkyBox->Render(pd3dCommandList, pCamera);
 	if (m_pTerrain)
 		m_pTerrain->Render(pd3dCommandList, pCamera);
+	if (m_pShader)
+		m_pShader->Render(pd3dCommandList, pCamera);
 }

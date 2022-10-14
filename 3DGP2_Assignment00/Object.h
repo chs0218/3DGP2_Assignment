@@ -72,6 +72,8 @@ public:
 	void SetShader(std::shared_ptr<CShader> pShader, std::shared_ptr<CTexture> pTexture = NULL);
 	void SetMaterial(int nMaterial, std::shared_ptr<CMaterial> pMaterial);
 	void SetTransform(XMFLOAT4X4 xmf4x4Transform) { m_xmf4x4Transform = xmf4x4Transform; }
+	void SetTexture(std::shared_ptr<CTexture> pTexture);
+	void SetLookAt(const XMFLOAT3& xmf3Target, const XMFLOAT3& xmf3Up);
 	void SetCbvGPUDescriptorHandle(D3D12_GPU_DESCRIPTOR_HANDLE d3dCbvGPUDescriptorHandle) { m_d3dCbvGPUDescriptorHandle = d3dCbvGPUDescriptorHandle; }
 
 	virtual void OnInitialize() { }
@@ -134,8 +136,6 @@ private:
 public:
 	CSkyBox(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature);
 	virtual ~CSkyBox();
-	virtual void CreateShaderVariables(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
-	virtual void ReleaseShaderVariables();
 	virtual void SetMesh(int nIndex, std::shared_ptr<CMesh> pMesh);
 	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera = NULL);
 };
