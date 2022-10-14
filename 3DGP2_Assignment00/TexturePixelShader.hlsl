@@ -42,6 +42,7 @@ struct VS_OUTPUT
 	float2 uv : TEXCOORD;
 };
 
+[earlydepthstencil]
 float4 PS_Tex(VS_OUTPUT input) : SV_TARGET
 {
 	float4 cAlbedoColor = float4(0.0f, 0.0f, 0.0f, 1.0f);

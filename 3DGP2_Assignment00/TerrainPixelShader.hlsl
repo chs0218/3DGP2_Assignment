@@ -11,6 +11,7 @@ struct VS_TERRAIN_OUTPUT
 	float2 uv1 : TEXCOORD1;
 };
 
+[earlydepthstencil]
 float4 PSTerrain(VS_TERRAIN_OUTPUT input) : SV_TARGET
 {
 	float4 cBaseTexColor = gtxtTerrainBaseTexture.Sample(gSamplerState, input.uv0);
