@@ -80,7 +80,6 @@ public:
 	virtual D3D12_INPUT_LAYOUT_DESC CreateInputLayout();
 	virtual D3D12_DEPTH_STENCIL_DESC CreateDepthStencilState();
 
-	virtual void CreateShader(ID3D12Device* pd3dDevice, ID3D12RootSignature* pd3dGraphicsRootSignature);
 	virtual D3D12_SHADER_BYTECODE CreateVertexShader(ID3DBlob** ppd3dShaderBlob);
 	virtual D3D12_SHADER_BYTECODE CreatePixelShader(ID3DBlob** ppd3dShaderBlob);
 };
@@ -94,7 +93,6 @@ public:
 	virtual ~CTerrainShader();
 
 	virtual D3D12_INPUT_LAYOUT_DESC CreateInputLayout();
-	virtual void CreateShader(ID3D12Device* pd3dDevice, ID3D12RootSignature* pd3dGraphicsRootSignature);
 	virtual D3D12_SHADER_BYTECODE CreateVertexShader(ID3DBlob** ppd3dShaderBlob);
 	virtual D3D12_SHADER_BYTECODE CreatePixelShader(ID3DBlob** ppd3dShaderBlob);
 };
@@ -113,11 +111,9 @@ public:
 	CBillboardObjectsShader();
 	virtual ~CBillboardObjectsShader();
 
-	virtual D3D12_RASTERIZER_DESC CreateRasterizerState();
 	virtual D3D12_BLEND_DESC CreateBlendState();
 
 	virtual D3D12_INPUT_LAYOUT_DESC CreateInputLayout();
-	virtual void CreateShader(ID3D12Device* pd3dDevice, ID3D12RootSignature* pd3dGraphicsRootSignature);
 	virtual D3D12_SHADER_BYTECODE CreateVertexShader(ID3DBlob** ppd3dShaderBlob);
 	virtual D3D12_SHADER_BYTECODE CreatePixelShader(ID3DBlob** ppd3dShaderBlob);
 
@@ -127,3 +123,15 @@ public:
 	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera);
 };
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+class CRippleWaterShader : public CShader
+{
+public:
+	CRippleWaterShader();
+	virtual ~CRippleWaterShader();
+
+	virtual D3D12_INPUT_LAYOUT_DESC CreateInputLayout();
+
+	virtual D3D12_SHADER_BYTECODE CreateVertexShader(ID3DBlob** ppd3dShaderBlob);
+	virtual D3D12_SHADER_BYTECODE CreatePixelShader(ID3DBlob** ppd3dShaderBlob);
+};

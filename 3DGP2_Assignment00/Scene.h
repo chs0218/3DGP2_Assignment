@@ -1,5 +1,6 @@
 #pragma once
 #include "Camera.h"
+#include "Object.h"
 
 class CCamera;
 class CShader;
@@ -8,6 +9,7 @@ class CShader;
 //-----------------------------------------------------------------------------
 class CSkyBox;
 class CHeightMapTerrain;
+class CRippleWater;
 class CScene
 {
 public:
@@ -34,6 +36,7 @@ private:
 
 	std::unique_ptr<CSkyBox> m_pSkyBox = NULL;
 	std::unique_ptr<CHeightMapTerrain> m_pTerrain = NULL;
+	std::unique_ptr<CRippleWater> m_pWater = NULL;
 	std::unique_ptr<CShader> m_pShader = NULL;
 	XMFLOAT4 m_fClearColor = {0.0f, 0.0f, 0.0f, 0.0f};
 };

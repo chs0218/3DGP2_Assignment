@@ -170,3 +170,27 @@ public:
 	virtual void SetMesh(int nIndex, std::shared_ptr<CMesh> pMesh);
 	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera = NULL);
 };
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+class CRippleWater : public CGameObject
+{
+public:
+	CRippleWater(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, int nWidth, int nLength, int nBlockWidth, int nBlockLength, XMFLOAT3 xmf3Scale, XMFLOAT4 xmf4Color);
+	virtual ~CRippleWater();
+
+private:
+	int								m_nWidth;
+	int								m_nLength;
+
+	XMFLOAT3						m_xmf3Scale;
+
+	int	m_nMeshes;
+	std::vector<std::shared_ptr<CMesh>> m_ppMeshes;
+public:
+	XMFLOAT3 GetScale() { return(m_xmf3Scale); }
+	float GetWidth() { return(m_nWidth * m_xmf3Scale.x); }
+	float GetLength() { return(m_nLength * m_xmf3Scale.z); }
+
+	virtual void SetMesh(int nIndex, std::shared_ptr<CMesh> pMesh);
+	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera = NULL);
+};

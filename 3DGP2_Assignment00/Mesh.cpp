@@ -680,8 +680,13 @@ CHeightMapGridMesh::CHeightMapGridMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsC
 	std::vector<CDiffused2TexturedVertex> pVertices(m_nVertices); 
 
 	CHeightMapImage* pHeightMapImage = (CHeightMapImage*)pContext;
-	int cxHeightMap = pHeightMapImage->GetRawImageWidth();
-	int czHeightMap = pHeightMapImage->GetRawImageLength();
+	int cxHeightMap = m_nWidth;
+	int czHeightMap = m_nLength;
+	if (pHeightMapImage)
+	{
+		cxHeightMap = pHeightMapImage->GetRawImageWidth();
+		czHeightMap = pHeightMapImage->GetRawImageLength();
+	}
 
 	float fHeight = 0.0f, fMinHeight = +FLT_MAX, fMaxHeight = -FLT_MAX;
 	for (int i = 0, z = zStart; z < (zStart + nLength); z++)
@@ -750,28 +755,37 @@ CHeightMapGridMesh::~CHeightMapGridMesh()
 
 float CHeightMapGridMesh::OnGetHeight(int x, int z, void* pContext)
 {
+	float fHeight = 0.0f;
 	CHeightMapImage* pHeightMapImage = (CHeightMapImage*)pContext;
-	BYTE* pHeightMapPixels = pHeightMapImage->GetRawImagePixels();
-	XMFLOAT3 xmf3Scale = pHeightMapImage->GetScale();
-	int nWidth = pHeightMapImage->GetRawImageWidth();
-	float fHeight = pHeightMapPixels[x + (z * nWidth)] * xmf3Scale.y;
+	if (pHeightMapImage)
+	{
+		BYTE* pHeightMapPixels = pHeightMapImage->GetRawImagePixels();
+		XMFLOAT3 xmf3Scale = pHeightMapImage->GetScale();
+		int nWidth = pHeightMapImage->GetRawImageWidth();
+		fHeight = pHeightMapPixels[x + (z * nWidth)] * xmf3Scale.y;
+	}
 	return(fHeight);
 }
 
 XMFLOAT4 CHeightMapGridMesh::OnGetColor(int x, int z, void* pContext)
 {
-	XMFLOAT3 xmf3LightDirection = XMFLOAT3(-1.0f, 1.0f, 1.0f);
-	xmf3LightDirection = Vector3::Normalize(xmf3LightDirection);
+	XMFLOAT4 xmf4Color = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 	CHeightMapImage* pHeightMapImage = (CHeightMapImage*)pContext;
-	XMFLOAT3 xmf3Scale = pHeightMapImage->GetScale();
-	XMFLOAT4 xmf4IncidentLightColor(0.9f, 0.8f, 0.4f, 1.0f);
-	float fScale = Vector3::DotProduct(pHeightMapImage->GetHeightMapNormal(x, z), xmf3LightDirection);
-	fScale += Vector3::DotProduct(pHeightMapImage->GetHeightMapNormal(x + 1, z), xmf3LightDirection);
-	fScale += Vector3::DotProduct(pHeightMapImage->GetHeightMapNormal(x + 1, z + 1), xmf3LightDirection);
-	fScale += Vector3::DotProduct(pHeightMapImage->GetHeightMapNormal(x, z + 1), xmf3LightDirection);
-	fScale = (fScale / 4.0f) + 0.05f;
-	if (fScale > 1.0f) fScale = 1.0f;
-	if (fScale < 0.25f) fScale = 0.25f;
-	XMFLOAT4 xmf4Color = Vector4::Multiply(fScale, xmf4IncidentLightColor);
+	if (pHeightMapImage)
+	{
+		XMFLOAT3 xmf3LightDirection = XMFLOAT3(-1.0f, 1.0f, 1.0f);
+		xmf3LightDirection = Vector3::Normalize(xmf3LightDirection);
+		CHeightMapImage* pHeightMapImage = (CHeightMapImage*)pContext;
+		XMFLOAT3 xmf3Scale = pHeightMapImage->GetScale();
+		XMFLOAT4 xmf4IncidentLightColor(0.9f, 0.8f, 0.4f, 1.0f);
+		float fScale = Vector3::DotProduct(pHeightMapImage->GetHeightMapNormal(x, z), xmf3LightDirection);
+		fScale += Vector3::DotProduct(pHeightMapImage->GetHeightMapNormal(x + 1, z), xmf3LightDirection);
+		fScale += Vector3::DotProduct(pHeightMapImage->GetHeightMapNormal(x + 1, z + 1), xmf3LightDirection);
+		fScale += Vector3::DotProduct(pHeightMapImage->GetHeightMapNormal(x, z + 1), xmf3LightDirection);
+		fScale = (fScale / 4.0f) + 0.05f;
+		if (fScale > 1.0f) fScale = 1.0f;
+		if (fScale < 0.25f) fScale = 0.25f;
+		xmf4Color = Vector4::Multiply(fScale, xmf4IncidentLightColor);
+	}
 	return(xmf4Color);
 }

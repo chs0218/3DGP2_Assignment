@@ -129,9 +129,13 @@ void CScene::CreateGraphicsRootSignature(ID3D12Device* pd3dDevice)
 void CScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
 {
 	CreateGraphicsRootSignature(pd3dDevice);
-	XMFLOAT3 xmf3Scale(8.0f, 2.0f, 8.0f);
-	XMFLOAT4 xmf4Color(0.0f, 0.5f, 0.0f, 0.0f);
-	m_pTerrain = std::make_unique<CHeightMapTerrain>(pd3dDevice, pd3dCommandList, GetGraphicsRootSignature(), _T("Image/HeightMap.raw"), 257, 257, 257, 257, xmf3Scale, xmf4Color);
+	XMFLOAT3 xmf3TerrainScale(8.0f, 2.0f, 8.0f);
+	XMFLOAT4 xmf4TerrainColor(0.0f, 0.5f, 0.0f, 0.0f);
+	m_pTerrain = std::make_unique<CHeightMapTerrain>(pd3dDevice, pd3dCommandList, GetGraphicsRootSignature(), _T("Image/HeightMap.raw"), 257, 257, 257, 257, xmf3TerrainScale, xmf4TerrainColor);
+	
+	XMFLOAT3 xmf3WaterScale(8.0f, 1.0f, 8.0f);
+	XMFLOAT4 xmf4WaterColor(0.0f, 0.0f, 0.7f, 1.0f);
+	m_pWater = std::make_unique<CRippleWater>(pd3dDevice, pd3dCommandList, GetGraphicsRootSignature(), 257, 257, 257, 257, xmf3WaterScale, xmf4WaterColor);
 	m_pSkyBox = std::make_unique<CSkyBox>(pd3dDevice, pd3dCommandList, GetGraphicsRootSignature());
 	m_pShader = std::make_unique<CBillboardObjectsShader>();
 	CShader* pShader = m_pShader.get();
@@ -163,6 +167,8 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 		m_pSkyBox->Render(pd3dCommandList, pCamera);
 	if (m_pTerrain)
 		m_pTerrain->Render(pd3dCommandList, pCamera);
+	if (m_pWater)
+		m_pWater->Render(pd3dCommandList, pCamera);
 	if (m_pShader)
 		m_pShader->Render(pd3dCommandList, pCamera);
 }

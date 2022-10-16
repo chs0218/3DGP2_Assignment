@@ -121,5 +121,7 @@
     <FxCompile Include="TerrainPixelShader.hlsl" />
     <FxCompile Include="StandardVertexShader.hlsl" />
     <FxCompile Include="StandardPixelShader.hlsl" />
+    <FxCompile Include="WaterVertexShader.hlsl" />
+    <FxCompile Include="WaterPixelShader.hlsl" />
   </ItemGroup>
 </Project>
