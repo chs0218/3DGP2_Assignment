@@ -16,6 +16,7 @@ CGameFramework::CGameFramework()
 
 CGameFramework::~CGameFramework()
 {
+	ReleaseShaderVariables();
 }
 
 bool CGameFramework::OnCreate(HINSTANCE hInstance, HWND hMainWnd)
@@ -30,6 +31,7 @@ bool CGameFramework::OnCreate(HINSTANCE hInstance, HWND hMainWnd)
 	CreateRtvAndDsvDescriptorHeaps();
 	CreateRenderTargetViews();
 	CreateDepthStencilView();
+	CreateShaderVariables();
 
 	//렌더링할 게임 객체를 생성한다.
 	BuildObjects();
@@ -494,6 +496,8 @@ void CGameFramework::FrameAdvance()
 	//렌더 타겟 뷰(서술자)와 깊이-스텐실 뷰(서술자)를 출력-병합 단계(OM)에 연결한다. 
 	m_pd3dCommandList->OMSetRenderTargets(1, &d3dRtvCPUDescriptorHandle, TRUE, &d3dDsvCPUDescriptorHandle);
 
+	//UpdateShaderVariables();
+
 	//렌더링 코드는 여기에 추가될 것이다. 
 	m_pScene->Render(m_pd3dCommandList.Get(), m_pCamera);
 
@@ -542,6 +546,42 @@ void CGameFramework::FrameAdvance()
 
 	m_GameTimer.GetFrameRate(m_pszFrameRate + 20, 29);
 	::SetWindowText(m_hWnd, m_pszFrameRate);
+}
+
+void CGameFramework::CreateShaderVariables()
+{
+	UINT ncbElementBytes = ((sizeof(CB_FRAME_INFO) + 255) & ~255); //256의 배수
+	m_pd3dcbFrame = ::CreateBufferResource(m_pd3dDevice.Get(), m_pd3dCommandList.Get(), NULL, ncbElementBytes, D3D12_HEAP_TYPE_UPLOAD, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER, NULL);
+
+	m_pd3dcbFrame->Map(0, NULL, (void**)&m_pcbMappedFrame);
+}
+
+void CGameFramework::UpdateShaderVariables()
+{
+	float fCurrentTime = m_GameTimer.GetTotalTime();
+	float fElapsedTime = m_GameTimer.GetFrameTimeElapsed();
+	POINT ptCursorPos;
+	::GetCursorPos(&ptCursorPos);
+	::ScreenToClient(m_hWnd, &ptCursorPos);
+	float fxCursorPos = (ptCursorPos.x < 0) ? 0.0f : float(ptCursorPos.x);
+	float fyCursorPos = (ptCursorPos.y < 0) ? 0.0f : float(ptCursorPos.y);
+
+	m_pcbMappedFrame->fCurrentTime = fCurrentTime;
+	m_pcbMappedFrame->fElapsedTime = fElapsedTime;
+	m_pcbMappedFrame->f2CursorPos.x = fxCursorPos;
+	m_pcbMappedFrame->f2CursorPos.y = fyCursorPos;
+
+	D3D12_GPU_VIRTUAL_ADDRESS d3dGpuVirtualAddress = m_pd3dcbFrame->GetGPUVirtualAddress();
+	m_pd3dCommandList->SetGraphicsRootConstantBufferView(2, d3dGpuVirtualAddress);
+}
+
+void CGameFramework::ReleaseShaderVariables()
+{
+	if (m_pd3dcbFrame)
+	{
+		m_pd3dcbFrame->Unmap(0, NULL);
+		m_pd3dcbFrame->Release();
+	}
 }
 
 void CGameFramework::ChangeSwapChainState()

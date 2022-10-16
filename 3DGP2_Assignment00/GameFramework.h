@@ -7,6 +7,13 @@
 #include "Camera.h"
 #include "Texture.h"
 
+struct CB_FRAME_INFO
+{
+	float 		fCurrentTime;
+	float		fElapsedTime;
+	XMFLOAT2	f2CursorPos;
+};
+
 class CPlayer;
 class CGameFramework
 {
@@ -62,6 +69,9 @@ private:
 	std::unique_ptr<CShader> m_pShader = NULL;
 	CCamera* m_pCamera = NULL;
 
+	ID3D12Resource* m_pd3dcbFrame = NULL;
+	CB_FRAME_INFO* m_pcbMappedFrame = NULL;
+
 	CGameTimer					m_GameTimer;
 	POINT						m_ptOldCursorPos;
 	_TCHAR						m_pszFrameRate[50];
@@ -91,6 +101,11 @@ public:
 	void ProcessInput();
 	void AnimateObjects();
 	void FrameAdvance();
+
+	//프레임워크의 현재 시간, 경과 시간, 마우스 x 좌표, 마우스 y 좌표를 업데이트해주는 함수이다.
+	void CreateShaderVariables();
+	void UpdateShaderVariables();
+	void ReleaseShaderVariables();
 
 	//CPU와 GPU를 동기화하는 함수이다.
 	void WaitForGpuComplete();

@@ -45,7 +45,7 @@ struct VS_WATER_OUTPUT
 VS_WATER_OUTPUT VS_Water(VS_WATER_INPUT input)
 {
 	VS_WATER_OUTPUT output;
-	//input.position.y += sin(gfCurrentTime * 0.5f + input.position.x * 0.01f) * 45.0f + cos(gfCurrentTime * 1.0f + input.position.z * 0.01f) * 35.0f;
+	input.position.y += sin(gfCurrentTime * 0.5f + input.position.x * 0.01f) * 45.0f + cos(gfCurrentTime * 1.0f + input.position.z * 0.01f) * 35.0f;
 	output.position = mul(mul(mul(float4(input.position, 1.0f), gmtxGameObject), gmtxView), gmtxProjection);
 	output.color = (input.position.y / 200.0f) + 0.55f;
 	output.uv0 = input.uv0;
