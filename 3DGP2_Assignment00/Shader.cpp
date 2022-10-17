@@ -744,14 +744,14 @@ void CObjectShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommand
 	m_nObjects = 120;
 	m_ppObjects.resize(m_nObjects);
 
-	CreateCbvSrvDescriptorHeaps(pd3dDevice, 0, 17); //SuperCobra(17), Gunship(2)
+	CreateCbvSrvDescriptorHeaps(pd3dDevice, 0, 19); //SuperCobra(17), Gunship(2)
 
 	std::shared_ptr<CGameObject> pSuperCobraObject = std::make_shared<CGameObject>();
 	pSuperCobraObject = pSuperCobraObject->LoadGeometryFromFile(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature, "Model/SuperCobra.bin", this);
 
-	std::shared_ptr<CGameObject> pGunshipModel = std::make_shared<CGameObject>();
-	pGunshipModel = pGunshipModel->LoadGeometryFromFile(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature, "Model/GunShip.bin", this);
-
+	std::shared_ptr<CGameObject> pGunshipObject = std::make_shared<CGameObject>();
+	pGunshipObject = pGunshipObject->LoadGeometryFromFile(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature, "Model/Gunship.bin", this);
+	
 	int nColumnSpace = 5, nColumnSize = 30;
 	int nFirstPassColumnSize = (m_nObjects % nColumnSize) > 0 ? (nColumnSize - 1) : nColumnSize;
 
@@ -768,10 +768,11 @@ void CObjectShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommand
 			else
 			{
 				m_ppObjects[nObjects] = new CGunshipObject();
-				m_ppObjects[nObjects]->SetChild(pGunshipModel);
+				m_ppObjects[nObjects]->SetChild(pGunshipObject);
 			}
-			m_ppObjects[nObjects]->SetPosition(RandomPositionInSphere(XMFLOAT3(0.0f, 0.0f, 0.0f), Random(20.0f, 100.0f), h - int(floor(nColumnSize / 2.0f)), nColumnSpace));
-			m_ppObjects[nObjects]->Rotate(0.0f, 90.0f, 0.0f);
+			
+			m_ppObjects[nObjects]->SetPosition(RandomPositionInSphere(XMFLOAT3(1000.0f, 500.0f, 1500.0f), Random(20.0f, 100.0f), h - int(floor(nColumnSize / 2.0f)), nColumnSpace));
+			m_ppObjects[nObjects]->Rotate(0.0f, 45.0f, 0.0f);
 			m_ppObjects[nObjects++]->PrepareAnimate();
 		}
 	}
@@ -788,10 +789,10 @@ void CObjectShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommand
 			else
 			{
 				m_ppObjects[nObjects] = new CGunshipObject();
-				m_ppObjects[nObjects]->SetChild(pGunshipModel);
+				m_ppObjects[nObjects]->SetChild(pGunshipObject);
 			}
-			m_ppObjects[nObjects]->SetPosition(RandomPositionInSphere(XMFLOAT3(0.0f, 0.0f, 0.0f), Random(20.0f, 100.0f), nColumnSize - int(floor(nColumnSize / 2.0f)), nColumnSpace));
-			m_ppObjects[nObjects]->Rotate(0.0f, 90.0f, 0.0f);
+			m_ppObjects[nObjects]->SetPosition(RandomPositionInSphere(XMFLOAT3(1000.0f, 500.0f, 1500.0f), Random(20.0f, 100.0f), nColumnSize - int(floor(nColumnSize / 2.0f)), nColumnSpace));
+			m_ppObjects[nObjects]->Rotate(0.0f, 45.0f, 0.0f);
 			m_ppObjects[nObjects++]->PrepareAnimate();
 		}
 	}

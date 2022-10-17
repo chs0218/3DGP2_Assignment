@@ -150,6 +150,11 @@ void CScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 	CShader* pShader = m_pShader.get();
 	static_cast<CBillboardObjectsShader*>(pShader)->CreateShader(pd3dDevice, GetGraphicsRootSignature());
 	static_cast<CBillboardObjectsShader*>(pShader)->BuildObjects(pd3dDevice, pd3dCommandList, m_pTerrain.get());
+
+	m_pShader2 = std::make_unique<CObjectShader>();
+	pShader = m_pShader2.get();
+	static_cast<CObjectShader*>(pShader)->CreateShader(pd3dDevice, GetGraphicsRootSignature());
+	static_cast<CObjectShader*>(pShader)->BuildObjects(pd3dDevice, pd3dCommandList, GetGraphicsRootSignature());
 }
 
 void CScene::ReleaseObjects()
@@ -194,4 +199,7 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 		m_pWater->Render(pd3dCommandList, pCamera);
 	if (m_pShader)
 		m_pShader->Render(pd3dCommandList, pCamera);
+
+	if (m_pShader2)
+		m_pShader2->Render(pd3dCommandList, pCamera);
 }
