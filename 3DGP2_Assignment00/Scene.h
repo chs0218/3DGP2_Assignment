@@ -30,6 +30,7 @@ public:
 	void PrepareRender(ID3D12GraphicsCommandList* pd3dCommandList);
 	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera = NULL);
 
+	CHeightMapTerrain* GetTerrain() { return(m_pTerrain.get()); }
 private:
 	ComPtr<ID3D12RootSignature> m_pd3dGraphicsRootSignature = nullptr;
 

@@ -265,7 +265,7 @@ void CGameFramework::BuildObjects()
 	std::shared_ptr<CGameObject> SuperCobraObject = std::make_shared<CGameObject>();
 	SuperCobraObject = SuperCobraObject->LoadGeometryFromFile(m_pd3dDevice.Get(), m_pd3dCommandList.Get(), m_pScene->GetGraphicsRootSignature(), "Model/Mi24.bin", m_pShader.get());
 	
-	m_pPlayer = std::make_unique<CAirplanePlayer>(m_pd3dDevice.Get(), m_pd3dCommandList.Get(), m_pScene->GetGraphicsRootSignature());
+	m_pPlayer = std::make_unique<CTerrianFlyingPlayer>(m_pd3dDevice.Get(), m_pd3dCommandList.Get(), m_pScene->GetGraphicsRootSignature(), m_pScene->GetTerrain());
 	m_pPlayer->SetChild(SuperCobraObject);
 	m_pPlayer->PrepareAnimate();
 	m_pPlayer->SetScale(20.0f, 20.0f, 20.0f);

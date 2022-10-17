@@ -79,17 +79,20 @@ public:
 	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList);
 };
 
-class CAirplanePlayer : public CPlayer
+class CTerrianFlyingPlayer : public CPlayer
 {
 protected:
 	CGameObject* m_pMainRotorFrame = NULL;
 	CGameObject* m_pTailRotorFrame = NULL;
 public:
-	CAirplanePlayer(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, void* pContext = NULL, int nMeshes = 1);
-	virtual ~CAirplanePlayer();
+	CTerrianFlyingPlayer(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, void* pContext = NULL);
+	virtual ~CTerrianFlyingPlayer();
 
 	virtual CCamera* ChangeCamera(DWORD nNewCameraMode, float fTimeElapsed);
 	virtual void PrepareAnimate();
 	virtual void Animate(float fTimeElapsed, XMFLOAT4X4* pxmf4x4Parent = NULL);
 	virtual void OnPrepareRender();
+
+	virtual void OnPlayerUpdateCallback(float fTimeElapsed);
+	virtual void OnCameraUpdateCallback(float fTimeElapsed);
 };

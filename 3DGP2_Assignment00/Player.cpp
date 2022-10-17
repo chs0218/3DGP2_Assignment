@@ -222,23 +222,25 @@ void CPlayer::Render(ID3D12GraphicsCommandList* pd3dCommandList)
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// CAirplanePlayer
+// CTerrianFlyingPlayer
 //
-CAirplanePlayer::CAirplanePlayer(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, void* pContext, int nMeshes) : CPlayer(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature, pContext, nMeshes)
+CTerrianFlyingPlayer::CTerrianFlyingPlayer(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, void* pContext) : CPlayer(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature, pContext)
 {
 	m_pCamera = ChangeCamera(THIRD_PERSON_CAMERA, 0.0f);
 
 	CreateShaderVariables(pd3dDevice, pd3dCommandList);
 
-
+	CHeightMapTerrain* pTerrain = (CHeightMapTerrain*)pContext;
+	SetPlayerUpdatedContext(pTerrain);
+	SetCameraUpdatedContext(pTerrain);
 	UpdateTransform(NULL);
 }
 
-CAirplanePlayer::~CAirplanePlayer()
+CTerrianFlyingPlayer::~CTerrianFlyingPlayer()
 {
 }
 
-void CAirplanePlayer::OnPrepareRender()
+void CTerrianFlyingPlayer::OnPrepareRender()
 {
 	CPlayer::OnPrepareRender();
 
@@ -246,7 +248,46 @@ void CAirplanePlayer::OnPrepareRender()
 	m_xmf4x4World = Matrix4x4::Multiply(mtxRotate, m_xmf4x4World);
 }
 
-CCamera* CAirplanePlayer::ChangeCamera(DWORD nNewCameraMode, float fTimeElapsed)
+void CTerrianFlyingPlayer::OnPlayerUpdateCallback(float fTimeElapsed)
+{
+	CHeightMapTerrain* pTerrain = (CHeightMapTerrain*)m_pPlayerUpdatedContext;
+	XMFLOAT3 xmf3Scale = pTerrain->GetScale();
+	XMFLOAT3 xmf3PlayerPosition = GetPosition();
+	int z = (int)(xmf3PlayerPosition.z / xmf3Scale.z);
+	bool bReverseQuad = ((z % 2) != 0);
+	float fHeight = pTerrain->GetHeight(xmf3PlayerPosition.x, xmf3PlayerPosition.z, bReverseQuad) + 6.0f;
+	if (xmf3PlayerPosition.y < fHeight)
+	{
+		XMFLOAT3 xmf3PlayerVelocity = GetVelocity();
+		xmf3PlayerVelocity.y = 0.0f;
+		SetVelocity(xmf3PlayerVelocity);
+		xmf3PlayerPosition.y = fHeight;
+		SetPosition(xmf3PlayerPosition);
+	}
+}
+
+void CTerrianFlyingPlayer::OnCameraUpdateCallback(float fTimeElapsed)
+{
+	CHeightMapTerrain* pTerrain = (CHeightMapTerrain*)m_pCameraUpdatedContext;
+	XMFLOAT3 xmf3Scale = pTerrain->GetScale();
+	XMFLOAT3 xmf3CameraPosition = m_pCamera->GetPosition();
+	int z = (int)(xmf3CameraPosition.z / xmf3Scale.z);
+	bool bReverseQuad = ((z % 2) != 0);
+	float fHeight = pTerrain->GetHeight(xmf3CameraPosition.x, xmf3CameraPosition.z, bReverseQuad) + 5.0f;
+	if (xmf3CameraPosition.y <= fHeight)
+	{
+		xmf3CameraPosition.y = fHeight;
+		m_pCamera->SetPosition(xmf3CameraPosition);
+		if (m_pCamera->GetMode() == THIRD_PERSON_CAMERA)
+		{
+			CThirdPersonCamera* p3rdPersonCamera = (CThirdPersonCamera*)m_pCamera;
+			XMFLOAT3 xmf3Position = GetPosition();
+			p3rdPersonCamera->SetLookAt(xmf3Position);
+		}
+	}
+}
+
+CCamera* CTerrianFlyingPlayer::ChangeCamera(DWORD nNewCameraMode, float fTimeElapsed)
 {
 	DWORD nCurrentCameraMode = (m_pCamera) ? m_pCamera->GetMode() : 0x00;
 	if (nCurrentCameraMode == nNewCameraMode) return(m_pCamera);
@@ -297,13 +338,13 @@ CCamera* CAirplanePlayer::ChangeCamera(DWORD nNewCameraMode, float fTimeElapsed)
 	return(m_pCamera);
 }
 
-void CAirplanePlayer::PrepareAnimate()
+void CTerrianFlyingPlayer::PrepareAnimate()
 {
 	m_pMainRotorFrame = FindFrame("Top_Rotor");
 	m_pTailRotorFrame = FindFrame("Tail_Rotor");
 }
 
-void CAirplanePlayer::Animate(float fTimeElapsed, XMFLOAT4X4* pxmf4x4Parent)
+void CTerrianFlyingPlayer::Animate(float fTimeElapsed, XMFLOAT4X4* pxmf4x4Parent)
 {
 	if (m_pMainRotorFrame)
 	{
