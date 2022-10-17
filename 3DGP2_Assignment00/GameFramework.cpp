@@ -293,6 +293,7 @@ void CGameFramework::BuildObjects()
 
 void CGameFramework::ReleaseObjects()
 {
+	if (m_pScene) m_pScene->ReleaseObjects();
 }
 
 void CGameFramework::OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)

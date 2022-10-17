@@ -39,6 +39,7 @@ private:
 	std::unique_ptr<CHeightMapTerrain> m_pTerrain = NULL;
 	std::unique_ptr<CRippleWater> m_pWater = NULL;
 	std::unique_ptr<CShader> m_pShader = NULL;
+	std::unique_ptr<CShader> m_pShader2 = NULL;
 	XMFLOAT4 m_fClearColor = {0.0f, 0.0f, 0.0f, 0.0f};
 };
 

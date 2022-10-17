@@ -154,6 +154,17 @@ void CScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 
 void CScene::ReleaseObjects()
 {
+	if (m_pShader)
+	{
+		m_pShader->ReleaseShaderVariables();
+		m_pShader->ReleaseObjects();
+	}
+	
+	if (m_pShader2)
+	{
+		m_pShader2->ReleaseShaderVariables();
+		m_pShader2->ReleaseObjects();
+	}
 }
 
 bool CScene::ProcessInput(UCHAR* pKeysBuffer)
