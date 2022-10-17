@@ -154,7 +154,7 @@ void CScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 	m_pShader2 = std::make_unique<CObjectShader>();
 	pShader = m_pShader2.get();
 	static_cast<CObjectShader*>(pShader)->CreateShader(pd3dDevice, GetGraphicsRootSignature());
-	static_cast<CObjectShader*>(pShader)->BuildObjects(pd3dDevice, pd3dCommandList, GetGraphicsRootSignature());
+	static_cast<CObjectShader*>(pShader)->BuildObjects(pd3dDevice, pd3dCommandList, GetGraphicsRootSignature(), m_pTerrain.get());
 }
 
 void CScene::ReleaseObjects()

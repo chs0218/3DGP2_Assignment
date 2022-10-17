@@ -756,6 +756,11 @@ void CObjectShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommand
 	int nFirstPassColumnSize = (m_nObjects % nColumnSize) > 0 ? (nColumnSize - 1) : nColumnSize;
 
 	int nObjects = 0;
+
+	CHeightMapTerrain* pTerrain = (CHeightMapTerrain*)pContext;
+	float f_Width = pTerrain->GetWidth();
+	float f_Length = pTerrain->GetLength();
+
 	for (int h = 0; h < nFirstPassColumnSize; h++)
 	{
 		for (int i = 0; i < floor(float(m_nObjects) / float(nColumnSize)); i++)
@@ -771,7 +776,7 @@ void CObjectShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommand
 				m_ppObjects[nObjects]->SetChild(pGunshipObject);
 			}
 			
-			m_ppObjects[nObjects]->SetPosition(RandomPositionInSphere(XMFLOAT3(1000.0f, 500.0f, 1500.0f), Random(20.0f, 100.0f), h - int(floor(nColumnSize / 2.0f)), nColumnSpace));
+			m_ppObjects[nObjects]->SetPosition(RandomPositionInSphere(XMFLOAT3(f_Width / 2.0f, 500.0f, f_Length / 2.0f), Random(800.0f, 1000.0f), h - int(floor(nColumnSize / 2.0f)), nColumnSpace));
 			m_ppObjects[nObjects]->Rotate(0.0f, 45.0f, 0.0f);
 			m_ppObjects[nObjects++]->PrepareAnimate();
 		}
@@ -791,7 +796,7 @@ void CObjectShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommand
 				m_ppObjects[nObjects] = new CGunshipObject();
 				m_ppObjects[nObjects]->SetChild(pGunshipObject);
 			}
-			m_ppObjects[nObjects]->SetPosition(RandomPositionInSphere(XMFLOAT3(1000.0f, 500.0f, 1500.0f), Random(20.0f, 100.0f), nColumnSize - int(floor(nColumnSize / 2.0f)), nColumnSpace));
+			m_ppObjects[nObjects]->SetPosition(RandomPositionInSphere(XMFLOAT3(f_Width / 2.0f, 500.0f, f_Length / 2.0f), Random(0.0f, 1000.0f), nColumnSize - int(floor(nColumnSize / 2.0f)), nColumnSpace));
 			m_ppObjects[nObjects]->Rotate(0.0f, 45.0f, 0.0f);
 			m_ppObjects[nObjects++]->PrepareAnimate();
 		}
