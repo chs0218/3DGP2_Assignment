@@ -125,7 +125,38 @@ public:
 	virtual void PrepareAnimate();
 	virtual void Animate(float fTimeElapsed, XMFLOAT4X4* pxmf4x4Parent = NULL);
 };
+
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+class CMi24Object : public CGameObject
+{
+public:
+	CMi24Object() {}
+	~CMi24Object() {}
+
+private:
+	CGameObject* m_pMainRotorFrame = NULL;
+	CGameObject* m_pTailRotorFrame = NULL;
+
+public:
+	virtual void PrepareAnimate();
+	virtual void Animate(float fTimeElapsed, XMFLOAT4X4* pxmf4x4Parent = NULL);
+};
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+class CGunshipObject : public CGameObject
+{
+public:
+	CGunshipObject() {}
+	~CGunshipObject() {}
+
+private:
+	CGameObject* m_pMainRotorFrame = NULL;
+	CGameObject* m_pTailRotorFrame = NULL;
+
+public:
+	virtual void PrepareAnimate();
+	virtual void Animate(float fTimeElapsed, XMFLOAT4X4* pxmf4x4Parent = NULL);
+};
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class CSkyBox : public CGameObject

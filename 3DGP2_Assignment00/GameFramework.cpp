@@ -266,10 +266,10 @@ void CGameFramework::BuildObjects()
 	SuperCobraObject = SuperCobraObject->LoadGeometryFromFile(m_pd3dDevice.Get(), m_pd3dCommandList.Get(), m_pScene->GetGraphicsRootSignature(), "Model/Mi24.bin", m_pShader.get());
 	
 	// Object »ý¼º
-	m_pObject = std::make_unique<CSuperCobraObject>();
+	m_pObject = std::make_unique<CMi24Object>();
 	m_pObject->SetChild(SuperCobraObject);
 	m_pObject->PrepareAnimate();
-	m_pObject->SetPosition(XMFLOAT3(1030.0f, 200.0f, 1400.0f));
+	m_pObject->SetPosition(XMFLOAT3(1030.0f, 600.0f, 1500.0f));
 	m_pObject->SetScale(3.0f, 3.0f, 3.0f);
 	m_pObject->Rotate(0.0f, 45.0f, 0.0f);
 
@@ -505,8 +505,8 @@ void CGameFramework::FrameAdvance()
 		m_pShader->Render(m_pd3dCommandList.Get());
 	if (m_pObject)
 	{
-		/*m_pObject->UpdateTransform(NULL);
-		m_pObject->Render(m_pd3dCommandList.Get());*/
+		m_pObject->UpdateTransform(NULL);
+		m_pObject->Render(m_pd3dCommandList.Get());
 	}
 
 	if (m_pPlayer)

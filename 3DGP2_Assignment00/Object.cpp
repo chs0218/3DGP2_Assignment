@@ -432,11 +432,57 @@ int CGameObject::FindReplicatedTexture(_TCHAR* pstrTextureName, D3D12_GPU_DESCRI
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void CSuperCobraObject::PrepareAnimate()
 {
+	m_pMainRotorFrame = FindFrame("MainRotor");
+	m_pTailRotorFrame = FindFrame("TailRotor");
+}
+
+void CSuperCobraObject::Animate(float fTimeElapsed, XMFLOAT4X4* pxmf4x4Parent)
+{
+	if (m_pMainRotorFrame)
+	{
+		XMMATRIX xmmtxRotate = XMMatrixRotationY(XMConvertToRadians(360.0f * 4.0f) * fTimeElapsed);
+		m_pMainRotorFrame->SetTransform(Matrix4x4::Multiply(xmmtxRotate, m_pMainRotorFrame->GetTransform()));
+	}
+	if (m_pTailRotorFrame)
+	{
+		XMMATRIX xmmtxRotate = XMMatrixRotationX(XMConvertToRadians(360.0f * 4.0f) * fTimeElapsed);
+		m_pTailRotorFrame->SetTransform(Matrix4x4::Multiply(xmmtxRotate, m_pTailRotorFrame->GetTransform()));
+	}
+
+	CGameObject::Animate(fTimeElapsed, pxmf4x4Parent);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void CMi24Object::PrepareAnimate()
+{
 	m_pMainRotorFrame = FindFrame("Top_Rotor");
 	m_pTailRotorFrame = FindFrame("Tail_Rotor");
 }
 
-void CSuperCobraObject::Animate(float fTimeElapsed, XMFLOAT4X4* pxmf4x4Parent)
+void CMi24Object::Animate(float fTimeElapsed, XMFLOAT4X4* pxmf4x4Parent)
+{
+	if (m_pMainRotorFrame)
+	{
+		XMMATRIX xmmtxRotate = XMMatrixRotationY(XMConvertToRadians(360.0f * 4.0f) * fTimeElapsed);
+		m_pMainRotorFrame->SetTransform(Matrix4x4::Multiply(xmmtxRotate, m_pMainRotorFrame->GetTransform()));
+	}
+	if (m_pTailRotorFrame)
+	{
+		XMMATRIX xmmtxRotate = XMMatrixRotationX(XMConvertToRadians(360.0f * 4.0f) * fTimeElapsed);
+		m_pTailRotorFrame->SetTransform(Matrix4x4::Multiply(xmmtxRotate, m_pTailRotorFrame->GetTransform()));
+	}
+
+	CGameObject::Animate(fTimeElapsed, pxmf4x4Parent);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void CGunshipObject::PrepareAnimate()
+{
+	m_pMainRotorFrame = FindFrame("Rotor");
+	m_pTailRotorFrame = FindFrame("Back_Rotor");
+}
+
+void CGunshipObject::Animate(float fTimeElapsed, XMFLOAT4X4* pxmf4x4Parent)
 {
 	if (m_pMainRotorFrame)
 	{
