@@ -277,7 +277,7 @@ void CGameFramework::BuildObjects()
 	m_pPlayer->SetChild(SuperCobraObject);
 	m_pPlayer->PrepareAnimate();
 	m_pPlayer->SetScale(20.0f, 20.0f, 20.0f);
-	m_pPlayer->SetPosition(XMFLOAT3(1030.0f, 200.0f, 1400.0f));
+	m_pPlayer->SetPosition(XMFLOAT3(1030.0f, 600.0f, 1400.0f));
 
 	m_pCamera = m_pPlayer->GetCamera();
 

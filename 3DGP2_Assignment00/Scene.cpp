@@ -143,7 +143,7 @@ void CScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 	XMFLOAT3 xmf3WaterScale(8.0f, 1.0f, 8.0f);
 	XMFLOAT4 xmf4WaterColor(0.0f, 0.0f, 0.7f, 1.0f);
 	m_pWater = std::make_unique<CRippleWater>(pd3dDevice, pd3dCommandList, GetGraphicsRootSignature(), 257, 257, 257, 257, xmf3WaterScale, xmf4WaterColor);
-	m_pWater->SetPosition(XMFLOAT3(0.0f, 200.0f, 0.0f));
+	m_pWater->SetPosition(XMFLOAT3(0.0f, 130.0f, 0.0f));
 
 	m_pSkyBox = std::make_unique<CSkyBox>(pd3dDevice, pd3dCommandList, GetGraphicsRootSignature());
 	m_pShader = std::make_unique<CBillboardObjectsShader>();
