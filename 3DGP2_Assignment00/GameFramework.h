@@ -103,9 +103,7 @@ public:
 	void FrameAdvance();
 
 	//프레임워크의 현재 시간, 경과 시간, 마우스 x 좌표, 마우스 y 좌표를 업데이트해주는 함수이다.
-	void CreateShaderVariables();
 	void UpdateShaderVariables();
-	void ReleaseShaderVariables();
 
 	//CPU와 GPU를 동기화하는 함수이다.
 	void WaitForGpuComplete();
