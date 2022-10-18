@@ -4,6 +4,7 @@ class CTexture;
 class CCamera;
 class CGameObject;
 class CTexturedRectMesh;
+class CEnemy;
 
 class CShader
 {
@@ -79,7 +80,7 @@ class CObjectShader : public CShader
 {
 protected:
 	int	m_nObjects = 0;
-	std::vector<CGameObject*> m_ppObjects;
+	std::vector<CEnemy*> m_ppObjects;
 public:
 	virtual D3D12_SHADER_BYTECODE CreateVertexShader(ID3DBlob** ppd3dShaderBlob);
 	virtual D3D12_SHADER_BYTECODE CreatePixelShader(ID3DBlob** ppd3dShaderBlob);

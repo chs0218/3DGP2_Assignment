@@ -199,7 +199,6 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 		m_pWater->Render(pd3dCommandList, pCamera);
 	if (m_pShader)
 		m_pShader->Render(pd3dCommandList, pCamera);
-
 	if (m_pShader2)
 		m_pShader2->Render(pd3dCommandList, pCamera);
 }

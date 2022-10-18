@@ -1,4 +1,15 @@
 #include "Enemy.h"
+XMFLOAT3 RandomPositionInSphere(XMFLOAT3 xmf3Center, float fRadius, int nColumn, int nColumnSpace)
+{
+	float fAngle = Random() * 360.0f * (2.0f * 3.14159f / 360.0f);
+
+	XMFLOAT3 xmf3Position;
+	xmf3Position.x = xmf3Center.x + fRadius * sin(fAngle);
+	xmf3Position.y = xmf3Center.y - (nColumn * float(nColumnSpace) / 2.0f) + (nColumn * nColumnSpace) + Random();
+	xmf3Position.z = xmf3Center.z + fRadius * cos(fAngle);
+
+	return(xmf3Position);
+}
 
 XMFLOAT3 RandomDirection()
 {
@@ -22,6 +33,8 @@ CEnemy::CEnemy()
 
 CEnemy::~CEnemy()
 {
+	if (m_pObject)
+		delete m_pObject;
 }
 
 void CEnemy::Update(float fTimeElapsed)
@@ -48,5 +61,31 @@ void CEnemy::UpdateDirection(float fTimeElapsed)
 		{
 			direction = RandomDirection();
 		}
+	}
+}
+
+void CEnemy::SetObject(CGameObject* pObject, float f_Width, float f_Length, int nColumnSize, int nColumnSpace, int h)
+{
+	m_pObject = pObject;
+	if (h != -1)
+		m_pObject->SetPosition(RandomPositionInSphere(XMFLOAT3(f_Width / 2.0f, 500.0f, f_Length / 2.0f), Random(800.0f, 1000.0f), h - int(floor(nColumnSize / 2.0f)), nColumnSpace));
+	else
+		m_pObject->SetPosition(RandomPositionInSphere(XMFLOAT3(f_Width / 2.0f, 500.0f, f_Length / 2.0f), Random(0.0f, 1000.0f), nColumnSize - int(floor(nColumnSize / 2.0f)), nColumnSpace));
+	m_pObject->Rotate(0.0f, 45.0f, 0.0f);
+	m_pObject->PrepareAnimate();
+}
+
+void CEnemy::Animate(float fTimeElapsed)
+{
+	if (m_pObject)
+		m_pObject->Animate(fTimeElapsed, NULL);
+}
+
+void CEnemy::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera)
+{
+	if (m_pObject)
+	{
+		m_pObject->UpdateTransform(NULL);
+		m_pObject->Render(pd3dCommandList, pCamera);
 	}
 }

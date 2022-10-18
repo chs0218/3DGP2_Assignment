@@ -3,6 +3,7 @@
 #include "Texture.h"
 #include "Object.h"
 #include "Camera.h"
+#include "Enemy.h"
 
 CShader::CShader()
 {
@@ -685,18 +686,6 @@ D3D12_SHADER_BYTECODE CRippleWaterShader::CreatePixelShader(ID3DBlob** ppd3dShad
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-XMFLOAT3 RandomPositionInSphere(XMFLOAT3 xmf3Center, float fRadius, int nColumn, int nColumnSpace)
-{
-	float fAngle = Random() * 360.0f * (2.0f * 3.14159f / 360.0f);
-
-	XMFLOAT3 xmf3Position;
-	xmf3Position.x = xmf3Center.x + fRadius * sin(fAngle);
-	xmf3Position.y = xmf3Center.y - (nColumn * float(nColumnSpace) / 2.0f) + (nColumn * nColumnSpace) + Random();
-	xmf3Position.z = xmf3Center.z + fRadius * cos(fAngle);
-
-	return(xmf3Position);
-}
-
 D3D12_SHADER_BYTECODE CObjectShader::CreateVertexShader(ID3DBlob** ppd3dShaderBlob)
 {
 	return(CShader::ReadCompiledShaderFile(L"TextureVertexShader.cso", ppd3dShaderBlob));
@@ -748,24 +737,27 @@ void CObjectShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommand
 	float f_Width = pTerrain->GetWidth();
 	float f_Length = pTerrain->GetLength();
 
+	CGameObject* pGameObject;
+
 	for (int h = 0; h < nFirstPassColumnSize; h++)
 	{
 		for (int i = 0; i < floor(float(m_nObjects) / float(nColumnSize)); i++)
 		{
 			if (nObjects % 2)
 			{
-				m_ppObjects[nObjects] = new CSuperCobraObject();
-				m_ppObjects[nObjects]->SetChild(pSuperCobraObject);
+				pGameObject = new CSuperCobraObject();
+				pGameObject->SetChild(pSuperCobraObject);
+				m_ppObjects[nObjects] = new CEnemy();
+				m_ppObjects[nObjects]->SetObject(pGameObject, f_Width, f_Length, nColumnSize, nColumnSpace, h);
 			}
 			else
 			{
-				m_ppObjects[nObjects] = new CGunshipObject();
-				m_ppObjects[nObjects]->SetChild(pGunshipObject);
+				pGameObject = new CGunshipObject();
+				pGameObject->SetChild(pGunshipObject);
+				m_ppObjects[nObjects] = new CEnemy();
+				m_ppObjects[nObjects]->SetObject(pGameObject, f_Width, f_Length, nColumnSize, nColumnSpace, h);
 			}
-			
-			m_ppObjects[nObjects]->SetPosition(RandomPositionInSphere(XMFLOAT3(f_Width / 2.0f, 500.0f, f_Length / 2.0f), Random(800.0f, 1000.0f), h - int(floor(nColumnSize / 2.0f)), nColumnSpace));
-			m_ppObjects[nObjects]->Rotate(0.0f, 45.0f, 0.0f);
-			m_ppObjects[nObjects++]->PrepareAnimate();
+			++nObjects;
 		}
 	}
 
@@ -775,17 +767,19 @@ void CObjectShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommand
 		{
 			if (nObjects % 2)
 			{
-				m_ppObjects[nObjects] = new CSuperCobraObject();
-				m_ppObjects[nObjects]->SetChild(pSuperCobraObject);
+				pGameObject = new CSuperCobraObject();
+				pGameObject->SetChild(pSuperCobraObject);
+				m_ppObjects[nObjects] = new CEnemy();
+				m_ppObjects[nObjects]->SetObject(pGameObject, f_Width, f_Length, nColumnSize, nColumnSpace);
 			}
 			else
 			{
-				m_ppObjects[nObjects] = new CGunshipObject();
-				m_ppObjects[nObjects]->SetChild(pGunshipObject);
+				pGameObject = new CGunshipObject();
+				pGameObject->SetChild(pGunshipObject);
+				m_ppObjects[nObjects] = new CEnemy();
+				m_ppObjects[nObjects]->SetObject(pGameObject, f_Width, f_Length, nColumnSize, nColumnSpace);
 			}
-			m_ppObjects[nObjects]->SetPosition(RandomPositionInSphere(XMFLOAT3(f_Width / 2.0f, 500.0f, f_Length / 2.0f), Random(0.0f, 1000.0f), nColumnSize - int(floor(nColumnSize / 2.0f)), nColumnSpace));
-			m_ppObjects[nObjects]->Rotate(0.0f, 45.0f, 0.0f);
-			m_ppObjects[nObjects++]->PrepareAnimate();
+			++nObjects;
 		}
 	}
 }
@@ -811,7 +805,6 @@ void CObjectShader::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* 
 		if (m_ppObjects[j])
 		{
 			m_ppObjects[j]->Animate(0.16f);
-			m_ppObjects[j]->UpdateTransform(NULL);
 			m_ppObjects[j]->Render(pd3dCommandList, pCamera);
 		}
 	}
