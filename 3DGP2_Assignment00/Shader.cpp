@@ -592,10 +592,6 @@ void CBillboardObjectsShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12Graph
 	delete pRawFormatImage;
 }
 
-void CBillboardObjectsShader::AnimateObjects(float fTimeElapsed)
-{
-}
-
 void CBillboardObjectsShader::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera)
 {
 	XMFLOAT3 xmf3CameraPosition = pCamera->GetPosition();
@@ -737,7 +733,7 @@ void CObjectShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommand
 	float f_Width = pTerrain->GetWidth();
 	float f_Length = pTerrain->GetLength();
 
-	CGameObject* pGameObject;
+	std::shared_ptr<CGameObject> pGameObject;
 
 	for (int h = 0; h < nFirstPassColumnSize; h++)
 	{
@@ -745,17 +741,19 @@ void CObjectShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommand
 		{
 			if (nObjects % 2)
 			{
-				pGameObject = new CSuperCobraObject();
+				pGameObject = std::make_shared<CSuperCobraObject>();
 				pGameObject->SetChild(pSuperCobraObject);
 				m_ppObjects[nObjects] = new CEnemy();
 				m_ppObjects[nObjects]->SetObject(pGameObject, f_Width, f_Length, nColumnSize, nColumnSpace, h);
+				m_ppObjects[nObjects]->SetContext(pTerrain);
 			}
 			else
 			{
-				pGameObject = new CGunshipObject();
+				pGameObject = std::make_shared<CGunshipObject>();
 				pGameObject->SetChild(pGunshipObject);
 				m_ppObjects[nObjects] = new CEnemy();
 				m_ppObjects[nObjects]->SetObject(pGameObject, f_Width, f_Length, nColumnSize, nColumnSpace, h);
+				m_ppObjects[nObjects]->SetContext(pTerrain);
 			}
 			++nObjects;
 		}
@@ -767,17 +765,19 @@ void CObjectShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommand
 		{
 			if (nObjects % 2)
 			{
-				pGameObject = new CSuperCobraObject();
+				pGameObject = std::make_shared<CSuperCobraObject>();
 				pGameObject->SetChild(pSuperCobraObject);
 				m_ppObjects[nObjects] = new CEnemy();
 				m_ppObjects[nObjects]->SetObject(pGameObject, f_Width, f_Length, nColumnSize, nColumnSpace);
+				m_ppObjects[nObjects]->SetContext(pTerrain);
 			}
 			else
 			{
-				pGameObject = new CGunshipObject();
+				pGameObject = std::make_shared<CGunshipObject>();
 				pGameObject->SetChild(pGunshipObject);
 				m_ppObjects[nObjects] = new CEnemy();
 				m_ppObjects[nObjects]->SetObject(pGameObject, f_Width, f_Length, nColumnSize, nColumnSpace);
+				m_ppObjects[nObjects]->SetContext(pTerrain);
 			}
 			++nObjects;
 		}
@@ -786,13 +786,17 @@ void CObjectShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommand
 
 void CObjectShader::AnimateObjects(float fTimeElapsed)
 {
+	if (m_ppObjects.data())
+	{
+		for (int i = 0; i < m_nObjects; i++) if (m_ppObjects[i]) m_ppObjects[i]->Update(fTimeElapsed);
+	}
 }
 
 void CObjectShader::ReleaseObjects()
 {
 	if (m_ppObjects.data())
 	{
-		for (int j = 0; j < m_nObjects; j++) if (m_ppObjects[j]) delete m_ppObjects[j];
+		for (int i = 0; i < m_nObjects; i++) if (m_ppObjects[i]) delete m_ppObjects[i];
 	}
 }
 

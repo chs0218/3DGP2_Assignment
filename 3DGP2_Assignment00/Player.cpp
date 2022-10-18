@@ -256,14 +256,42 @@ void CTerrianFlyingPlayer::OnPlayerUpdateCallback(float fTimeElapsed)
 	int z = (int)(xmf3PlayerPosition.z / xmf3Scale.z);
 	bool bReverseQuad = ((z % 2) != 0);
 	float fHeight = pTerrain->GetHeight(xmf3PlayerPosition.x, xmf3PlayerPosition.z, bReverseQuad) + 6.0f;
+	float fLength = pTerrain->GetLength();
+	float fWidth = pTerrain->GetWidth();
+	XMFLOAT3 xmf3PlayerVelocity = GetVelocity();
+
+	if (xmf3PlayerPosition.x > fWidth - CORRECTION)
+	{
+		xmf3PlayerVelocity.x = 0.0f;
+		xmf3PlayerPosition.x = fWidth - CORRECTION;
+	}
+	if (xmf3PlayerPosition.x < CORRECTION)
+	{
+		xmf3PlayerVelocity.x = 0.0f;
+		xmf3PlayerPosition.x = CORRECTION;
+	}
+	if (xmf3PlayerPosition.y > 500.0f)
+	{
+		xmf3PlayerVelocity.y = 0.0f;
+		xmf3PlayerPosition.y = 500.0f;
+	}
 	if (xmf3PlayerPosition.y < fHeight)
 	{
-		XMFLOAT3 xmf3PlayerVelocity = GetVelocity();
 		xmf3PlayerVelocity.y = 0.0f;
-		SetVelocity(xmf3PlayerVelocity);
 		xmf3PlayerPosition.y = fHeight;
-		SetPosition(xmf3PlayerPosition);
 	}
+	if (xmf3PlayerPosition.z > fLength - CORRECTION)
+	{
+		xmf3PlayerVelocity.z = 0.0f;
+		xmf3PlayerPosition.z = fLength - CORRECTION;
+	}
+	if (xmf3PlayerPosition.z < CORRECTION)
+	{
+		xmf3PlayerVelocity.z = 0.0f;
+		xmf3PlayerPosition.z = CORRECTION;
+	}
+	SetPosition(xmf3PlayerPosition);
+	SetVelocity(xmf3PlayerVelocity);
 }
 
 void CTerrianFlyingPlayer::OnCameraUpdateCallback(float fTimeElapsed)

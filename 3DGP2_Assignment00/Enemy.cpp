@@ -24,17 +24,15 @@ XMFLOAT3 RandomDirection()
 }
 CEnemy::CEnemy()
 {
-	direction = XMFLOAT3(0.0f, 0.0f, 0.0f);
+	direction = RandomDirection();
 	fWanderingTime = 0.0f;
-	fVelocity = 0.0f;
+	fVelocity = 50.0f;
 	m_pPlayer = NULL;
 	m_pObject = NULL;
 }
 
 CEnemy::~CEnemy()
 {
-	if (m_pObject)
-		delete m_pObject;
 }
 
 void CEnemy::Update(float fTimeElapsed)
@@ -44,6 +42,14 @@ void CEnemy::Update(float fTimeElapsed)
 	if (m_pObject)
 	{
 		UpdateDirection(fTimeElapsed);
+		if (Vector3::Length(direction) > 0.0f)
+			m_pObject->SetLookAt(XMFLOAT3(cur_Position.x + direction.x, cur_Position.y, cur_Position.z + direction.z), XMFLOAT3(0.0f, 1.0f, 0.0f));
+		// ÀÌµ¿
+		XMFLOAT3 deltaPos = Vector3::ScalarProduct(direction, fVelocity * fTimeElapsed);
+		reult_Position = Vector3::Add(cur_Position, deltaPos);
+		m_pObject->SetPosition(reult_Position);
+		if (m_pUpdatedContext)
+			OnUpdateCallback(fTimeElapsed);
 	}
 }
 
@@ -57,22 +63,72 @@ void CEnemy::UpdateDirection(float fTimeElapsed)
 	else
 	{
 		fWanderingTime += fTimeElapsed;
-		if (fWanderingTime > 1.0f)
+		if (fWanderingTime > 10.0f)
 		{
+			fWanderingTime = 0.0f;
 			direction = RandomDirection();
 		}
 	}
 }
 
-void CEnemy::SetObject(CGameObject* pObject, float f_Width, float f_Length, int nColumnSize, int nColumnSpace, int h)
+void CEnemy::OnUpdateCallback(float fTimeElapsed)
+{
+	CHeightMapTerrain* pTerrain = (CHeightMapTerrain*)m_pUpdatedContext;
+	XMFLOAT3 xmf3Scale = pTerrain->GetScale();
+	XMFLOAT3 xmf3Position = m_pObject->GetPosition();
+	int z = (int)(xmf3Position.z / xmf3Scale.z);
+	bool bReverseQuad = ((z % 2) != 0);
+	float fHeight = pTerrain->GetHeight(xmf3Position.x, xmf3Position.z, bReverseQuad) + 6.0f;
+	float fLength = pTerrain->GetLength();
+	float fWidth = pTerrain->GetWidth();
+	if (xmf3Position.x > fWidth - CORRECTION)
+	{
+		direction.x = 0.0f;
+		xmf3Position.x = fWidth - CORRECTION;
+	}
+	if (xmf3Position.x < CORRECTION)
+	{
+		direction.x = 0.0f;
+		xmf3Position.x = CORRECTION;
+	}
+	if (xmf3Position.y > 500.0f)
+	{
+		direction.y = 0.0f;
+		xmf3Position.y = 500.0f;
+	}
+	if (xmf3Position.y < fHeight)
+	{
+		direction.y = 0.0f;
+		xmf3Position.y = fHeight;
+	}
+	if (xmf3Position.z > fLength - CORRECTION)
+	{
+		direction.z = 0.0f;
+		xmf3Position.z = fLength - CORRECTION;
+	}
+	if (xmf3Position.z < CORRECTION)
+	{
+		direction.z = 0.0f;
+		xmf3Position.z = CORRECTION;
+	}
+	m_pObject->SetPosition(xmf3Position);
+}
+
+void CEnemy::SetObject(std::shared_ptr<CGameObject> pObject, float f_Width, float f_Length, int nColumnSize, int nColumnSpace, int h)
 {
 	m_pObject = pObject;
 	if (h != -1)
-		m_pObject->SetPosition(RandomPositionInSphere(XMFLOAT3(f_Width / 2.0f, 500.0f, f_Length / 2.0f), Random(800.0f, 1000.0f), h - int(floor(nColumnSize / 2.0f)), nColumnSpace));
+		m_pObject->SetPosition(RandomPositionInSphere(XMFLOAT3(f_Width / 2.0f, 300.0f, f_Length / 2.0f), Random(800.0f, 1000.0f), h - int(floor(nColumnSize / 2.0f)), nColumnSpace));
 	else
-		m_pObject->SetPosition(RandomPositionInSphere(XMFLOAT3(f_Width / 2.0f, 500.0f, f_Length / 2.0f), Random(0.0f, 1000.0f), nColumnSize - int(floor(nColumnSize / 2.0f)), nColumnSpace));
+		m_pObject->SetPosition(RandomPositionInSphere(XMFLOAT3(f_Width / 2.0f, 300.0f, f_Length / 2.0f), Random(0.0f, 1000.0f), nColumnSize - int(floor(nColumnSize / 2.0f)), nColumnSpace));
 	m_pObject->Rotate(0.0f, 45.0f, 0.0f);
 	m_pObject->PrepareAnimate();
+}
+
+void CEnemy::SetContext(void* pContext)
+{
+	CHeightMapTerrain* pTerrain = (CHeightMapTerrain*)pContext;
+	m_pUpdatedContext = pTerrain;
 }
 
 void CEnemy::Animate(float fTimeElapsed)

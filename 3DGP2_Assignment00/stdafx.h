@@ -47,7 +47,7 @@ using Microsoft::WRL::ComPtr;
 // 주 윈도우 클라이언트 영역의 크기를 표현하는 상수들입니다.
 #define FRAME_BUFFER_WIDTH 800
 #define FRAME_BUFFER_HEIGHT 600
-
+#define CORRECTION 20.0f
 
 //----------------------------------------------------------------------------
 // 22/09/21 CreateBufferResource 함수 정의 - ChoiHS

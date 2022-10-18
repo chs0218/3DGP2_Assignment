@@ -179,6 +179,8 @@ bool CScene::ProcessInput(UCHAR* pKeysBuffer)
 
 void CScene::AnimateObjects(float fTimeElapsed)
 {
+	if (m_pShader2)
+		m_pShader2->AnimateObjects(fTimeElapsed);
 }
 
 void CScene::PrepareRender(ID3D12GraphicsCommandList* pd3dCommandList)

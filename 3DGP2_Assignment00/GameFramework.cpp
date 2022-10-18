@@ -269,7 +269,7 @@ void CGameFramework::BuildObjects()
 	m_pPlayer->SetChild(SuperCobraObject);
 	m_pPlayer->PrepareAnimate();
 	m_pPlayer->SetScale(20.0f, 20.0f, 20.0f);
-	m_pPlayer->SetPosition(XMFLOAT3(1030.0f, 600.0f, 1400.0f));
+	m_pPlayer->SetPosition(XMFLOAT3(1030.0f, 300.0f, 1400.0f));
 
 	m_pCamera = m_pPlayer->GetCamera();
 
@@ -415,6 +415,8 @@ void CGameFramework::ProcessInput()
 
 void CGameFramework::AnimateObjects()
 {
+	if (m_pScene)
+		m_pScene->AnimateObjects(m_GameTimer.GetFrameTimeElapsed());
 	if (m_pObject)
 	{
 		m_pObject->Animate(m_GameTimer.GetFrameTimeElapsed());
