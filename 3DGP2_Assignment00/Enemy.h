@@ -15,8 +15,8 @@ private:
 public:
 	CEnemy();
 	~CEnemy();
-	void Update(float fTimeElapsed);
-	void UpdateDirection(float fTimeElapsed);
+	void Update(CGameObject* pPlayer, float fTimeElapsed);
+	void UpdateDirection(CGameObject* pPlayer, float fTimeElapsed);
 	void OnUpdateCallback(float fTimeElapsed);
 	void SetPlayer(CGameObject* pPlayer) { m_pPlayer = pPlayer; }
 	void SetObject(std::shared_ptr<CGameObject> pObject, float f_Width, float f_Length, int nColumnSize, int nColumnSpace, int h = -1);

@@ -35,13 +35,13 @@ CEnemy::~CEnemy()
 {
 }
 
-void CEnemy::Update(float fTimeElapsed)
+void CEnemy::Update(CGameObject* pPlayer, float fTimeElapsed)
 {
 	XMFLOAT3 cur_Position = m_pObject->GetPosition();
 	XMFLOAT3 reult_Position = XMFLOAT3(0.0f, 0.0f, 0.0f);
 	if (m_pObject)
 	{
-		UpdateDirection(fTimeElapsed);
+		UpdateDirection(pPlayer, fTimeElapsed);
 		if (Vector3::Length(direction) > 0.0f)
 			m_pObject->SetLookAt(XMFLOAT3(cur_Position.x + direction.x, cur_Position.y, cur_Position.z + direction.z), XMFLOAT3(0.0f, 1.0f, 0.0f));
 		XMFLOAT3 deltaPos = Vector3::ScalarProduct(direction, fVelocity * fTimeElapsed);
@@ -52,7 +52,7 @@ void CEnemy::Update(float fTimeElapsed)
 	}
 }
 
-void CEnemy::UpdateDirection(float fTimeElapsed)
+void CEnemy::UpdateDirection(CGameObject* pPlayer, float fTimeElapsed)
 {
 	XMFLOAT3 cur_Position = m_pObject->GetPosition();
 	if (m_pPlayer)
@@ -63,11 +63,17 @@ void CEnemy::UpdateDirection(float fTimeElapsed)
 	}
 	else
 	{
-		fWanderingTime += fTimeElapsed;
-		if (fWanderingTime > 10.0f)
+		XMFLOAT3 deltaPos = Vector3::Subtract(pPlayer->GetPosition(), cur_Position);
+		if (Vector3::Length(deltaPos) < 300.0f)
+			SetPlayer(pPlayer);
+		else
 		{
-			fWanderingTime = 0.0f;
-			direction = RandomDirection();
+			fWanderingTime += fTimeElapsed;
+			if (fWanderingTime > 10.0f)
+			{
+				fWanderingTime = 0.0f;
+				direction = RandomDirection();
+			}
 		}
 	}
 }

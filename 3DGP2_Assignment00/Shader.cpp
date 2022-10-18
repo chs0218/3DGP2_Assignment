@@ -789,8 +789,7 @@ void CObjectShader::AnimateObjects(CGameObject* pPlayer, float fTimeElapsed)
 	if (m_ppObjects.data())
 	{
 		for (int i = 0; i < m_nObjects; i++) if (m_ppObjects[i]) {
-			m_ppObjects[i]->SetPlayer(pPlayer);
-			m_ppObjects[i]->Update(fTimeElapsed);
+			m_ppObjects[i]->Update(pPlayer, fTimeElapsed);
 		}
 	}
 }
