@@ -177,10 +177,13 @@ bool CScene::ProcessInput(UCHAR* pKeysBuffer)
 	return false;
 }
 
-void CScene::AnimateObjects(float fTimeElapsed)
+void CScene::AnimateObjects(CGameObject* pPlayer, float fTimeElapsed)
 {
 	if (m_pShader2)
-		m_pShader2->AnimateObjects(fTimeElapsed);
+	{
+		CShader* pShader = m_pShader2.get();
+		static_cast<CObjectShader*>(pShader)->AnimateObjects(pPlayer, fTimeElapsed);
+	}
 }
 
 void CScene::PrepareRender(ID3D12GraphicsCommandList* pd3dCommandList)

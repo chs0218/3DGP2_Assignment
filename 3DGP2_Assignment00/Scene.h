@@ -26,7 +26,7 @@ public:
 	void ReleaseObjects();
 
 	virtual bool ProcessInput(UCHAR* pKeysBuffer);
-	virtual void AnimateObjects(float fTimeElapsed);
+	virtual void AnimateObjects(CGameObject* pPlayer, float fTimeElapsed);
 	void PrepareRender(ID3D12GraphicsCommandList* pd3dCommandList);
 	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera = NULL);
 

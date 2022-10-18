@@ -416,7 +416,7 @@ void CGameFramework::ProcessInput()
 void CGameFramework::AnimateObjects()
 {
 	if (m_pScene)
-		m_pScene->AnimateObjects(m_GameTimer.GetFrameTimeElapsed());
+		m_pScene->AnimateObjects(m_pPlayer.get(), m_GameTimer.GetFrameTimeElapsed());
 	if (m_pObject)
 	{
 		m_pObject->Animate(m_GameTimer.GetFrameTimeElapsed());

@@ -784,11 +784,14 @@ void CObjectShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommand
 	}
 }
 
-void CObjectShader::AnimateObjects(float fTimeElapsed)
+void CObjectShader::AnimateObjects(CGameObject* pPlayer, float fTimeElapsed)
 {
 	if (m_ppObjects.data())
 	{
-		for (int i = 0; i < m_nObjects; i++) if (m_ppObjects[i]) m_ppObjects[i]->Update(fTimeElapsed);
+		for (int i = 0; i < m_nObjects; i++) if (m_ppObjects[i]) {
+			m_ppObjects[i]->SetPlayer(pPlayer);
+			m_ppObjects[i]->Update(fTimeElapsed);
+		}
 	}
 }
 

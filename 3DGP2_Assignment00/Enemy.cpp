@@ -44,7 +44,6 @@ void CEnemy::Update(float fTimeElapsed)
 		UpdateDirection(fTimeElapsed);
 		if (Vector3::Length(direction) > 0.0f)
 			m_pObject->SetLookAt(XMFLOAT3(cur_Position.x + direction.x, cur_Position.y, cur_Position.z + direction.z), XMFLOAT3(0.0f, 1.0f, 0.0f));
-		// ÀÌµ¿
 		XMFLOAT3 deltaPos = Vector3::ScalarProduct(direction, fVelocity * fTimeElapsed);
 		reult_Position = Vector3::Add(cur_Position, deltaPos);
 		m_pObject->SetPosition(reult_Position);
@@ -59,6 +58,8 @@ void CEnemy::UpdateDirection(float fTimeElapsed)
 	if (m_pPlayer)
 	{
 		direction = Vector3::Subtract(m_pPlayer->GetPosition(), cur_Position);
+		if (Vector3::Length(direction) < 100.0f)
+			direction = XMFLOAT3{ 0.0f, 0.0f, 0.0f };
 	}
 	else
 	{
