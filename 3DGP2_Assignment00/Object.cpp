@@ -779,3 +779,9 @@ void CRippleWater::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* p
 		}
 	}
 }
+
+void CBullet::ShootBullet(CGameObject* pPlayer)
+{
+	isEnable = true;
+	SetPosition(pPlayer->GetPosition());
+}

@@ -83,10 +83,12 @@ public:
 class CTerrianFlyingPlayer : public CPlayer
 {
 protected:
+	int nMaxBullet = 10;
+
 	CGameObject* m_pMainRotorFrame = NULL;
 	CGameObject* m_pTailRotorFrame = NULL;
 	std::unique_ptr<CShader> m_pShader = NULL;
-	std::unique_ptr<CGameObject> m_pBullet = NULL;
+	std::vector<CBullet*> m_pBullets;
 public:
 	CTerrianFlyingPlayer(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, void* pContext = NULL);
 	virtual ~CTerrianFlyingPlayer();
@@ -99,4 +101,7 @@ public:
 
 	virtual void OnPlayerUpdateCallback(float fTimeElapsed);
 	virtual void OnCameraUpdateCallback(float fTimeElapsed);
+
+	void PrepareShooting(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature);
+	void ShootBullet();
 };

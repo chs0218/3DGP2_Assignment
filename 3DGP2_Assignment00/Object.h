@@ -110,11 +110,25 @@ public:
 	int FindReplicatedTexture(_TCHAR* pstrTextureName, D3D12_GPU_DESCRIPTOR_HANDLE* pd3dSrvGpuDescriptorHandle);
 };
 
+class CBullet : public CGameObject
+{
+private:
+	bool isEnable = false;
+public:
+	CBullet() {}
+	~CBullet() {}
+
+	bool CheckEnable() { return isEnable; }
+	void DisableBullet() { isEnable = false; }
+	void ShootBullet(CGameObject* pPlayer);
+	void Update(float fTimeElapsed);
+};
+
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class CCubeObject : public CGameObject
 {
 public:
-	CCubeObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, CShader* pShader);
+	CCubeObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, CShader* pShader = NULL);
 	~CCubeObject() {}
 };
 

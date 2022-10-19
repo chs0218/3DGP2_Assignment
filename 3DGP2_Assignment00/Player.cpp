@@ -241,8 +241,7 @@ CTerrianFlyingPlayer::CTerrianFlyingPlayer(ID3D12Device* pd3dDevice, ID3D12Graph
 	SuperCobraObject = SuperCobraObject->LoadGeometryFromFile(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature, "Model/Mi24.bin", m_pShader.get());
 	SetChild(SuperCobraObject);
 
-	m_pBullet = std::make_unique<CCubeObject>(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature, m_pShader.get());
-	m_pBullet->SetPosition(XMFLOAT3(1030.0f, 300.0f, 1400.0f));
+	PrepareShooting(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature);
 
 	CHeightMapTerrain* pTerrain = (CHeightMapTerrain*)pContext;
 	SetPlayerUpdatedContext(pTerrain);
@@ -252,6 +251,11 @@ CTerrianFlyingPlayer::CTerrianFlyingPlayer(ID3D12Device* pd3dDevice, ID3D12Graph
 
 CTerrianFlyingPlayer::~CTerrianFlyingPlayer()
 {
+	for (int i = 0; i < m_pBullets.size(); ++i)
+	{
+		if (m_pBullets[i])
+			delete m_pBullets[i];
+	}
 }
 
 void CTerrianFlyingPlayer::OnPrepareRender()
@@ -269,7 +273,17 @@ void CTerrianFlyingPlayer::Render(ID3D12GraphicsCommandList* pd3dCommandList)
 	if (nCameraMode == THIRD_PERSON_CAMERA) {
 		CGameObject::Render(pd3dCommandList, m_pCamera);
 	}
-	m_pBullet->Render(pd3dCommandList, m_pCamera);
+	if (m_pBullets.data())
+	{
+		for (int i = 0; i < m_pBullets.size(); ++i)
+		{
+			if (m_pBullets[i]->CheckEnable())
+			{
+				m_pBullets[i]->UpdateTransform(NULL);
+				m_pBullets[i]->Render(pd3dCommandList);
+			}
+		}
+	}
 }
 
 void CTerrianFlyingPlayer::OnPlayerUpdateCallback(float fTimeElapsed)
@@ -336,6 +350,29 @@ void CTerrianFlyingPlayer::OnCameraUpdateCallback(float fTimeElapsed)
 			XMFLOAT3 xmf3Position = GetPosition();
 			p3rdPersonCamera->SetLookAt(xmf3Position);
 		}
+	}
+}
+
+void CTerrianFlyingPlayer::PrepareShooting(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature)
+{
+	std::shared_ptr<CGameObject> m_pBullet = NULL;
+	m_pBullet = std::make_shared<CCubeObject>(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature, m_pShader.get());
+	m_pBullet->SetPosition(XMFLOAT3(1030.0f, 300.0f, 1400.0f));
+
+	for (int i = 0; i < nMaxBullet; ++i)
+	{
+		CBullet* pBullet = new CBullet();
+		pBullet->SetChild(m_pBullet);
+		m_pBullets.push_back(std::move(pBullet));
+	}
+}
+
+void CTerrianFlyingPlayer::ShootBullet()
+{
+	std::vector<CBullet*>::iterator DisabledBullet = std::find_if(m_pBullets.begin(), m_pBullets.end(), [](CBullet* pBullet) { return !(pBullet->CheckEnable()); });
+	if (DisabledBullet != m_pBullets.end())
+	{
+		(*DisabledBullet)->ShootBullet(this);
 	}
 }
 

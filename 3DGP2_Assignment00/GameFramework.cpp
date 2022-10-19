@@ -319,6 +319,8 @@ void CGameFramework::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPA
 			break;
 		case VK_F10:
 			break;
+		case VK_CONTROL:
+			break;
 		default:
 			break;
 		}
