@@ -66,7 +66,7 @@ private:
 	std::unique_ptr<CScene> m_pScene = NULL;
 	std::unique_ptr<CPlayer> m_pPlayer = NULL;
 	std::unique_ptr<CGameObject> m_pObject = NULL;
-	std::unique_ptr<CShader> m_pShader = NULL;
+	std::shared_ptr<CShader> m_pShader = NULL;
 	CCamera* m_pCamera = NULL;
 
 	ID3D12Resource* m_pd3dcbFrame = NULL;

@@ -37,8 +37,6 @@ struct VS_OUTPUT
 	float4 position : SV_POSITION;
 	float3 positionW : POSITION;
 	float3 normalW : NORMAL;
-	float3 tangentW : TANGENT;
-	float3 bitangentW : BITANGENT;
 	float2 uv : TEXCOORD;
 };
 

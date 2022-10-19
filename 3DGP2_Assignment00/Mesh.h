@@ -102,6 +102,10 @@ public:
 
 class CCubeMeshDiffused : public CMesh
 {
+protected:
+	std::vector<XMFLOAT2> m_pxmf2TextureCoords0;
+	ComPtr<ID3D12Resource> m_pd3dTextureCoord0Buffer = NULL;
+	ComPtr<ID3D12Resource> m_pd3dTextureCoord0UploadBuffer = NULL;
 public:
 	CCubeMeshDiffused(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, float fWidth = 2.0f, float fHeight = 2.0f, float fDepth = 2.0f);
 	virtual ~CCubeMeshDiffused();
