@@ -1,4 +1,4 @@
-Texture2D gtxtSkyBoxTexture : register(t7);
+Texture2D gtxtBillBoardTexture : register(t7);
 SamplerState gSamplerState : register(s0);
 
 struct VS_OUTPUT
@@ -10,7 +10,7 @@ struct VS_OUTPUT
 //[earlydepthstencil]
 float4 PS_BillBoard(VS_OUTPUT input) : SV_TARGET
 {
-	float4 cColor = gtxtSkyBoxTexture.Sample(gSamplerState, input.uv);
+	float4 cColor = gtxtBillBoardTexture.Sample(gSamplerState, input.uv);
 
 	return(cColor);
 }
