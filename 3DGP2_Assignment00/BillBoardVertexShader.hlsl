@@ -23,13 +23,13 @@ cbuffer cbCameraInfo : register(b1)
 struct VS_INPUT
 {
 	float3 position : POSITION;
-	float2 uv : TEXCOORD;
+	float2 uv : SIZE;
 };
 
 struct VS_OUTPUT
 {
 	float4 position : SV_POSITION;
-	float2 uv : TEXCOORD;
+	float2 uv : SIZE;
 };
 
 VS_OUTPUT VS_BillBoard(VS_INPUT input)
