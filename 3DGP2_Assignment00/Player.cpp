@@ -277,7 +277,7 @@ void CTerrianFlyingPlayer::Render(ID3D12GraphicsCommandList* pd3dCommandList)
 	{
 		for (int i = 0; i < m_pBullets.size(); ++i)
 		{
-			if (m_pBullets[i]->isEnable)
+			if (m_pBullets[i]->CheckEnable())
 			{
 				m_pBullets[i]->UpdateTransform(NULL);
 				m_pBullets[i]->Render(pd3dCommandList);
@@ -369,11 +369,11 @@ void CTerrianFlyingPlayer::PrepareShooting(ID3D12Device* pd3dDevice, ID3D12Graph
 
 void CTerrianFlyingPlayer::ShootBullet()
 {
-	std::vector<CBullet*>::iterator pBullet = std::find_if(m_pBullets.begin(), m_pBullets.end(), [](const CBullet* bullet) {return !bullet->isEnable; });
+	std::vector<CBullet*>::iterator pBullet = std::find_if(m_pBullets.begin(), m_pBullets.end(), [](const CBullet* bullet) {return !bullet->CheckEnable(); });
 	if (pBullet != m_pBullets.end())
 	{
-		(*pBullet)->isEnable = true;
-		(*pBullet)->SetPosition(GetPosition());
+		(*pBullet)->ShootBullet(this);
+		(*pBullet)->SetDirection(GetLookVector());
 	}
 }
 
@@ -447,5 +447,10 @@ void CTerrianFlyingPlayer::Animate(float fTimeElapsed, XMFLOAT4X4* pxmf4x4Parent
 		m_pTailRotorFrame->SetTransform(Matrix4x4::Multiply(xmmtxRotate, m_pTailRotorFrame->GetTransform()));
 	}
 
+	for (int i = 0; i < m_pBullets.size(); ++i)
+	{
+		if (m_pBullets[i]->CheckEnable())
+			m_pBullets[i]->Update(fTimeElapsed);
+	}
 	CGameObject::Animate(fTimeElapsed, pxmf4x4Parent);
 }

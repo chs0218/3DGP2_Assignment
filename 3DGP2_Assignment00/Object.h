@@ -109,21 +109,6 @@ public:
 	void LoadMaterialsFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, CGameObject* pParent, FILE* pInFile, CShader* pShader);
 	int FindReplicatedTexture(_TCHAR* pstrTextureName, D3D12_GPU_DESCRIPTOR_HANDLE* pd3dSrvGpuDescriptorHandle);
 };
-
-class CBullet : public CGameObject
-{
-public:
-	bool isEnable = false;
-public:
-	CBullet() {}
-	~CBullet() {}
-
-	bool CheckEnable() { return isEnable; }
-	void DisableBullet() { isEnable = false; }
-	void ShootBullet(CGameObject* pPlayer);
-	void Update(float fTimeElapsed);
-};
-
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class CCubeObject : public CGameObject
 {
@@ -246,4 +231,21 @@ public:
 
 	virtual void SetMesh(int nIndex, std::shared_ptr<CMesh> pMesh);
 	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera = NULL);
+};
+
+class CBullet : public CGameObject
+{
+protected:
+	XMFLOAT3 direction = { 0.0f, 0.0f, 0.0f };
+	bool isEnable = false;
+	float fVelocity = 10.0f;
+public:
+	CBullet() {}
+	~CBullet() {}
+
+	void SetDirection(XMFLOAT3 xmf3Direction) { direction = xmf3Direction; };
+	bool CheckEnable() const { return isEnable; }
+	void DisableBullet() { isEnable = false; }
+	void Update(float fTimeElapsed);
+	void ShootBullet(CGameObject* pPlayer);
 };

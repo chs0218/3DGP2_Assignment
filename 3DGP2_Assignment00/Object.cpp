@@ -780,6 +780,16 @@ void CRippleWater::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* p
 	}
 }
 
+void CBullet::Update(float fTimeElapsed)
+{
+	XMFLOAT3 cur_Position = GetPosition();
+	XMFLOAT3 reult_Position = XMFLOAT3(0.0f, 0.0f, 0.0f);
+
+	XMFLOAT3 deltaPos = Vector3::ScalarProduct(direction, fVelocity * fTimeElapsed);
+	reult_Position = Vector3::Add(cur_Position, deltaPos);
+	SetPosition(reult_Position);
+}
+
 void CBullet::ShootBullet(CGameObject* pPlayer)
 {
 	isEnable = true;
