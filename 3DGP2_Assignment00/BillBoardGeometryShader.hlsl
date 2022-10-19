@@ -10,11 +10,14 @@ struct GS_OUT
 	float2 uv : SIZE;
 };
 
-[maxvertexcount(4)]
+[maxvertexcount(1)]
 void GS_BillBoard(
 	point VS_OUTPUT input[1], 
 	inout TriangleStream< GS_OUT > outStream
 )
 {
-	outStream.Append(input[0]);
+	GS_OUT output;
+	output.position = input[0].position;
+	output.uv = input[0].uv;
+	outStream.Append(output);
 }
