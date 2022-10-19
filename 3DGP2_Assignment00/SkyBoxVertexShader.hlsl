@@ -31,7 +31,7 @@ struct VS_OUTPUT
 	float2 uv : TEXCOORD;
 };
 
-VS_OUTPUT VS_Standard(VS_INPUT input)
+VS_OUTPUT VS_SkyBox(VS_INPUT input)
 {
 	VS_OUTPUT output;
 	output.position = mul(mul(mul(float4(input.position, 1.0f), gmtxGameObject), gmtxView), gmtxProjection);

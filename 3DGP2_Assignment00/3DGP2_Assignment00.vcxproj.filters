@@ -125,9 +125,11 @@
     <FxCompile Include="TexturePixelShader.hlsl" />
     <FxCompile Include="TerrainVertexShader.hlsl" />
     <FxCompile Include="TerrainPixelShader.hlsl" />
-    <FxCompile Include="StandardVertexShader.hlsl" />
-    <FxCompile Include="StandardPixelShader.hlsl" />
+    <FxCompile Include="SkyBoxVertexShader.hlsl" />
+    <FxCompile Include="SkyBoxPixelShader.hlsl" />
     <FxCompile Include="WaterVertexShader.hlsl" />
     <FxCompile Include="WaterPixelShader.hlsl" />
+    <FxCompile Include="BillBoardVertexShader.hlsl" />
+    <FxCompile Include="BillBoardPixelShader.hlsl" />
   </ItemGroup>
 </Project>

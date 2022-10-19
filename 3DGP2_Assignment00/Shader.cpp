@@ -365,12 +365,12 @@ D3D12_DEPTH_STENCIL_DESC CSkyBoxShader::CreateDepthStencilState()
 
 D3D12_SHADER_BYTECODE CSkyBoxShader::CreateVertexShader(ID3DBlob** ppd3dShaderBlob)
 {
-	return(CShader::ReadCompiledShaderFile(L"StandardVertexShader.cso", ppd3dShaderBlob));
+	return(CShader::ReadCompiledShaderFile(L"SkyBoxVertexShader.cso", ppd3dShaderBlob));
 }
 
 D3D12_SHADER_BYTECODE CSkyBoxShader::CreatePixelShader(ID3DBlob** ppd3dShaderBlob)
 {
-	return(CShader::ReadCompiledShaderFile(L"StandardPixelShader.cso", ppd3dShaderBlob));
+	return(CShader::ReadCompiledShaderFile(L"SkyBoxPixelShader.cso", ppd3dShaderBlob));
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -635,12 +635,12 @@ void CBillboardObjectsShader::ReleaseUploadBuffers()
 
 D3D12_SHADER_BYTECODE CBillboardObjectsShader::CreateVertexShader(ID3DBlob** ppd3dShaderBlob)
 {
-	return(CShader::ReadCompiledShaderFile(L"StandardVertexShader.cso", ppd3dShaderBlob));
+	return(CShader::ReadCompiledShaderFile(L"BillBoardVertexShader.cso", ppd3dShaderBlob));
 }
 
 D3D12_SHADER_BYTECODE CBillboardObjectsShader::CreatePixelShader(ID3DBlob** ppd3dShaderBlob)
 {
-	return(CShader::ReadCompiledShaderFile(L"StandardPixelShader.cso", ppd3dShaderBlob));
+	return(CShader::ReadCompiledShaderFile(L"BillBoardPixelShader.cso", ppd3dShaderBlob));
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
