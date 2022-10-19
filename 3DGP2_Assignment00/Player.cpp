@@ -357,7 +357,6 @@ void CTerrianFlyingPlayer::PrepareShooting(ID3D12Device* pd3dDevice, ID3D12Graph
 {
 	std::shared_ptr<CGameObject> m_pBullet = NULL;
 	m_pBullet = std::make_shared<CCubeObject>(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature, m_pShader.get());
-	m_pBullet->SetPosition(XMFLOAT3(1030.0f, 300.0f, 1400.0f));
 
 	for (int i = 0; i < nMaxBullet; ++i)
 	{
@@ -366,17 +365,16 @@ void CTerrianFlyingPlayer::PrepareShooting(ID3D12Device* pd3dDevice, ID3D12Graph
 		m_pBullets.push_back(pBullet);
 	}
 
-	//ShootBullet();
 }
 
 void CTerrianFlyingPlayer::ShootBullet()
 {
-	for (int i = 0; i < m_pBullets.size(); ++i)
+	std::vector<CBullet*>::iterator pBullet = std::find_if(m_pBullets.begin(), m_pBullets.end(), [](const CBullet* bullet) {return !bullet->isEnable; });
+	if (pBullet != m_pBullets.end())
 	{
-		m_pBullets[i]->isEnable = true;
-		m_pBullets[i]->SetPosition(GetPosition());
+		(*pBullet)->isEnable = true;
+		(*pBullet)->SetPosition(GetPosition());
 	}
-	SetPosition(XMFLOAT3(0.0f, 0.0f, 0.0f));
 }
 
 CCamera* CTerrianFlyingPlayer::ChangeCamera(DWORD nNewCameraMode, float fTimeElapsed)
