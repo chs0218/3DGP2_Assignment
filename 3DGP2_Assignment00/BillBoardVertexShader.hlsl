@@ -2,7 +2,7 @@ struct MATERIAL
 {
 	float4 m_cAmbient;
 	float4 m_cDiffuse;
-	float4 m_cSpecular;
+	float4 m_cSpecular; //a = power
 	float4 m_cEmissive;
 };
 
@@ -28,7 +28,7 @@ struct VS_INPUT
 
 struct VS_OUTPUT
 {
-	float4 position : POSITION;
+	float4 position : SV_POSITION;
 	float2 uv : SIZE;
 };
 
