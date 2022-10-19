@@ -301,7 +301,7 @@ void CGameFramework::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPA
 {
 	switch (nMessageID)
 	{
-	case WM_KEYUP:
+	case WM_KEYDOWN:
 		switch (wParam)
 		{
 		case VK_ESCAPE:
@@ -317,9 +317,10 @@ void CGameFramework::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPA
 		case VK_F9:
 			ChangeSwapChainState();
 			break;
-		case VK_F10:
-			break;
 		case VK_CONTROL:
+			m_pPlayer->ShootBullet();
+			break;
+		case VK_F10:
 			break;
 		default:
 			break;

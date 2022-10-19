@@ -112,7 +112,7 @@ public:
 
 class CBullet : public CGameObject
 {
-private:
+public:
 	bool isEnable = false;
 public:
 	CBullet() {}

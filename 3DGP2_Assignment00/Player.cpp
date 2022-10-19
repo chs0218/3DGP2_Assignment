@@ -277,7 +277,7 @@ void CTerrianFlyingPlayer::Render(ID3D12GraphicsCommandList* pd3dCommandList)
 	{
 		for (int i = 0; i < m_pBullets.size(); ++i)
 		{
-			if (m_pBullets[i]->CheckEnable())
+			if (m_pBullets[i]->isEnable)
 			{
 				m_pBullets[i]->UpdateTransform(NULL);
 				m_pBullets[i]->Render(pd3dCommandList);
@@ -363,17 +363,20 @@ void CTerrianFlyingPlayer::PrepareShooting(ID3D12Device* pd3dDevice, ID3D12Graph
 	{
 		CBullet* pBullet = new CBullet();
 		pBullet->SetChild(m_pBullet);
-		m_pBullets.push_back(std::move(pBullet));
+		m_pBullets.push_back(pBullet);
 	}
+
+	//ShootBullet();
 }
 
 void CTerrianFlyingPlayer::ShootBullet()
 {
-	std::vector<CBullet*>::iterator DisabledBullet = std::find_if(m_pBullets.begin(), m_pBullets.end(), [](CBullet* pBullet) { return !(pBullet->CheckEnable()); });
-	if (DisabledBullet != m_pBullets.end())
+	for (int i = 0; i < m_pBullets.size(); ++i)
 	{
-		(*DisabledBullet)->ShootBullet(this);
+		m_pBullets[i]->isEnable = true;
+		m_pBullets[i]->SetPosition(GetPosition());
 	}
+	SetPosition(XMFLOAT3(0.0f, 0.0f, 0.0f));
 }
 
 CCamera* CTerrianFlyingPlayer::ChangeCamera(DWORD nNewCameraMode, float fTimeElapsed)

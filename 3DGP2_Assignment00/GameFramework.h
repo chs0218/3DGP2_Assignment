@@ -14,7 +14,7 @@ struct CB_FRAME_INFO
 	XMFLOAT2	f2CursorPos;
 };
 
-class CPlayer;
+class CTerrianFlyingPlayer;
 class CGameFramework
 {
 private:
@@ -64,7 +64,7 @@ private:
 	HANDLE m_hFenceEvent;
 
 	std::unique_ptr<CScene> m_pScene = NULL;
-	std::unique_ptr<CPlayer> m_pPlayer = NULL;
+	std::unique_ptr<CTerrianFlyingPlayer> m_pPlayer = NULL;
 	std::unique_ptr<CGameObject> m_pObject = NULL;
 	CCamera* m_pCamera = NULL;
 
