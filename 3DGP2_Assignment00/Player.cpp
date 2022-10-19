@@ -1,4 +1,5 @@
 #include "Player.h"
+#include "Shader.h"
 #include "Camera.h"
 
 CPlayer::CPlayer(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, void* pContext, int nMeshes)
@@ -220,7 +221,6 @@ void CPlayer::Render(ID3D12GraphicsCommandList* pd3dCommandList)
 	DWORD nCameraMode = (m_pCamera) ? m_pCamera->GetMode() : 0x00;
 	if (nCameraMode == THIRD_PERSON_CAMERA) CGameObject::Render(pd3dCommandList, m_pCamera);
 }
-
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // CTerrianFlyingPlayer
 //
@@ -229,6 +229,20 @@ CTerrianFlyingPlayer::CTerrianFlyingPlayer(ID3D12Device* pd3dDevice, ID3D12Graph
 	m_pCamera = ChangeCamera(THIRD_PERSON_CAMERA, 0.0f);
 
 	CreateShaderVariables(pd3dDevice, pd3dCommandList);
+
+	// Shader 持失
+	m_pShader = std::make_unique<CModeledTexturedShader>();
+	m_pShader->CreateShader(pd3dDevice, pd3dGraphicsRootSignature);
+	m_pShader->CreateShaderVariables(pd3dDevice, pd3dCommandList);
+	m_pShader->CreateCbvSrvDescriptorHeaps(pd3dDevice, 0, 2);
+
+	// Mesh 持失
+	std::shared_ptr<CGameObject> SuperCobraObject = std::make_shared<CGameObject>();
+	SuperCobraObject = SuperCobraObject->LoadGeometryFromFile(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature, "Model/Mi24.bin", m_pShader.get());
+	SetChild(SuperCobraObject);
+
+	m_pBullet = std::make_unique<CCubeObject>(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature, m_pShader.get());
+	m_pBullet->SetPosition(XMFLOAT3(1030.0f, 300.0f, 1400.0f));
 
 	CHeightMapTerrain* pTerrain = (CHeightMapTerrain*)pContext;
 	SetPlayerUpdatedContext(pTerrain);
@@ -246,6 +260,16 @@ void CTerrianFlyingPlayer::OnPrepareRender()
 
 	XMMATRIX mtxRotate = XMMatrixRotationRollPitchYaw(XMConvertToRadians(90.0f), 0.0f, 0.0f);
 	m_xmf4x4World = Matrix4x4::Multiply(mtxRotate, m_xmf4x4World);
+}
+
+void CTerrianFlyingPlayer::Render(ID3D12GraphicsCommandList* pd3dCommandList)
+{
+	DWORD nCameraMode = (m_pCamera) ? m_pCamera->GetMode() : 0x00;
+	m_pShader->Render(pd3dCommandList);
+	if (nCameraMode == THIRD_PERSON_CAMERA) {
+		CGameObject::Render(pd3dCommandList, m_pCamera);
+	}
+	m_pBullet->Render(pd3dCommandList, m_pCamera);
 }
 
 void CTerrianFlyingPlayer::OnPlayerUpdateCallback(float fTimeElapsed)

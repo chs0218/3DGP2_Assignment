@@ -255,28 +255,12 @@ void CGameFramework::BuildObjects()
 	m_pScene = std::make_unique<CScene>();
 	m_pScene->BuildObjects(m_pd3dDevice.Get(), m_pd3dCommandList.Get());
 
-	// Shader 생성
-	m_pShader = std::make_unique<CModeledTexturedShader>();
-	m_pShader->CreateShader(m_pd3dDevice.Get(), m_pScene->GetGraphicsRootSignature());
-	m_pShader->CreateShaderVariables(m_pd3dDevice.Get(), m_pd3dCommandList.Get());
-	m_pShader->CreateCbvSrvDescriptorHeaps(m_pd3dDevice.Get(), 0, 2);
-
-	// Mesh 생성
-	std::shared_ptr<CGameObject> SuperCobraObject = std::make_shared<CGameObject>();
-	SuperCobraObject = SuperCobraObject->LoadGeometryFromFile(m_pd3dDevice.Get(), m_pd3dCommandList.Get(), m_pScene->GetGraphicsRootSignature(), "Model/Mi24.bin", m_pShader.get());
-	
-	m_pObject = std::make_unique<CCubeObject>(m_pd3dDevice.Get(), m_pd3dCommandList.Get(), m_pScene->GetGraphicsRootSignature(), m_pShader.get());
-	m_pObject->SetPosition(XMFLOAT3(1030.0f, 300.0f, 1400.0f));
-
 	m_pPlayer = std::make_unique<CTerrianFlyingPlayer>(m_pd3dDevice.Get(), m_pd3dCommandList.Get(), m_pScene->GetGraphicsRootSignature(), m_pScene->GetTerrain());
-	m_pPlayer->SetChild(SuperCobraObject);
 	m_pPlayer->PrepareAnimate();
 	m_pPlayer->SetScale(20.0f, 20.0f, 20.0f);
 	m_pPlayer->SetPosition(XMFLOAT3(1030.0f, 300.0f, 1400.0f));
 
 	m_pCamera = m_pPlayer->GetCamera();
-
-	
 
 	//씬 객체를 생성하기 위하여 필요한 그래픽 명령 리스트들을 명령 큐에 추가한다. 
 	m_pd3dCommandList->Close();
@@ -501,18 +485,12 @@ void CGameFramework::FrameAdvance()
 	//렌더링 코드는 여기에 추가될 것이다. 
 	m_pScene->Render(m_pd3dCommandList.Get(), m_pCamera);
 
-	if (m_pShader)
-		m_pShader->Render(m_pd3dCommandList.Get());
 	if (m_pPlayer)
 	{
 		m_pPlayer->UpdateTransform(NULL);
 		m_pPlayer->Render(m_pd3dCommandList.Get());
 	}
-	if (m_pObject)
-	{
-		m_pObject->UpdateTransform(NULL);
-		m_pObject->Render(m_pd3dCommandList.Get());
-	}
+
 	/*현재 렌더 타겟에 대한 렌더링이 끝나기를 기다린다. GPU가 렌더 타겟(버퍼)을 더 이상 사용하지 않으면 렌더 타겟
 	의 상태는 프리젠트 상태(D3D12_RESOURCE_STATE_PRESENT)로 바뀔 것이다.*/
 	d3dResourceBarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;

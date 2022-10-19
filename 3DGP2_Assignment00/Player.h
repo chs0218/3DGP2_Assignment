@@ -8,6 +8,7 @@
 #define DIR_UP					0x10
 #define DIR_DOWN				0x20
 
+class CShader;
 class CPlayer : public CGameObject
 {
 protected:
@@ -84,6 +85,8 @@ class CTerrianFlyingPlayer : public CPlayer
 protected:
 	CGameObject* m_pMainRotorFrame = NULL;
 	CGameObject* m_pTailRotorFrame = NULL;
+	std::unique_ptr<CShader> m_pShader = NULL;
+	std::unique_ptr<CGameObject> m_pBullet = NULL;
 public:
 	CTerrianFlyingPlayer(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, void* pContext = NULL);
 	virtual ~CTerrianFlyingPlayer();
@@ -92,6 +95,7 @@ public:
 	virtual void PrepareAnimate();
 	virtual void Animate(float fTimeElapsed, XMFLOAT4X4* pxmf4x4Parent = NULL);
 	virtual void OnPrepareRender();
+	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList);
 
 	virtual void OnPlayerUpdateCallback(float fTimeElapsed);
 	virtual void OnCameraUpdateCallback(float fTimeElapsed);
