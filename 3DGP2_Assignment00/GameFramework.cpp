@@ -259,12 +259,15 @@ void CGameFramework::BuildObjects()
 	m_pShader = std::make_unique<CModeledTexturedShader>();
 	m_pShader->CreateShader(m_pd3dDevice.Get(), m_pScene->GetGraphicsRootSignature());
 	m_pShader->CreateShaderVariables(m_pd3dDevice.Get(), m_pd3dCommandList.Get());
-	m_pShader->CreateCbvSrvDescriptorHeaps(m_pd3dDevice.Get(), 0, 1);
+	m_pShader->CreateCbvSrvDescriptorHeaps(m_pd3dDevice.Get(), 0, 2);
 
 	// Mesh 생성
 	std::shared_ptr<CGameObject> SuperCobraObject = std::make_shared<CGameObject>();
 	SuperCobraObject = SuperCobraObject->LoadGeometryFromFile(m_pd3dDevice.Get(), m_pd3dCommandList.Get(), m_pScene->GetGraphicsRootSignature(), "Model/Mi24.bin", m_pShader.get());
 	
+	m_pObject = std::make_unique<CCubeObject>(m_pd3dDevice.Get(), m_pd3dCommandList.Get(), m_pScene->GetGraphicsRootSignature(), m_pShader.get());
+	m_pObject->SetPosition(XMFLOAT3(1030.0f, 300.0f, 1400.0f));
+
 	m_pPlayer = std::make_unique<CTerrianFlyingPlayer>(m_pd3dDevice.Get(), m_pd3dCommandList.Get(), m_pScene->GetGraphicsRootSignature(), m_pScene->GetTerrain());
 	m_pPlayer->SetChild(SuperCobraObject);
 	m_pPlayer->PrepareAnimate();
@@ -273,8 +276,7 @@ void CGameFramework::BuildObjects()
 
 	m_pCamera = m_pPlayer->GetCamera();
 
-	m_pObject = std::make_unique<CCubeObject>(m_pd3dDevice.Get(), m_pd3dCommandList.Get(), m_pScene->GetGraphicsRootSignature());
-	m_pObject->SetPosition(XMFLOAT3(1030.0f, 300.0f, 1400.0f));
+	
 
 	//씬 객체를 생성하기 위하여 필요한 그래픽 명령 리스트들을 명령 큐에 추가한다. 
 	m_pd3dCommandList->Close();

@@ -429,7 +429,7 @@ int CGameObject::FindReplicatedTexture(_TCHAR* pstrTextureName, D3D12_GPU_DESCRI
 	return(nParameterIndex);
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-CCubeObject::CCubeObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature)
+CCubeObject::CCubeObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, CShader* pShader)
 {
 	std::shared_ptr<CCubeMeshDiffused> pCubeMesh = std::make_shared<CCubeMeshDiffused>(pd3dDevice, pd3dCommandList, 20.0f, 20.0f, 20.0f);
 	SetMesh(pCubeMesh);
@@ -438,15 +438,12 @@ CCubeObject::CCubeObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd
 	pCubeTexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Image/Stone.dds", RESOURCE_TEXTURE2D, 0);
 	pCubeTexture->SetRootParameterIndex(0, 2);
 
-	std::shared_ptr<CModeledTexturedShader> pShader = std::make_shared<CModeledTexturedShader>();
-	pShader->CreateShader(pd3dDevice, pd3dGraphicsRootSignature);
-	pShader->CreateCbvSrvDescriptorHeaps(pd3dDevice, 0, 1);
+	
 	pShader->CreateShaderResourceView(pd3dDevice, pCubeTexture.get(), 0);
-
+	
 	std::shared_ptr<CMaterial> pMaterial = std::make_shared<CMaterial>();
 	pMaterial->SetMaterialType(MATERIAL_ALBEDO_MAP);
 	pMaterial->SetTexture(pCubeTexture);
-	pMaterial->SetShader(pShader);
 
 	m_nMaterials = 1;
 	m_ppMaterials.push_back(pMaterial);
