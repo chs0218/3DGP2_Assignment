@@ -238,7 +238,8 @@ class CBullet : public CGameObject
 protected:
 	XMFLOAT3 direction = { 0.0f, 0.0f, 0.0f };
 	bool isEnable = false;
-	float fVelocity = 10.0f;
+	float fVelocity = 200.0f;
+	float m_fmovingDistance = 0.0f;
 public:
 	CBullet() {}
 	~CBullet() {}
@@ -247,5 +248,6 @@ public:
 	bool CheckEnable() const { return isEnable; }
 	void DisableBullet() { isEnable = false; }
 	void Update(float fTimeElapsed);
+	void Reset();
 	void ShootBullet(CGameObject* pPlayer);
 };

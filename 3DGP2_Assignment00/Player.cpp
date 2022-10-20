@@ -362,6 +362,7 @@ void CTerrianFlyingPlayer::PrepareShooting(ID3D12Device* pd3dDevice, ID3D12Graph
 	{
 		CBullet* pBullet = new CBullet();
 		pBullet->SetChild(m_pBullet);
+		pBullet->Rotate(0.0f, 45.0f, 0.0f);
 		m_pBullets.push_back(pBullet);
 	}
 
