@@ -29,6 +29,7 @@ CEnemy::CEnemy()
 	fVelocity = 50.0f;
 	m_pPlayer = NULL;
 	m_pObject = NULL;
+	m_xmOOBB = BoundingOrientedBox{ XMFLOAT3{0.0f, 0.0f, 0.0f}, XMFLOAT3{50.0f, 50.0f, 50.0f}, XMFLOAT4{0.0f, 0.0f, 0.0f, 1.0f} };
 }
 
 CEnemy::~CEnemy()
@@ -52,6 +53,7 @@ void CEnemy::Update(CGameObject* pPlayer, float fTimeElapsed)
 		m_pObject->SetPosition(reult_Position);
 		if (m_pUpdatedContext)
 			OnUpdateCallback(fTimeElapsed);
+		UpdateBoundingBox();
 	}
 }
 
@@ -139,6 +141,13 @@ void CEnemy::SetContext(void* pContext)
 {
 	CHeightMapTerrain* pTerrain = (CHeightMapTerrain*)pContext;
 	m_pUpdatedContext = pTerrain;
+}
+
+void CEnemy::UpdateBoundingBox()
+{
+	XMFLOAT4X4 xmf4x5Transform = m_pObject->GetTransform();
+	m_xmOOBB.Transform(m_xmOOBB, XMLoadFloat4x4(&xmf4x5Transform));
+	XMStoreFloat4(&m_xmOOBB.Orientation, XMQuaternionNormalize(XMLoadFloat4(&m_xmOOBB.Orientation)));
 }
 
 void CEnemy::Animate(float fTimeElapsed)
