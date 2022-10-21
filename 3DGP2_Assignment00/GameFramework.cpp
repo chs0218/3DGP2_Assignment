@@ -259,7 +259,7 @@ void CGameFramework::BuildObjects()
 	m_pPlayer->PrepareAnimate();
 	m_pPlayer->SetScale(20.0f, 20.0f, 20.0f);
 	m_pPlayer->SetPosition(XMFLOAT3(1030.0f, 300.0f, 1400.0f));
-
+	m_pScene->SetPlayer(m_pPlayer.get());
 	m_pCamera = m_pPlayer->GetCamera();
 
 	//씬 객체를 생성하기 위하여 필요한 그래픽 명령 리스트들을 명령 큐에 추가한다. 
@@ -444,7 +444,7 @@ void CGameFramework::FrameAdvance()
 
 	ProcessInput();
 	AnimateObjects();
-
+	m_pScene->CheckCollision();
 	//명령 할당자와 명령 리스트를 리셋한다.
 	HRESULT hResult = m_pd3dCommandAllocator->Reset();
 	hResult = m_pd3dCommandList->Reset(m_pd3dCommandAllocator.Get(), NULL);

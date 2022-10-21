@@ -2,6 +2,7 @@
 #include "Object.h"
 #include "Shader.h"
 #include "Camera.h"
+#include "Enemy.h"
 
 CGameObject::CGameObject()
 {
@@ -431,7 +432,7 @@ int CGameObject::FindReplicatedTexture(_TCHAR* pstrTextureName, D3D12_GPU_DESCRI
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 CCubeObject::CCubeObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, CShader* pShader)
 {
-	std::shared_ptr<CCubeMeshDiffused> pCubeMesh = std::make_shared<CCubeMeshDiffused>(pd3dDevice, pd3dCommandList, 20.0f, 20.0f, 20.0f);
+	std::shared_ptr<CCubeMeshDiffused> pCubeMesh = std::make_shared<CCubeMeshDiffused>(pd3dDevice, pd3dCommandList, 4.0f, 4.0f, 4.0f);
 	SetMesh(pCubeMesh);
 
 	std::shared_ptr<CTexture> pCubeTexture = std::make_shared<CTexture>(7, RESOURCE_TEXTURE2D, 0, 1);
@@ -780,6 +781,14 @@ void CRippleWater::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* p
 	}
 }
 
+CBullet::CBullet() {
+	direction = XMFLOAT3{ 0.0f, 0.0f, 0.0f };
+	isEnable = false;
+	fVelocity = 200.0f;
+	m_fmovingDistance = 0.0f;
+	m_xmOOBB = BoundingOrientedBox{ XMFLOAT3{0.0f, 0.0f, 0.0f}, XMFLOAT3{3.5f, 3.5f, 3.5f}, XMFLOAT4{0.0f, 0.0f, 0.0f, 1.0f} };
+}
+
 void CBullet::Update(float fTimeElapsed)
 {
 	XMFLOAT3 cur_Position = GetPosition();
@@ -794,6 +803,7 @@ void CBullet::Update(float fTimeElapsed)
 		reult_Position = Vector3::Add(cur_Position, deltaPos);
 		SetPosition(reult_Position);
 		Rotate(0.0f, 360.0f * fTimeElapsed, 0.0f);
+		UpdateBoundingBox();
 	}
 }
 
@@ -808,4 +818,21 @@ void CBullet::Reset()
 	direction = XMFLOAT3{ 0.0f, 0.0f, 0.0f };
 	isEnable = false;
 	m_fmovingDistance = 0.0f;
+}
+
+void CBullet::UpdateBoundingBox()
+{
+	XMFLOAT4X4 xmf4x5Transform = GetTransform();
+	m_xmOOBB.Transform(m_xmOOBB_result, XMLoadFloat4x4(&xmf4x5Transform));
+	XMStoreFloat4(&m_xmOOBB_result.Orientation, XMQuaternionNormalize(XMLoadFloat4(&m_xmOOBB.Orientation)));
+}
+
+bool CBullet::CheckCollision(BoundingOrientedBox p_xmOOBB)
+{
+	if (isEnable)
+	{
+		if (m_xmOOBB_result.Intersects(p_xmOOBB))
+			return true;
+	}
+	return false;
 }

@@ -240,14 +240,18 @@ protected:
 	bool isEnable = false;
 	float fVelocity = 200.0f;
 	float m_fmovingDistance = 0.0f;
+	BoundingOrientedBox	m_xmOOBB_result = BoundingOrientedBox();
+	BoundingOrientedBox	m_xmOOBB = BoundingOrientedBox();
 public:
-	CBullet() {}
+	CBullet();
 	~CBullet() {}
 
 	void SetDirection(XMFLOAT3 xmf3Direction) { direction = xmf3Direction; };
 	bool CheckEnable() const { return isEnable; }
 	void DisableBullet() { isEnable = false; }
 	void Update(float fTimeElapsed);
+	void UpdateBoundingBox();
+	bool CheckCollision(BoundingOrientedBox p_xmOOBB);
 	void Reset();
 	void ShootBullet(CGameObject* pPlayer);
 };

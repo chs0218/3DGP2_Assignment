@@ -91,6 +91,8 @@ public:
 	virtual void ReleaseObjects();
 
 	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera);
+	std::vector<CEnemy*>::iterator getObjectsBegin() { return m_ppObjects.begin(); }
+	std::vector<CEnemy*>::iterator getObjectsEnd() { return m_ppObjects.end(); }
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

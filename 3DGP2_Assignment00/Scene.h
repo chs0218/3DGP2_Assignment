@@ -1,8 +1,10 @@
 #pragma once
 #include "Camera.h"
 #include "Object.h"
+#include "Player.h"
 
 class CCamera;
+class CPlayer;
 class CShader;
 //-----------------------------------------------------------------------------
 // 22/09/20 CScene 클래스 추가 - Leejh
@@ -31,6 +33,8 @@ public:
 	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera = NULL);
 
 	CHeightMapTerrain* GetTerrain() { return(m_pTerrain.get()); }
+	void SetPlayer(CPlayer* pPlayer) { m_pPlayer = pPlayer; }
+	void CheckCollision();
 private:
 	ComPtr<ID3D12RootSignature> m_pd3dGraphicsRootSignature = nullptr;
 
@@ -42,5 +46,6 @@ private:
 	std::unique_ptr<CShader> m_pShader = NULL;
 	std::unique_ptr<CShader> m_pShader2 = NULL;
 	XMFLOAT4 m_fClearColor = {0.0f, 0.0f, 0.0f, 0.0f};
+	CPlayer* m_pPlayer = NULL;
 };
 

@@ -2,14 +2,17 @@
 #include "Object.h"
 
 class CGameObject;
+class CBullet;
 class CEnemy
 {
 private:
+	bool m_bEnable;
 	XMFLOAT3 direction;
 	float fWanderingTime;
 	float fVelocity;
 	CGameObject* m_pPlayer;
 	std::shared_ptr<CGameObject> m_pObject;
+	BoundingOrientedBox	m_xmOOBB_Result = BoundingOrientedBox();
 	BoundingOrientedBox	m_xmOOBB = BoundingOrientedBox();
 	LPVOID m_pUpdatedContext = NULL;
 public:
@@ -23,6 +26,7 @@ public:
 	void SetContext(void* pContext);
 	void UpdateBoundingBox();
 	void Animate(float fTimeElapsed);
+	void CheckCollision(std::vector<CBullet*> m_pBullets);
 	void Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera);
 };
 

@@ -2,6 +2,7 @@
 #include "Scene.h"
 #include "Object.h"
 #include "Shader.h"
+#include "Enemy.h"
 
 CScene::CScene()
 {
@@ -206,4 +207,16 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 		m_pShader->Render(pd3dCommandList, pCamera);
 	if (m_pShader2)
 		m_pShader2->Render(pd3dCommandList, pCamera);
+}
+
+void CScene::CheckCollision()
+{
+	CShader* pShader = m_pShader2.get();
+	for (std::vector<CEnemy*>::iterator i = static_cast<CObjectShader*>(pShader)->getObjectsBegin();
+		i != static_cast<CObjectShader*>(pShader)->getObjectsEnd();
+		++i)
+	{
+		(*i)->UpdateBoundingBox();
+		(*i)->CheckCollision(((CTerrianFlyingPlayer*)m_pPlayer)->getBullets());
+	}
 }
