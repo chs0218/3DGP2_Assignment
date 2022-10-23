@@ -6,21 +6,11 @@
 #define MATERIAL_DETAIL_ALBEDO_MAP	0x20
 #define MATERIAL_DETAIL_NORMAL_MAP	0x40
 
-struct MATERIAL
-{
-	float4 m_cAmbient;
-	float4 m_cDiffuse;
-	float4 m_cSpecular; //a = power
-	float4 m_cEmissive;
-};
-
 cbuffer cbGameObjectInfo : register(b0)
 {
 	matrix gmtxGameObject : packoffset(c0);
-	MATERIAL gMaterial : packoffset(c4);
-	uint gnTexturesMask : packoffset(c8);
+	uint gnTexturesMask : packoffset(c4);
 }
-
 
 cbuffer cbCameraInfo : register(b1)
 {
