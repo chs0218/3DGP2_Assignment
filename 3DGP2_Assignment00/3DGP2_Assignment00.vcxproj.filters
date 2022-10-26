@@ -131,5 +131,6 @@
     <FxCompile Include="WaterPixelShader.hlsl" />
     <FxCompile Include="BillBoardVertexShader.hlsl" />
     <FxCompile Include="BillBoardPixelShader.hlsl" />
+    <FxCompile Include="MultiSpriteVertexShader.hlsl" />
   </ItemGroup>
 </Project>

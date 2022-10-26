@@ -3,7 +3,7 @@
 #include "Object.h"
 #include "Shader.h"
 
-CTexture::CTexture(int nTextures, UINT nTextureType, int nSamplers, int nRootParameters)
+CTexture::CTexture(int nTextures, UINT nTextureType, int nSamplers, int nRootParameters, int nRows, int nCols)
 {
 	m_nTextureType = nTextureType;
 
@@ -27,6 +27,11 @@ CTexture::CTexture(int nTextures, UINT nTextureType, int nSamplers, int nRootPar
 	m_nRootParameters = nRootParameters;
 	if (nRootParameters > 0) m_pnRootParameterIndices = new int[nRootParameters];
 	for (int i = 0; i < m_nRootParameters; i++) m_pnRootParameterIndices[i] = -1;
+
+	m_nRows = nRows;
+	m_nCols = nCols;
+
+	m_xmf4x4Texture = Matrix4x4::Identity();
 }
 
 CTexture::~CTexture()
@@ -56,6 +61,10 @@ void CTexture::SetRootParameterIndex(int nIndex, UINT nRootParameterIndex)
 }
 void CTexture::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList)
 {
+	XMFLOAT4X4 xmf4x4World;
+	XMStoreFloat4x4(&xmf4x4World, XMMatrixTranspose(XMLoadFloat4x4(&m_xmf4x4Texture)));
+	pd3dCommandList->SetGraphicsRoot32BitConstants(0, 16, &xmf4x4World, 16);
+
 	if (m_nRootParameters == m_nTextures)
 	{
 		for (int i = 0; i < m_nRootParameters; i++)
@@ -211,6 +220,18 @@ D3D12_SHADER_RESOURCE_VIEW_DESC CTexture::GetShaderResourceViewDesc(int nIndex)
 	return(d3dShaderResourceViewDesc);
 }
 
+void CTexture::AnimateRowColumn(float fTimeElapased)
+{
+	m_xmf4x4Texture._11 = 1.0f / float(m_nRows);
+	m_xmf4x4Texture._22 = 1.0f / float(m_nCols);
+	m_xmf4x4Texture._31 = float(m_nRow) / float(m_nRows);
+	m_xmf4x4Texture._32 = float(m_nCol) / float(m_nCols);
+	if (fTimeElapased == 0.0f)
+	{
+		if (++m_nCol == m_nCols) { m_nRow++; m_nCol = 0; }
+		if (m_nRow == m_nRows) m_nRow = 0;
+	}
+}
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 CMaterial::CMaterial()
@@ -238,8 +259,8 @@ void CMaterial::ReleaseUploadBuffers()
 
 void CMaterial::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList)
 {
-	pd3dCommandList->SetGraphicsRoot32BitConstants(0, 1, &m_nType, 16);
 	if (m_pTexture) m_pTexture->UpdateShaderVariables(pd3dCommandList);
+	pd3dCommandList->SetGraphicsRoot32BitConstants(0, 1, &m_nType, 32);
 }
 
 void CMaterial::ReleaseShaderVariables()

@@ -15,23 +15,21 @@ struct VS_INPUT
 {
 	float3 position : POSITION;
 	float2 uv : TEXCOORD;
-	float3 normal : NORMAL;
 };
 
 struct VS_OUTPUT
 {
 	float4 position : SV_POSITION;
-	float3 positionW : POSITION;
-	float3 normalW : NORMAL;
 	float2 uv : TEXCOORD;
 };
 
-VS_OUTPUT VS_Tex(VS_INPUT input)
+VS_OUTPUT VS_MultiSprite(VS_INPUT input)
 {
 	VS_OUTPUT output;
-	output.positionW = (float3)mul(float4(input.position, 1.0f), gmtxGameObject);
-	output.normalW = mul(input.normal, (float3x3)gmtxGameObject);
-	output.position = mul(mul(float4(output.positionW, 1.0f), gmtxView), gmtxProjection);
-	output.uv = input.uv;
+
+	output.position = mul(mul(mul(float4(input.position, 1.0f), gmtxGameObject), gmtxView), gmtxProjection);
+	output.uv = mul(float3(input.uv, 1.0f), (float3x3)(gmtxTexture)).xy;
+
 	return(output);
 }
+

@@ -1,7 +1,8 @@
 cbuffer cbGameObjectInfo : register(b0)
 {
 	matrix gmtxGameObject : packoffset(c0);
-	uint gnTexturesMask : packoffset(c4);
+	matrix gmtxTexture : packoffset(c4);
+	uint gnTexturesMask : packoffset(c8);
 }
 
 cbuffer cbCameraInfo : register(b1)

@@ -58,7 +58,7 @@ void CScene::CreateGraphicsRootSignature(ID3D12Device* pd3dDevice)
 	D3D12_ROOT_PARAMETER pd3dRootParameters[8];
 
 	pd3dRootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_32BIT_CONSTANTS;
-	pd3dRootParameters[0].Constants.Num32BitValues = 17;
+	pd3dRootParameters[0].Constants.Num32BitValues = 33;
 	pd3dRootParameters[0].Constants.ShaderRegister = 0; //GameObject
 	pd3dRootParameters[0].Constants.RegisterSpace = 0;
 	pd3dRootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
@@ -156,6 +156,15 @@ void CScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 	pShader = m_pShader2.get();
 	static_cast<CObjectShader*>(pShader)->CreateShader(pd3dDevice, GetGraphicsRootSignature());
 	static_cast<CObjectShader*>(pShader)->BuildObjects(pd3dDevice, pd3dCommandList, GetGraphicsRootSignature(), m_pTerrain.get());
+
+	m_pBoomShader = std::make_unique<CMultiSpriteObjectsShader>();
+
+	pShader = m_pBoomShader.get();
+	static_cast<CMultiSpriteObjectsShader*>(pShader)->CreateShader(pd3dDevice, GetGraphicsRootSignature());
+	static_cast<CMultiSpriteObjectsShader*>(pShader)->CreateCbvSrvDescriptorHeaps(pd3dDevice, 0, 1);
+
+	m_pObject = std::make_unique<CMultiSpriteObject>();
+
 }
 
 void CScene::ReleaseObjects()

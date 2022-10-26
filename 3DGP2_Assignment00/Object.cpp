@@ -836,3 +836,26 @@ bool CBullet::CheckCollision(BoundingOrientedBox p_xmOOBB)
 	}
 	return false;
 }
+
+////////////////////////////////////////////////////////////////////////////////////////////
+CMultiSpriteObject::CMultiSpriteObject()
+{
+}
+
+CMultiSpriteObject::~CMultiSpriteObject()
+{
+}
+
+CMultiSpriteObject::CMultiSpriteObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature)
+{
+}
+
+void CMultiSpriteObject::Animate(float fTimeElapsed)
+{
+	if (m_ppMaterials.data() && m_ppMaterials[0])
+	{
+		m_fTime += fTimeElapsed * 0.5f;
+		if (m_fTime >= m_fSpeed) m_fTime = 0.0f;
+		m_ppMaterials[0]->m_pTexture->AnimateRowColumn(m_fTime);
+	}
+}
