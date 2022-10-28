@@ -4,6 +4,7 @@ class CTexture;
 class CCamera;
 class CGameObject;
 class CTexturedRectMesh;
+class CMultiSpriteObject;
 class CEnemy;
 
 class CShader
@@ -165,6 +166,9 @@ public:
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class CMultiSpriteObjectsShader : public CShader
 {
+	std::shared_ptr<CMultiSpriteObject> m_pObject;
+	std::shared_ptr<CTexturedRectMesh> pTexturedRectMesh;
+	std::shared_ptr<CTexture> pTexture;
 public:
 	CMultiSpriteObjectsShader();
 	virtual ~CMultiSpriteObjectsShader();
@@ -176,10 +180,11 @@ public:
 	virtual D3D12_SHADER_BYTECODE CreateVertexShader(ID3DBlob** ppd3dShaderBlob);
 	virtual D3D12_SHADER_BYTECODE CreatePixelShader(ID3DBlob** ppd3dShaderBlob);
 
-	//virtual void BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, void* pContext = NULL);
+	virtual void BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, void* pContext = NULL);
 	//virtual void ReleaseObjects();
 
-	//virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera);
+	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera);
+	virtual void AnimateObjects(float fTimeElapsed);
 
 	//virtual void ReleaseUploadBuffers();
 };

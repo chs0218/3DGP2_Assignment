@@ -161,10 +161,7 @@ void CScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 
 	pShader = m_pBoomShader.get();
 	static_cast<CMultiSpriteObjectsShader*>(pShader)->CreateShader(pd3dDevice, GetGraphicsRootSignature());
-	static_cast<CMultiSpriteObjectsShader*>(pShader)->CreateCbvSrvDescriptorHeaps(pd3dDevice, 0, 1);
-
-	m_pObject = std::make_unique<CMultiSpriteObject>();
-
+	static_cast<CMultiSpriteObjectsShader*>(pShader)->BuildObjects(pd3dDevice, pd3dCommandList, GetGraphicsRootSignature());
 }
 
 void CScene::ReleaseObjects()
@@ -194,6 +191,12 @@ void CScene::AnimateObjects(CGameObject* pPlayer, float fTimeElapsed)
 		CShader* pShader = m_pShader2.get();
 		static_cast<CObjectShader*>(pShader)->AnimateObjects(pPlayer, fTimeElapsed);
 	}
+
+	if (m_pBoomShader)
+	{
+		CShader* pShader = m_pBoomShader.get();
+		static_cast<CMultiSpriteObjectsShader*>(pShader)->AnimateObjects(fTimeElapsed);
+	}
 }
 
 void CScene::PrepareRender(ID3D12GraphicsCommandList* pd3dCommandList)
@@ -216,6 +219,8 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 		m_pShader->Render(pd3dCommandList, pCamera);
 	if (m_pShader2)
 		m_pShader2->Render(pd3dCommandList, pCamera);
+	if (m_pBoomShader)
+		m_pBoomShader->Render(pd3dCommandList, pCamera);
 }
 
 void CScene::CheckCollision()

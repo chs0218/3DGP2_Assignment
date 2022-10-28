@@ -901,3 +901,40 @@ D3D12_SHADER_BYTECODE CMultiSpriteObjectsShader::CreatePixelShader(ID3DBlob** pp
 {
 	return(CShader::ReadCompiledShaderFile(L"BillBoardPixelShader.cso", ppd3dShaderBlob));
 }
+
+void CMultiSpriteObjectsShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, void* pContext)
+{
+	pTexturedRectMesh = std::make_shared<CTexturedRectMesh>(pd3dDevice, pd3dCommandList, 50.0f, 50.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+	pTexture = std::make_shared<CTexture>(1, RESOURCE_TEXTURE2D, 0, 1, 8, 8);
+	pTexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Image/Explode_8x8.dds", RESOURCE_TEXTURE2D, 0);
+
+	m_pObject = std::make_shared<CMultiSpriteObject>();
+	m_pObject->SetMesh(pTexturedRectMesh);
+	m_pObject->SetTexture(pTexture);
+	m_pObject->SetPosition(1030.0f, 300.0f, 1400.0f);
+	m_pObject->m_fSpeed = 3.0f / (8 * 8);
+
+	CreateCbvSrvDescriptorHeaps(pd3dDevice, 0, 1);
+	CreateShaderResourceViews(pd3dDevice, pTexture.get(), 0, 3);
+}
+
+void CMultiSpriteObjectsShader::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera)
+{
+	XMFLOAT3 xmf3CameraPosition = pCamera->GetPosition();
+	
+	CShader::Render(pd3dCommandList, pCamera);
+	if (m_pObject)
+	{
+		m_pObject->SetLookAt(xmf3CameraPosition, XMFLOAT3(0.0f, 1.0f, 0.0f));
+		m_pObject->UpdateTransform(NULL);
+		m_pObject->Render(pd3dCommandList, pCamera);
+	}			
+}
+
+void CMultiSpriteObjectsShader::AnimateObjects(float fTimeElapsed)
+{
+	if (m_pObject)
+	{
+		m_pObject->Animate(fTimeElapsed);
+	}
+}
