@@ -141,41 +141,34 @@ void CScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 	XMFLOAT4 xmf4TerrainColor(0.0f, 0.5f, 0.0f, 0.0f);
 	m_pTerrain = std::make_unique<CHeightMapTerrain>(pd3dDevice, pd3dCommandList, GetGraphicsRootSignature(), _T("Image/HeightMap.raw"), 257, 257, 257, 257, xmf3TerrainScale, xmf4TerrainColor);
 	
+	m_pSkyBox = std::make_unique<CSkyBox>(pd3dDevice, pd3dCommandList, GetGraphicsRootSignature());
+
 	XMFLOAT3 xmf3WaterScale(8.0f, 1.0f, 8.0f);
 	XMFLOAT4 xmf4WaterColor(0.0f, 0.0f, 0.7f, 1.0f);
 	m_pWater = std::make_unique<CRippleWater>(pd3dDevice, pd3dCommandList, GetGraphicsRootSignature(), 257, 257, 257, 257, xmf3WaterScale, xmf4WaterColor);
 	m_pWater->SetPosition(XMFLOAT3(0.0f, 130.0f, 0.0f));
 
-	m_pSkyBox = std::make_unique<CSkyBox>(pd3dDevice, pd3dCommandList, GetGraphicsRootSignature());
-	m_pShader = std::make_unique<CBillboardObjectsShader>();
-	CShader* pShader = m_pShader.get();
-	static_cast<CBillboardObjectsShader*>(pShader)->CreateShader(pd3dDevice, GetGraphicsRootSignature());
-	static_cast<CBillboardObjectsShader*>(pShader)->BuildObjects(pd3dDevice, pd3dCommandList, m_pTerrain.get());
+	CBillboardObjectsShader::Instance()->CreateShader(pd3dDevice, GetGraphicsRootSignature());
+	CBillboardObjectsShader::Instance()->BuildObjects(pd3dDevice, pd3dCommandList, m_pTerrain.get());
 
-	m_pShader2 = std::make_unique<CObjectShader>();
-	pShader = m_pShader2.get();
-	static_cast<CObjectShader*>(pShader)->CreateShader(pd3dDevice, GetGraphicsRootSignature());
-	static_cast<CObjectShader*>(pShader)->BuildObjects(pd3dDevice, pd3dCommandList, GetGraphicsRootSignature(), m_pTerrain.get());
+	CObjectShader::Instance()->CreateShader(pd3dDevice, GetGraphicsRootSignature());
+	CObjectShader::Instance()->BuildObjects(pd3dDevice, pd3dCommandList, GetGraphicsRootSignature(), m_pTerrain.get());
 
-	m_pBoomShader = std::make_unique<CMultiSpriteObjectsShader>();
-
-	pShader = m_pBoomShader.get();
-	static_cast<CMultiSpriteObjectsShader*>(pShader)->CreateShader(pd3dDevice, GetGraphicsRootSignature());
-	static_cast<CMultiSpriteObjectsShader*>(pShader)->BuildObjects(pd3dDevice, pd3dCommandList, GetGraphicsRootSignature());
+	CMultiSpriteObjectsShader::Instance()->CreateShader(pd3dDevice, GetGraphicsRootSignature());
+	CMultiSpriteObjectsShader::Instance()->BuildObjects(pd3dDevice, pd3dCommandList, GetGraphicsRootSignature());
 }
 
 void CScene::ReleaseObjects()
 {
-	if (m_pShader)
+	if (CBillboardObjectsShader::Instance())
 	{
-		m_pShader->ReleaseShaderVariables();
-		m_pShader->ReleaseObjects();
+		CBillboardObjectsShader::Instance()->ReleaseShaderVariables();
+		CBillboardObjectsShader::Instance()->ReleaseObjects();
 	}
-	
-	if (m_pShader2)
+	if (CObjectShader::Instance())
 	{
-		m_pShader2->ReleaseShaderVariables();
-		m_pShader2->ReleaseObjects();
+		CObjectShader::Instance()->ReleaseShaderVariables();
+		CObjectShader::Instance()->ReleaseObjects();
 	}
 }
 
@@ -186,17 +179,12 @@ bool CScene::ProcessInput(UCHAR* pKeysBuffer)
 
 void CScene::AnimateObjects(CGameObject* pPlayer, float fTimeElapsed)
 {
-	if (m_pShader2)
+	if (CObjectShader::Instance())
 	{
-		CShader* pShader = m_pShader2.get();
-		static_cast<CObjectShader*>(pShader)->AnimateObjects(pPlayer, fTimeElapsed);
+		CObjectShader::Instance()->AnimateObjects(pPlayer, fTimeElapsed);
 	}
 
-	if (m_pBoomShader)
-	{
-		CShader* pShader = m_pBoomShader.get();
-		static_cast<CMultiSpriteObjectsShader*>(pShader)->AnimateObjects(fTimeElapsed);
-	}
+	CMultiSpriteObjectsShader::Instance()->AnimateObjects(fTimeElapsed);
 }
 
 void CScene::PrepareRender(ID3D12GraphicsCommandList* pd3dCommandList)
@@ -215,20 +203,15 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 		m_pTerrain->Render(pd3dCommandList, pCamera);
 	if (m_pWater)
 		m_pWater->Render(pd3dCommandList, pCamera);
-	if (m_pShader)
-		m_pShader->Render(pd3dCommandList, pCamera);
-	if (m_pShader2)
-		m_pShader2->Render(pd3dCommandList, pCamera);
-	if (m_pBoomShader)
-		m_pBoomShader->Render(pd3dCommandList, pCamera);
+	CBillboardObjectsShader::Instance()->Render(pd3dCommandList, pCamera);
+	CObjectShader::Instance()->Render(pd3dCommandList, pCamera);
+	CMultiSpriteObjectsShader::Instance()->Render(pd3dCommandList, pCamera);
 }
 
 void CScene::CheckCollision()
 {
-	CShader* pShader = m_pShader2.get();
-	for (std::vector<CEnemy*>::iterator i = static_cast<CObjectShader*>(pShader)->getObjectsBegin();
-		i != static_cast<CObjectShader*>(pShader)->getObjectsEnd();
-		++i)
+	for (std::vector<CEnemy*>::iterator i = CObjectShader::Instance()->getObjectsBegin();
+		i != CObjectShader::Instance()->getObjectsEnd(); ++i)
 	{
 		(*i)->UpdateBoundingBox();
 		(*i)->CheckCollision(((CTerrianFlyingPlayer*)m_pPlayer)->getBullets());

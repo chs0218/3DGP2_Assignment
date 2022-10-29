@@ -407,6 +407,12 @@ D3D12_SHADER_BYTECODE CTerrainShader::CreatePixelShader(ID3DBlob** ppd3dShaderBl
 	return(CShader::ReadCompiledShaderFile(L"TerrainPixelShader.cso", ppd3dShaderBlob));
 }
 
+CBillboardObjectsShader* CBillboardObjectsShader::Instance()
+{
+	static CBillboardObjectsShader instance;
+	return &instance;
+}
+
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 CBillboardObjectsShader::CBillboardObjectsShader()
@@ -640,6 +646,12 @@ D3D12_SHADER_BYTECODE CBillboardObjectsShader::CreatePixelShader(ID3DBlob** ppd3
 	return(CShader::ReadCompiledShaderFile(L"BillBoardPixelShader.cso", ppd3dShaderBlob));
 }
 
+CRippleWaterShader* CRippleWaterShader::Instance()
+{
+	static CRippleWaterShader instance;
+	return &instance;
+}
+
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 CRippleWaterShader::CRippleWaterShader()
@@ -695,6 +707,12 @@ D3D12_SHADER_BYTECODE CRippleWaterShader::CreateVertexShader(ID3DBlob** ppd3dSha
 D3D12_SHADER_BYTECODE CRippleWaterShader::CreatePixelShader(ID3DBlob** ppd3dShaderBlob)
 {
 	return(CShader::ReadCompiledShaderFile(L"WaterPixelShader.cso", ppd3dShaderBlob));
+}
+
+CObjectShader* CObjectShader::Instance()
+{
+	static CObjectShader instance;
+	return &instance;
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -905,17 +923,24 @@ D3D12_SHADER_BYTECODE CMultiSpriteObjectsShader::CreatePixelShader(ID3DBlob** pp
 void CMultiSpriteObjectsShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, void* pContext)
 {
 	pTexturedRectMesh = std::make_shared<CTexturedRectMesh>(pd3dDevice, pd3dCommandList, 50.0f, 50.0f, 0.0f, 0.0f, 0.0f, 0.0f);
-	pTexture = std::make_shared<CTexture>(1, RESOURCE_TEXTURE2D, 0, 1, 8, 8);
+	pTexture = std::make_shared<CTexture>(1, RESOURCE_TEXTURE2D, 0, 1);
 	pTexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Image/Explode_8x8.dds", RESOURCE_TEXTURE2D, 0);
-
-	m_pObject = std::make_shared<CMultiSpriteObject>();
-	m_pObject->SetMesh(pTexturedRectMesh);
-	m_pObject->SetTexture(pTexture);
-	m_pObject->SetPosition(1030.0f, 300.0f, 1400.0f);
-	m_pObject->m_fSpeed = 3.0f / (8 * 8);
 
 	CreateCbvSrvDescriptorHeaps(pd3dDevice, 0, 1);
 	CreateShaderResourceViews(pd3dDevice, pTexture.get(), 0, 3);
+}
+
+void CMultiSpriteObjectsShader::AddObject(XMFLOAT3 xmf3Position)
+{
+	CMultiSpriteObject* pObject = new CMultiSpriteObject;
+	pObject->SetMesh(pTexturedRectMesh);
+	pObject->SetTexture(pTexture);
+	pObject->SetPosition(xmf3Position);
+	pObject->SetRowColumn(8, 8);
+	pObject->Animate(0.0f);
+	pObject->m_fSpeed = 3.0f / (8 * 8);
+
+	m_ppObject.push_back(pObject);
 }
 
 void CMultiSpriteObjectsShader::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera)
@@ -923,18 +948,36 @@ void CMultiSpriteObjectsShader::Render(ID3D12GraphicsCommandList* pd3dCommandLis
 	XMFLOAT3 xmf3CameraPosition = pCamera->GetPosition();
 	
 	CShader::Render(pd3dCommandList, pCamera);
-	if (m_pObject)
+	if (!m_ppObject.empty())
 	{
-		m_pObject->SetLookAt(xmf3CameraPosition, XMFLOAT3(0.0f, 1.0f, 0.0f));
-		m_pObject->UpdateTransform(NULL);
-		m_pObject->Render(pd3dCommandList, pCamera);
+		for (CMultiSpriteObject* pObject : m_ppObject)
+		{
+			pObject->SetLookAt(xmf3CameraPosition, XMFLOAT3(0.0f, 1.0f, 0.0f));
+			pObject->UpdateTransform(NULL);
+			pObject->Render(pd3dCommandList, pCamera);
+		}
 	}			
 }
 
 void CMultiSpriteObjectsShader::AnimateObjects(float fTimeElapsed)
 {
-	if (m_pObject)
+	if (!m_ppObject.empty())
 	{
-		m_pObject->Animate(fTimeElapsed);
+		for (std::list<CMultiSpriteObject*>::iterator i = m_ppObject.begin(); i!=m_ppObject.end(); ++i)
+		{
+			(*i)->Animate(fTimeElapsed);
+			if ((*i)->IsFullAnimated())
+			{
+				delete (*i);
+				m_ppObject.erase(i);
+			}
+		}
 	}
+}
+
+CMultiSpriteObjectsShader* CMultiSpriteObjectsShader::Instance()
+{
+	static CMultiSpriteObjectsShader instance;
+
+	return &instance;
 }

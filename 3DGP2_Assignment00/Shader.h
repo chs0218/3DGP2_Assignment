@@ -83,6 +83,8 @@ protected:
 	int	m_nObjects = 0;
 	std::vector<CEnemy*> m_ppObjects;
 public:
+	static CObjectShader* Instance();
+public:
 	virtual D3D12_SHADER_BYTECODE CreateVertexShader(ID3DBlob** ppd3dShaderBlob);
 	virtual D3D12_SHADER_BYTECODE CreatePixelShader(ID3DBlob** ppd3dShaderBlob);
 	virtual D3D12_INPUT_LAYOUT_DESC CreateInputLayout();
@@ -135,6 +137,8 @@ protected:
 	std::shared_ptr<CTexturedRectMesh> pGrassMesh, pTreeMesh[3], pFlowerMesh;
 	std::shared_ptr<CTexture> pGrassTexture[2], pTreeTexture[3], pFlowerTexture[2];
 public:
+	static CBillboardObjectsShader* Instance();
+public:
 	CBillboardObjectsShader();
 	virtual ~CBillboardObjectsShader();
 
@@ -153,6 +157,8 @@ public:
 class CRippleWaterShader : public CShader
 {
 public:
+	static CRippleWaterShader* Instance();
+public:
 	CRippleWaterShader();
 	virtual ~CRippleWaterShader();
 
@@ -166,9 +172,11 @@ public:
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class CMultiSpriteObjectsShader : public CShader
 {
-	std::shared_ptr<CMultiSpriteObject> m_pObject;
+	std::list<CMultiSpriteObject*> m_ppObject;
 	std::shared_ptr<CTexturedRectMesh> pTexturedRectMesh;
 	std::shared_ptr<CTexture> pTexture;
+public: 
+	static CMultiSpriteObjectsShader* Instance();
 public:
 	CMultiSpriteObjectsShader();
 	virtual ~CMultiSpriteObjectsShader();
@@ -183,6 +191,7 @@ public:
 	virtual void BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, void* pContext = NULL);
 	//virtual void ReleaseObjects();
 
+	void AddObject(XMFLOAT3 xmf3Position);
 	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera);
 	virtual void AnimateObjects(float fTimeElapsed);
 

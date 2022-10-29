@@ -8,6 +8,7 @@ CGameObject::CGameObject()
 {
 	m_xmf4x4World = Matrix4x4::Identity();
 	m_xmf4x4Transform = Matrix4x4::Identity();
+	m_xmf4x4Texture = Matrix4x4::Identity();
 }
 
 CGameObject::~CGameObject()
@@ -840,6 +841,10 @@ bool CBullet::CheckCollision(BoundingOrientedBox p_xmOOBB)
 ////////////////////////////////////////////////////////////////////////////////////////////
 CMultiSpriteObject::CMultiSpriteObject()
 {
+	m_nRow = 0;
+	m_nCol = 0;
+	m_nRows = 1;
+	m_nCols = 1;
 }
 
 CMultiSpriteObject::~CMultiSpriteObject()
@@ -856,6 +861,25 @@ void CMultiSpriteObject::Animate(float fTimeElapsed)
 	{
 		m_fTime += fTimeElapsed * 0.5f;
 		if (m_fTime >= m_fSpeed) m_fTime = 0.0f;
-		m_ppMaterials[0]->m_pTexture->AnimateRowColumn(m_fTime);
+
+		m_xmf4x4Texture._11 = 1.0f / float(m_nRows);
+		m_xmf4x4Texture._22 = 1.0f / float(m_nCols);
+		m_xmf4x4Texture._31 = float(m_nRow) / float(m_nRows);
+		m_xmf4x4Texture._32 = float(m_nCol) / float(m_nCols);
+		if (m_fTime == 0.0f)
+		{
+			if (++m_nCol == m_nCols) { m_nRow++; m_nCol = 0; }
+			if (m_nRow == m_nRows) { m_nRow = 0, FullAnimated = true; }
+		}
 	}
+}
+
+void CMultiSpriteObject::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList)
+{
+	XMFLOAT4X4 xmf4x4World, xmf4x4Texture;
+	XMStoreFloat4x4(&xmf4x4World, XMMatrixTranspose(XMLoadFloat4x4(&m_xmf4x4World)));
+	pd3dCommandList->SetGraphicsRoot32BitConstants(0, 16, &xmf4x4World, 0);
+
+	XMStoreFloat4x4(&xmf4x4Texture, XMMatrixTranspose(XMLoadFloat4x4(&m_xmf4x4Texture)));
+	pd3dCommandList->SetGraphicsRoot32BitConstants(0, 16, &xmf4x4Texture, 16);
 }

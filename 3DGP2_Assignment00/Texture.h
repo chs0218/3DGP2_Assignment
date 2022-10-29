@@ -11,7 +11,7 @@ class CGameObject;
 class CTexture
 {
 public:
-	CTexture(int nTextureResources, UINT nResourceType, int nSamplers, int nRootParameters, int nRows = 1, int nCols = 1);
+	CTexture(int nTextureResources, UINT nResourceType, int nSamplers, int nRootParameters);
 	virtual ~CTexture();
 private:
 	UINT m_nTextureType;		// Texture 타입
@@ -28,13 +28,6 @@ private:
 	int	m_nRootParameters = 0;		// 루트파라미터 번호
 	int* m_pnRootParameterIndices;		// 루트파라미터 인덱스
 	D3D12_GPU_DESCRIPTOR_HANDLE* m_pd3dSrvGpuDescriptorHandles;	// Srv 디스크립터 핸들
-
-	int 							m_nRow = 0;
-	int 							m_nCol = 0;
-	int 							m_nRows = 1;
-	int 							m_nCols = 1;
-
-	XMFLOAT4X4						m_xmf4x4Texture;
 public:
 	int GetTextures() { return(m_nTextures); }
 	ID3D12Resource* GetResource(int nIndex) { return(m_ppd3dTextures[nIndex]); }
@@ -56,8 +49,6 @@ public:
 	D3D12_SHADER_RESOURCE_VIEW_DESC GetShaderResourceViewDesc(int nIndex);
 
 	void ReleaseUploadBuffers();
-
-	void AnimateRowColumn(float fTimeElapased);
 };
 
 class CMaterial

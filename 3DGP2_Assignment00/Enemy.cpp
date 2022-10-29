@@ -1,4 +1,6 @@
 #include "Enemy.h"
+#include "Shader.h"
+
 XMFLOAT3 RandomPositionInSphere(XMFLOAT3 xmf3Center, float fRadius, int nColumn, int nColumnSpace)
 {
 	float fAngle = Random() * 360.0f * (2.0f * 3.14159f / 360.0f);
@@ -166,6 +168,10 @@ void CEnemy::CheckCollision(std::vector<CBullet*> m_pBullets)
 			if (pBullet->CheckCollision(m_xmOOBB_Result))
 			{
 				m_bEnable = false;
+				if (CMultiSpriteObjectsShader::Instance())
+				{
+					CMultiSpriteObjectsShader::Instance()->AddObject(m_pObject->GetPosition());
+				}
 				break;
 			}
 		}

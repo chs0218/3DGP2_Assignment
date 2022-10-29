@@ -42,6 +42,7 @@ protected:
 
 	XMFLOAT4X4 m_xmf4x4Transform;
 	XMFLOAT4X4 m_xmf4x4World;
+	XMFLOAT4X4 m_xmf4x4Texture;
 
 	int	m_nMaterials = 0;
 	std::vector<std::shared_ptr<CMaterial>> m_ppMaterials;
@@ -265,6 +266,14 @@ public:
 
 	float m_fSpeed = 0.1f;
 	float m_fTime = 0.0f;
+	int m_nRow = 0;
+	int m_nCol = 0;
+	int m_nRows = 1;
+	int m_nCols = 1;
+	bool FullAnimated = false;
 
+	bool IsFullAnimated() { return FullAnimated; }
+	void SetRowColumn(int nRow, int nCol) { m_nRows = nRow; m_nCols = nCol; }
+	virtual void UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList);
 	virtual void Animate(float fTimeElapsed);
 };
