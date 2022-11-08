@@ -9,6 +9,7 @@ cbuffer cbCameraInfo : register(b1)
 {
 	matrix gmtxView : packoffset(c0);
 	matrix gmtxProjection : packoffset(c4);
+	float3 gf3CameraPosition : packoffset(c8);
 }
 
 struct VS_INPUT

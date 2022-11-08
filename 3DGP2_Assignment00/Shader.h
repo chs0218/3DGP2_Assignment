@@ -159,7 +159,7 @@ class CGSBillboardObjectsShader : public CShader
 {
 protected:
 	std::shared_ptr<CTexture> pTexture;
-	std::shared_ptr<CMesh> pMesh;
+	std::vector<std::shared_ptr<CMesh>> v_pMesh;
 public:
 	static CGSBillboardObjectsShader* Instance();
 public:

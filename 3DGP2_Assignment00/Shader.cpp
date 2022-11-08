@@ -728,15 +728,92 @@ void CGSBillboardObjectsShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12Gra
 
 	CreateShaderResourceViews(pd3dDevice, pTexture.get(), 0, 8);
 
-	pMesh = std::make_shared<CBillBoardPointMesh>(pd3dDevice, pd3dCommandList);
+	CHeightMapTerrain* pTerrain = (CHeightMapTerrain*)pContext;
+
+	int nTerrainWidth = int(pTerrain->GetWidth());
+	int nTerrainLength = int(pTerrain->GetLength());
+
+	XMFLOAT3 xmf3Scale = pTerrain->GetScale();
+	XMFLOAT3 xmf3Position{ 0.0f, 0.0f, 0.0f };
+
+	CRawFormatImage* pRawFormatImage = new CRawFormatImage(L"Image/ObjectsMap.raw", 257, 257, true);
+	std::vector<XMFLOAT3> pGrassVertices[2], pTreeVertices[3], pFlowerVertices[2];
+
+	for (int z = 2; z <= 254; z++)
+	{
+		for (int x = 2; x <= 254; x++)
+		{
+			BYTE nPixel = pRawFormatImage->GetRawImagePixel(x, z);
+			switch (nPixel)
+			{
+			case 102:
+				xmf3Position.x = x * xmf3Scale.x;
+				xmf3Position.z = z * xmf3Scale.z;
+				xmf3Position.y = pTerrain->GetHeight(xmf3Position.x, xmf3Position.z) + 8.0f * 0.5f;
+				pGrassVertices[0].push_back(xmf3Position);
+				break;
+			case 128:
+				xmf3Position.x = x * xmf3Scale.x;
+				xmf3Position.z = z * xmf3Scale.z;
+				xmf3Position.y = pTerrain->GetHeight(xmf3Position.x, xmf3Position.z) + 6.0f * 0.5f;
+				pGrassVertices[1].push_back(xmf3Position);
+				break;
+			case 153:
+				xmf3Position.x = x * xmf3Scale.x;
+				xmf3Position.z = z * xmf3Scale.z;
+				xmf3Position.y = pTerrain->GetHeight(xmf3Position.x, xmf3Position.z) + 16.0f * 0.5f;
+				pFlowerVertices[0].push_back(xmf3Position);
+				break;
+			case 179:
+				xmf3Position.x = x * xmf3Scale.x;
+				xmf3Position.z = z * xmf3Scale.z;
+				xmf3Position.y = pTerrain->GetHeight(xmf3Position.x, xmf3Position.z) + 16.0f * 0.5f;
+				pFlowerVertices[1].push_back(xmf3Position);
+				break;
+			case 204:
+				xmf3Position.x = x * xmf3Scale.x;
+				xmf3Position.z = z * xmf3Scale.z;
+				xmf3Position.y = pTerrain->GetHeight(xmf3Position.x, xmf3Position.z) + 33.0f * 0.5f;
+				pTreeVertices[0].push_back(xmf3Position);
+				break;
+			case 225:
+				xmf3Position.x = x * xmf3Scale.x;
+				xmf3Position.z = z * xmf3Scale.z;
+				xmf3Position.y = pTerrain->GetHeight(xmf3Position.x, xmf3Position.z) + 33.0f * 0.5f;
+				pTreeVertices[1].push_back(xmf3Position);
+				break;
+			case 255:
+				xmf3Position.x = x * xmf3Scale.x;
+				xmf3Position.z = z * xmf3Scale.z;
+				xmf3Position.y = pTerrain->GetHeight(xmf3Position.x, xmf3Position.z) + 40.0f * 0.5f;
+				pTreeVertices[2].push_back(xmf3Position);
+				break;
+			default: break;
+			}
+		}
+	}
+
+	v_pMesh.push_back(std::make_shared<CBillBoardPointMesh>(pd3dDevice, pd3dCommandList, &pGrassVertices[0], 0));
+	v_pMesh.push_back(std::make_shared<CBillBoardPointMesh>(pd3dDevice, pd3dCommandList, &pGrassVertices[1], 1));
+	v_pMesh.push_back(std::make_shared<CBillBoardPointMesh>(pd3dDevice, pd3dCommandList, &pTreeVertices[0], 2));
+	v_pMesh.push_back(std::make_shared<CBillBoardPointMesh>(pd3dDevice, pd3dCommandList, &pTreeVertices[1], 3));
+	v_pMesh.push_back(std::make_shared<CBillBoardPointMesh>(pd3dDevice, pd3dCommandList, &pTreeVertices[2], 4));
+	v_pMesh.push_back(std::make_shared<CBillBoardPointMesh>(pd3dDevice, pd3dCommandList, &pFlowerVertices[0], 5));
+	v_pMesh.push_back(std::make_shared<CBillBoardPointMesh>(pd3dDevice, pd3dCommandList, &pFlowerVertices[1], 6));
 }
 
 void CGSBillboardObjectsShader::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera)
 {
 	CShader::Render(pd3dCommandList, pCamera);
 	pTexture->UpdateShaderVariables(pd3dCommandList);
-	pMesh->OnPreRender(pd3dCommandList);
-	pMesh->Render(pd3dCommandList, 0);
+
+	for (int i = 0; i < v_pMesh.size(); ++i)
+	{
+		UINT nType = i;
+		pd3dCommandList->SetGraphicsRoot32BitConstants(0, 1, &nType, 32);
+		v_pMesh[i]->OnPreRender(pd3dCommandList);
+		v_pMesh[i]->Render(pd3dCommandList, 0);
+	}
 }
 
 D3D12_INPUT_LAYOUT_DESC CGSBillboardObjectsShader::CreateInputLayout()

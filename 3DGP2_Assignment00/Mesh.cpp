@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "Mesh.h"
+#include "Object.h"
 
 //----------------------------------------------------------------------------
 // 22/09/21 Mesh 함수들 정의 - ChoiHS
@@ -826,22 +827,54 @@ XMFLOAT4 CHeightMapGridMesh::OnGetColor(int x, int z, void* pContext)
 	return(xmf4Color);
 }
 
-CBillBoardPointMesh::CBillBoardPointMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
+CBillBoardPointMesh::CBillBoardPointMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, std::vector<XMFLOAT3>* pv_Vertices, UINT nType)
 {
+	std::vector<CTreeVertex> pVertices;
+	XMFLOAT2 xmf2Size = { 0.0f, 0.0f };
+	switch (nType)
+	{
+	case 0:
+		xmf2Size.x = 8.0f;
+		xmf2Size.y = 8.0f;
+		break;
+	case 1:
+		xmf2Size.x = 8.0f;
+		xmf2Size.y = 8.0f;
+		break;
+	case 2:
+		xmf2Size.x = 24.0f;
+		xmf2Size.y = 36.0f;
+		break;
+	case 3:
+		xmf2Size.x = 16.0f;
+		xmf2Size.y = 46.0f;
+		break;
+	case 4:
+		xmf2Size.x = 16.0f;
+		xmf2Size.y = 46.0f;
+		break;
+	case 5:
+		xmf2Size.x = 8.0f;
+		xmf2Size.y = 16.0f;
+		break;
+	case 6:
+		xmf2Size.x = 8.0f;
+		xmf2Size.y = 16.0f;
+		break;
+	default:
+		break;
+	}
+	
+	for (int i = 0; i < pv_Vertices->size(); ++i)
+	{
+		pVertices.push_back(CTreeVertex((*pv_Vertices)[i], xmf2Size));
+	}
+
 	m_nStride = sizeof(CTreeVertex);
-	m_nVertices = 1;
+	m_nVertices = pVertices.size();
 	m_nOffset = 0;
 	m_nSlot = 0;
 	m_d3dPrimitiveTopology = D3D_PRIMITIVE_TOPOLOGY_POINTLIST;
-
-	std::vector<CTreeVertex> pVertices(m_nVertices);
-
-	XMFLOAT3 xmf3Position;
-	xmf3Position.x = 1030.0f;
-	xmf3Position.y = 300.0f;
-	xmf3Position.z = 1400.0f;
-
-	pVertices[0] = CTreeVertex(xmf3Position, XMFLOAT2(50.0f, 50.0f));
 
 	m_pd3dPositionBuffer = CreateBufferResource(pd3dDevice, pd3dCommandList, pVertices.data(), m_nStride * m_nVertices, D3D12_HEAP_TYPE_DEFAULT, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER, &m_pd3dPositionUploadBuffer);
 

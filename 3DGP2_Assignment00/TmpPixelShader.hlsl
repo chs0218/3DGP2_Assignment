@@ -1,6 +1,13 @@
 SamplerState gSamplerState : register(s0);
 Texture2D gtxTmpTexture[7] : register(t11);
 
+cbuffer cbGameObjectInfo : register(b0)
+{
+	matrix gmtxGameObject : packoffset(c0);
+	matrix gmtxTexture : packoffset(c4);
+	uint gnTexturesMask : packoffset(c8);
+}
+
 struct GS_OUTPUT
 {
 	float4 posH : SV_POSITION;
@@ -11,7 +18,7 @@ struct GS_OUTPUT
 //[earlydepthstencil]
 float4 PS_Tmp(GS_OUTPUT input) : SV_TARGET
 {
-	float4 cColor = gtxTmpTexture[0].Sample(gSamplerState, input.uv);
+	float4 cColor = gtxTmpTexture[gnTexturesMask].Sample(gSamplerState, input.uv);
 
 	return(cColor);
 }

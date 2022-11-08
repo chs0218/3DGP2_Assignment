@@ -216,7 +216,7 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 		m_pTerrain->Render(pd3dCommandList, pCamera);
 	if (m_pWater)
 		m_pWater->Render(pd3dCommandList, pCamera);
-	CBillboardObjectsShader::Instance()->Render(pd3dCommandList, pCamera);
+	/*CBillboardObjectsShader::Instance()->Render(pd3dCommandList, pCamera);*/
 	CGSBillboardObjectsShader::Instance()->Render(pd3dCommandList, pCamera);
 	CObjectShader::Instance()->Render(pd3dCommandList, pCamera);
 	CMultiSpriteObjectsShader::Instance()->Render(pd3dCommandList, pCamera);

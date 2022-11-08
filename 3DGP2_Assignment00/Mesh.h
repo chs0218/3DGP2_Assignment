@@ -161,7 +161,7 @@ public:
 class CBillBoardPointMesh : public CMesh
 {
 public:
-	CBillBoardPointMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
+	CBillBoardPointMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, std::vector<XMFLOAT3>* pVertices, UINT nType);
 	virtual ~CBillBoardPointMesh();
 };
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

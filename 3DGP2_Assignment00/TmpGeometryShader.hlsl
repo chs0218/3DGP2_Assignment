@@ -9,6 +9,7 @@ cbuffer cbCameraInfo : register(b1)
 {
 	matrix gmtxView : packoffset(c0);
 	matrix gmtxProjection : packoffset(c4);
+	float3 gf3CameraPosition : packoffset(c8);
 }
 
 struct VS_OUTPUT
@@ -28,7 +29,7 @@ struct GS_OUTPUT
 void GS_Tmp(point VS_OUTPUT input[1], uint primID : SV_PrimitiveID, inout TriangleStream<GS_OUTPUT> outStream)
 {
 	float3 vUp = float3(0.0f, 1.0f, 0.0f);
-	float3 vLook = float3(0.0f, 0.0f, 1.0f);
+	float3 vLook = gf3CameraPosition.xyz - input[0].position;
 	vLook = normalize(vLook);
 	float3 vRight = cross(vUp, vLook);
 	float fHalfW = input[0].size.x * 0.5f;
