@@ -119,8 +119,6 @@
     </Image>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="TmpPixelShader.hlsl" />
-    <FxCompile Include="TmpVertexShader.hlsl" />
     <FxCompile Include="TextureVertexShader.hlsl" />
     <FxCompile Include="TexturePixelShader.hlsl" />
     <FxCompile Include="TerrainVertexShader.hlsl" />
@@ -132,6 +130,6 @@
     <FxCompile Include="BillBoardVertexShader.hlsl" />
     <FxCompile Include="BillBoardPixelShader.hlsl" />
     <FxCompile Include="MultiSpriteVertexShader.hlsl" />
-    <FxCompile Include="TmpGeometryShader.hlsl" />
+    <FxCompile Include="BillBoardGeometryShader.hlsl" />
   </ItemGroup>
 </Project>

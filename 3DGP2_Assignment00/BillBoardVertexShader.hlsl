@@ -1,33 +1,19 @@
-cbuffer cbGameObjectInfo : register(b0)
-{
-	matrix gmtxGameObject : packoffset(c0);
-	matrix gmtxTexture : packoffset(c4);
-	uint gnTexturesMask : packoffset(c8);
-}
-
-cbuffer cbCameraInfo : register(b1)
-{
-	matrix gmtxView : packoffset(c0);
-	matrix gmtxProjection : packoffset(c4);
-	float3 gf3CameraPosition : packoffset(c8);
-}
-
 struct VS_INPUT
 {
 	float3 position : POSITION;
-	float2 uv : TEXCOORD;
+	float2 size : SIZE;
 };
 
 struct VS_OUTPUT
 {
-	float4 position : SV_POSITION;
-	float2 uv : TEXCOORD;
+	float3 position : POSITION;
+	float2 size : SIZE;
 };
 
 VS_OUTPUT VS_BillBoard(VS_INPUT input)
 {
 	VS_OUTPUT output;
-	output.position = mul(mul(mul(float4(input.position, 1.0f), gmtxGameObject), gmtxView), gmtxProjection);
-	output.uv = input.uv;
+	output.position = input.position;
+	output.size = input.size;
 	return(output);
 }

@@ -18,7 +18,7 @@ struct VS_OUTPUT
 	float2 size : SIZE;
 };
 
-struct GS_OUTPUT 
+struct GS_OUTPUT
 {
 	float4 posH : SV_POSITION;
 	float3 posW : POSITION;
@@ -26,7 +26,7 @@ struct GS_OUTPUT
 };
 
 [maxvertexcount(4)]
-void GS_Tmp(point VS_OUTPUT input[1], uint primID : SV_PrimitiveID, inout TriangleStream<GS_OUTPUT> outStream)
+void GS_BillBoard(point VS_OUTPUT input[1], uint primID : SV_PrimitiveID, inout TriangleStream<GS_OUTPUT> outStream)
 {
 	float3 vUp = float3(0.0f, 1.0f, 0.0f);
 	float3 vLook = gf3CameraPosition.xyz - input[0].position;

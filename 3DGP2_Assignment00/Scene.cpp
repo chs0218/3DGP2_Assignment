@@ -161,9 +161,6 @@ void CScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 	CBillboardObjectsShader::Instance()->CreateShader(pd3dDevice, GetGraphicsRootSignature());
 	CBillboardObjectsShader::Instance()->BuildObjects(pd3dDevice, pd3dCommandList, m_pTerrain.get());
 
-	CGSBillboardObjectsShader::Instance()->CreateShader(pd3dDevice, GetGraphicsRootSignature());
-	CGSBillboardObjectsShader::Instance()->BuildObjects(pd3dDevice, pd3dCommandList, m_pTerrain.get());
-
 	CObjectShader::Instance()->CreateShader(pd3dDevice, GetGraphicsRootSignature());
 	CObjectShader::Instance()->BuildObjects(pd3dDevice, pd3dCommandList, GetGraphicsRootSignature(), m_pTerrain.get());
 
@@ -216,8 +213,7 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 		m_pTerrain->Render(pd3dCommandList, pCamera);
 	if (m_pWater)
 		m_pWater->Render(pd3dCommandList, pCamera);
-	/*CBillboardObjectsShader::Instance()->Render(pd3dCommandList, pCamera);*/
-	CGSBillboardObjectsShader::Instance()->Render(pd3dCommandList, pCamera);
+	CBillboardObjectsShader::Instance()->Render(pd3dCommandList, pCamera);
 	CObjectShader::Instance()->Render(pd3dCommandList, pCamera);
 	CMultiSpriteObjectsShader::Instance()->Render(pd3dCommandList, pCamera);
 }

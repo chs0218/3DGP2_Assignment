@@ -423,246 +423,7 @@ CBillboardObjectsShader::~CBillboardObjectsShader()
 {
 }
 
-D3D12_BLEND_DESC CBillboardObjectsShader::CreateBlendState()
-{
-	D3D12_BLEND_DESC d3dBlendDesc;
-	::ZeroMemory(&d3dBlendDesc, sizeof(D3D12_BLEND_DESC));
-	d3dBlendDesc.AlphaToCoverageEnable = TRUE;
-	d3dBlendDesc.IndependentBlendEnable = FALSE;
-	d3dBlendDesc.RenderTarget[0].BlendEnable = TRUE;
-	d3dBlendDesc.RenderTarget[0].LogicOpEnable = FALSE;
-	d3dBlendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA;
-	d3dBlendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_INV_SRC_ALPHA;
-	d3dBlendDesc.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
-	d3dBlendDesc.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_ONE;
-	d3dBlendDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ZERO;
-	d3dBlendDesc.RenderTarget[0].BlendOpAlpha = D3D12_BLEND_OP_ADD;
-	d3dBlendDesc.RenderTarget[0].LogicOp = D3D12_LOGIC_OP_NOOP;
-	d3dBlendDesc.RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
-
-	return(d3dBlendDesc);
-}
-
-void CBillboardObjectsShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, void* pContext)
-{
-	pGrassMesh = std::make_shared<CTexturedRectMesh>(pd3dDevice, pd3dCommandList, 8.0f, 8.0f, 0.0f, 0.0f, 0.0f, 0.0f);
-	pTreeMesh[0] = std::make_shared<CTexturedRectMesh>(pd3dDevice, pd3dCommandList, 24.0f, 36.0f, 0.0f, 0.0f, 0.0f, 0.0f);
-	pTreeMesh[1] = std::make_shared<CTexturedRectMesh>(pd3dDevice, pd3dCommandList, 16.0f, 46.0f, 0.0f, 0.0f, 0.0f, 0.0f);
-	pTreeMesh[2] = std::make_shared<CTexturedRectMesh>(pd3dDevice, pd3dCommandList, 16.0f, 46.0f, 0.0f, 0.0f, 0.0f, 0.0f);
-	pFlowerMesh = std::make_shared<CTexturedRectMesh>(pd3dDevice, pd3dCommandList, 8.0f, 16.0f, 0.0f, 0.0f, 0.0f, 0.0f);
-	
-	pGrassTexture[0] = std::make_shared<CTexture>(1, RESOURCE_TEXTURE2D, 0, 1);
-	pGrassTexture[1] = std::make_shared<CTexture>(1, RESOURCE_TEXTURE2D, 0, 1);
-	pTreeTexture[0] = std::make_shared<CTexture>(1, RESOURCE_TEXTURE2D, 0, 1);
-	pTreeTexture[1] = std::make_shared<CTexture>(1, RESOURCE_TEXTURE2D, 0, 1);
-	pTreeTexture[2] = std::make_shared<CTexture>(1, RESOURCE_TEXTURE2D, 0, 1);
-	pFlowerTexture[0] = std::make_shared<CTexture>(1, RESOURCE_TEXTURE2D, 0, 1);
-	pFlowerTexture[1] = std::make_shared<CTexture>(1, RESOURCE_TEXTURE2D, 0, 1);
-
-	pGrassTexture[0]->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Image/Grass01.dds", RESOURCE_TEXTURE2D, 0);
-	pGrassTexture[1]->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Image/Grass02.dds", RESOURCE_TEXTURE2D, 0);
-	pTreeTexture[0]->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Image/Tree01.dds", RESOURCE_TEXTURE2D, 0);
-	pTreeTexture[1]->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Image/Tree02.dds", RESOURCE_TEXTURE2D, 0); 
-	pTreeTexture[2]->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Image/Tree03.dds", RESOURCE_TEXTURE2D, 0);
-	pFlowerTexture[0]->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Image/Flower01.dds", RESOURCE_TEXTURE2D, 0);
-	pFlowerTexture[1]->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Image/Flower02.dds", RESOURCE_TEXTURE2D, 0);
-
-	pGrassObject[0] = std::make_shared<CGameObject>();
-	pGrassObject[1] = std::make_shared<CGameObject>();
-	pTreeObject[0] = std::make_shared<CGameObject>();
-	pTreeObject[1] = std::make_shared<CGameObject>();
-	pTreeObject[2] = std::make_shared<CGameObject>();
-	pFlowerObject[0] = std::make_shared<CGameObject>();
-	pFlowerObject[1] = std::make_shared<CGameObject>();
-
-	pGrassObject[0]->SetMesh(pGrassMesh);
-	pGrassObject[1]->SetMesh(pGrassMesh);
-	pTreeObject[0]->SetMesh(pTreeMesh[0]);
-	pTreeObject[1]->SetMesh(pTreeMesh[1]);
-	pTreeObject[2]->SetMesh(pTreeMesh[2]);
-	pFlowerObject[0]->SetMesh(pFlowerMesh);
-	pFlowerObject[1]->SetMesh(pFlowerMesh);
-
-	pGrassObject[0]->SetTexture(pGrassTexture[0]);
-	pGrassObject[1]->SetTexture(pGrassTexture[1]);
-	pTreeObject[0]->SetTexture(pTreeTexture[0]);
-	pTreeObject[1]->SetTexture(pTreeTexture[1]);
-	pTreeObject[2]->SetTexture(pTreeTexture[2]);
-	pFlowerObject[0]->SetTexture(pFlowerTexture[0]);
-	pFlowerObject[1]->SetTexture(pFlowerTexture[1]);
-
-	CreateCbvSrvDescriptorHeaps(pd3dDevice, 0, 7);
-
-	CreateShaderResourceViews(pd3dDevice, pGrassTexture[0].get(), 0, 3);
-	CreateShaderResourceViews(pd3dDevice, pGrassTexture[1].get(), 0, 3);
-	CreateShaderResourceViews(pd3dDevice, pTreeTexture[0].get(), 0, 3);
-	CreateShaderResourceViews(pd3dDevice, pTreeTexture[1].get(), 0, 3);
-	CreateShaderResourceViews(pd3dDevice, pTreeTexture[2].get(), 0, 3);
-	CreateShaderResourceViews(pd3dDevice, pFlowerTexture[0].get(), 0, 3);
-	CreateShaderResourceViews(pd3dDevice, pFlowerTexture[1].get(), 0, 3);
-
-	CRawFormatImage* pRawFormatImage = new CRawFormatImage(L"Image/ObjectsMap.raw", 257, 257, true);
-	int nGrassObjects = 0, nFlowerObjects = 0, nBlacks = 0, nOthers = 0, nTreeObjects[3] = { 0, 0, 0 };
-	for (int z = 2; z <= 254; z++)
-	{
-		for (int x = 2; x <= 254; x++)
-		{
-			BYTE nPixel = pRawFormatImage->GetRawImagePixel(x, z);
-			switch (nPixel)
-			{
-			case 102: nGrassObjects++; break;
-			case 128: nGrassObjects++; break;
-			case 153: nFlowerObjects++; break;
-			case 179: nFlowerObjects++; break;
-			case 204: nTreeObjects[0]++; break;
-			case 225: nTreeObjects[1]++; break;
-			case 255: nTreeObjects[2]++; break;
-			case 0: nBlacks++; break;
-			default: nOthers++; break;
-			}
-		}
-	}
-	m_nObjects = nGrassObjects + nFlowerObjects + nTreeObjects[0] + nTreeObjects[1] + nTreeObjects[2];
-
-	CHeightMapTerrain* pTerrain = (CHeightMapTerrain*)pContext;
-
-	int nTerrainWidth = int(pTerrain->GetWidth());
-	int nTerrainLength = int(pTerrain->GetLength());
-
-	XMFLOAT3 xmf3Scale = pTerrain->GetScale();
-
-	std::shared_ptr<CGameObject> pBillboardObject = NULL;
-	for (int nObjects = 0, z = 2; z <= 254; z++)
-	{
-		for (int x = 2; x <= 254; x++)
-		{
-			BYTE nPixel = pRawFormatImage->GetRawImagePixel(x, z);
-
-			float fyOffset = 0.0f;
-
-			std::shared_ptr<CGameObject> pGameObject = NULL;
-
-			switch (nPixel)
-			{
-			case 102:
-				pGameObject = pGrassObject[0];
-				fyOffset = 8.0f * 0.5f;
-				break;
-			case 128:
-				pGameObject = pGrassObject[1];
-				fyOffset = 6.0f * 0.5f;
-				break;
-			case 153:
-				pGameObject = pFlowerObject[0];
-				fyOffset = 16.0f * 0.5f;
-				break;
-			case 179:
-				pGameObject = pFlowerObject[1];
-				fyOffset = 16.0f * 0.5f;
-				break;
-			case 204:
-				pGameObject = pTreeObject[0];
-				fyOffset = 33.0f * 0.5f;
-				break;
-			case 225:
-				pGameObject = pTreeObject[1];
-				fyOffset = 33.0f * 0.5f;
-				break;
-			case 255:
-				pGameObject = pTreeObject[2];
-				fyOffset = 40.0f * 0.5f;
-				break;
-			default:
-				break;
-			}
-
-			if (pGameObject)
-			{
-				pBillboardObject = std::make_shared<CGameObject>();
-
-				pBillboardObject->SetChild(pGameObject);
-
-				float xPosition = x * xmf3Scale.x;
-				float zPosition = z * xmf3Scale.z;
-				float fHeight = pTerrain->GetHeight(xPosition, zPosition);
-
-				pBillboardObject->SetPosition(xPosition, fHeight + fyOffset, zPosition);
-				m_ppObjects.push_back(pBillboardObject);
-			}
-		}
-	}
-
-	delete pRawFormatImage;
-}
-
-void CBillboardObjectsShader::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera)
-{
-	XMFLOAT3 xmf3CameraPosition = pCamera->GetPosition();
-	for (int i = 0; i < m_nObjects; i++)
-	{
-		if (m_ppObjects[i]) m_ppObjects[i]->SetLookAt(xmf3CameraPosition, XMFLOAT3(0.0f, 1.0f, 0.0f));
-	}
-	CShader::Render(pd3dCommandList, pCamera);
-
-	for (int i = 0; i < m_nObjects; i++)
-	{
-		if (m_ppObjects[i]) {
-			m_ppObjects[i]->UpdateTransform(NULL);
-			m_ppObjects[i]->Render(pd3dCommandList, pCamera);
-		}
-	}
-}
-
-D3D12_INPUT_LAYOUT_DESC CBillboardObjectsShader::CreateInputLayout()
-{
-	UINT nInputElementDescs = 2;
-	D3D12_INPUT_ELEMENT_DESC* pd3dInputElementDescs = new D3D12_INPUT_ELEMENT_DESC[nInputElementDescs];
-
-	pd3dInputElementDescs[0] = { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
-	pd3dInputElementDescs[1] = { "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
-
-	D3D12_INPUT_LAYOUT_DESC d3dInputLayoutDesc;
-	d3dInputLayoutDesc.pInputElementDescs = pd3dInputElementDescs;
-	d3dInputLayoutDesc.NumElements = nInputElementDescs;
-
-	return(d3dInputLayoutDesc);
-}
-
-void CBillboardObjectsShader::ReleaseUploadBuffers()
-{
-	if (m_ppObjects.data())
-	{
-		for (int i = 0; i < m_nObjects; i++) if (m_ppObjects[i]) m_ppObjects[i]->ReleaseShaderVariables();
-	}
-}
-
-D3D12_SHADER_BYTECODE CBillboardObjectsShader::CreateVertexShader(ID3DBlob** ppd3dShaderBlob)
-{
-	return(CShader::ReadCompiledShaderFile(L"BillBoardVertexShader.cso", ppd3dShaderBlob));
-}
-
-D3D12_SHADER_BYTECODE CBillboardObjectsShader::CreatePixelShader(ID3DBlob** ppd3dShaderBlob)
-{
-	return(CShader::ReadCompiledShaderFile(L"BillBoardPixelShader.cso", ppd3dShaderBlob));
-}
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//
-CGSBillboardObjectsShader* CGSBillboardObjectsShader::Instance()
-{
-	static CGSBillboardObjectsShader instance;
-	return &instance;
-}
-
-CGSBillboardObjectsShader::CGSBillboardObjectsShader()
-{
-}
-
-CGSBillboardObjectsShader::~CGSBillboardObjectsShader()
-{
-}
-
-void CGSBillboardObjectsShader::CreateShader(ID3D12Device* pd3dDevice, ID3D12RootSignature* pd3dGraphicsRootSignature)
+void CBillboardObjectsShader::CreateShader(ID3D12Device* pd3dDevice, ID3D12RootSignature* pd3dGraphicsRootSignature)
 {
 	ID3DBlob* pd3dVertexShaderBlob = NULL, * pd3dGeometryShaderBlob = NULL , * pd3dPixelShaderBlob = NULL;
 
@@ -692,7 +453,7 @@ void CGSBillboardObjectsShader::CreateShader(ID3D12Device* pd3dDevice, ID3D12Roo
 	if (d3dPipelineStateDesc.InputLayout.pInputElementDescs) delete[] d3dPipelineStateDesc.InputLayout.pInputElementDescs;
 }
 
-D3D12_BLEND_DESC CGSBillboardObjectsShader::CreateBlendState()
+D3D12_BLEND_DESC CBillboardObjectsShader::CreateBlendState()
 {
 	D3D12_BLEND_DESC d3dBlendDesc;
 	::ZeroMemory(&d3dBlendDesc, sizeof(D3D12_BLEND_DESC));
@@ -712,7 +473,7 @@ D3D12_BLEND_DESC CGSBillboardObjectsShader::CreateBlendState()
 	return(d3dBlendDesc);
 }
 
-void CGSBillboardObjectsShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, void* pContext)
+void CBillboardObjectsShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, void* pContext)
 {
 	pTexture = std::make_shared<CTexture>(7, RESOURCE_TEXTURE2D, 0, 1);
 
@@ -802,7 +563,7 @@ void CGSBillboardObjectsShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12Gra
 	v_pMesh.push_back(std::make_shared<CBillBoardPointMesh>(pd3dDevice, pd3dCommandList, &pFlowerVertices[1], 6));
 }
 
-void CGSBillboardObjectsShader::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera)
+void CBillboardObjectsShader::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera)
 {
 	CShader::Render(pd3dCommandList, pCamera);
 	pTexture->UpdateShaderVariables(pd3dCommandList);
@@ -816,7 +577,7 @@ void CGSBillboardObjectsShader::Render(ID3D12GraphicsCommandList* pd3dCommandLis
 	}
 }
 
-D3D12_INPUT_LAYOUT_DESC CGSBillboardObjectsShader::CreateInputLayout()
+D3D12_INPUT_LAYOUT_DESC CBillboardObjectsShader::CreateInputLayout()
 {
 	UINT nInputElementDescs = 2;
 	D3D12_INPUT_ELEMENT_DESC* pd3dInputElementDescs = new D3D12_INPUT_ELEMENT_DESC[nInputElementDescs];
@@ -831,23 +592,23 @@ D3D12_INPUT_LAYOUT_DESC CGSBillboardObjectsShader::CreateInputLayout()
 	return(d3dInputLayoutDesc);
 }
 
-void CGSBillboardObjectsShader::ReleaseUploadBuffers()
+void CBillboardObjectsShader::ReleaseUploadBuffers()
 {
 }
 
-D3D12_SHADER_BYTECODE CGSBillboardObjectsShader::CreateVertexShader(ID3DBlob** ppd3dShaderBlob)
+D3D12_SHADER_BYTECODE CBillboardObjectsShader::CreateVertexShader(ID3DBlob** ppd3dShaderBlob)
 {
-	return(CShader::ReadCompiledShaderFile(L"TmpVertexShader.cso", ppd3dShaderBlob));
+	return(CShader::ReadCompiledShaderFile(L"BillBoardVertexShader.cso", ppd3dShaderBlob));
 }
 
-D3D12_SHADER_BYTECODE CGSBillboardObjectsShader::CreateGeometryShader(ID3DBlob** ppd3dShaderBlob)
+D3D12_SHADER_BYTECODE CBillboardObjectsShader::CreateGeometryShader(ID3DBlob** ppd3dShaderBlob)
 {
-	return(CShader::ReadCompiledShaderFile(L"TmpGeometryShader.cso", ppd3dShaderBlob));
+	return(CShader::ReadCompiledShaderFile(L"BillBoardGeometryShader.cso", ppd3dShaderBlob));
 }
 
-D3D12_SHADER_BYTECODE CGSBillboardObjectsShader::CreatePixelShader(ID3DBlob** ppd3dShaderBlob)
+D3D12_SHADER_BYTECODE CBillboardObjectsShader::CreatePixelShader(ID3DBlob** ppd3dShaderBlob)
 {
-	return(CShader::ReadCompiledShaderFile(L"TmpPixelShader.cso", ppd3dShaderBlob));
+	return(CShader::ReadCompiledShaderFile(L"BillBoardPixelShader.cso", ppd3dShaderBlob));
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

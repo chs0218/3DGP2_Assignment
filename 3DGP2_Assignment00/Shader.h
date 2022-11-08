@@ -131,40 +131,13 @@ public:
 class CBillboardObjectsShader : public CShader
 {
 protected:
-	std::vector<std::shared_ptr<CGameObject>> m_ppObjects;
-	int	m_nObjects = 0;
-
-	std::shared_ptr<CGameObject>  pGrassObject[2], pTreeObject[3], pFlowerObject[2];
-	std::shared_ptr<CTexturedRectMesh> pGrassMesh, pTreeMesh[3], pFlowerMesh;
-	std::shared_ptr<CTexture> pGrassTexture[2], pTreeTexture[3], pFlowerTexture[2];
+	std::shared_ptr<CTexture> pTexture;
+	std::vector<std::shared_ptr<CMesh>> v_pMesh;
 public:
 	static CBillboardObjectsShader* Instance();
 public:
 	CBillboardObjectsShader();
 	virtual ~CBillboardObjectsShader();
-
-	virtual D3D12_BLEND_DESC CreateBlendState();
-
-	virtual D3D12_INPUT_LAYOUT_DESC CreateInputLayout();
-	virtual D3D12_SHADER_BYTECODE CreateVertexShader(ID3DBlob** ppd3dShaderBlob);
-	virtual D3D12_SHADER_BYTECODE CreatePixelShader(ID3DBlob** ppd3dShaderBlob);
-
-	virtual void BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, void* pContext = NULL);
-	virtual void ReleaseUploadBuffers();
-	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera);
-};
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//
-class CGSBillboardObjectsShader : public CShader
-{
-protected:
-	std::shared_ptr<CTexture> pTexture;
-	std::vector<std::shared_ptr<CMesh>> v_pMesh;
-public:
-	static CGSBillboardObjectsShader* Instance();
-public:
-	CGSBillboardObjectsShader();
-	virtual ~CGSBillboardObjectsShader();
 
 	virtual void CreateShader(ID3D12Device* pd3dDevice, ID3D12RootSignature* pd3dGraphicsRootSignature);
 	virtual D3D12_BLEND_DESC CreateBlendState();
