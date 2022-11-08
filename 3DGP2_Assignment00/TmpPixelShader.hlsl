@@ -1,17 +1,17 @@
-Texture2D gtxMappedTexture[7] : register(t0);
-Texture2D gtxtSkyBoxTexture : register(t7);
 SamplerState gSamplerState : register(s0);
+Texture2D gtxTmpTexture[7] : register(t11);
 
-struct VS_OUTPUT
+struct GS_OUTPUT
 {
-	float4 position : SV_POSITION;
+	float4 posH : SV_POSITION;
+	float3 posW : POSITION;
 	float2 uv : TEXCOORD;
 };
 
-[earlydepthstencil]
-float4 PS_Tmp(VS_OUTPUT input) : SV_TARGET
+//[earlydepthstencil]
+float4 PS_Tmp(GS_OUTPUT input) : SV_TARGET
 {
-	float4 cColor = gtxtSkyBoxTexture.Sample(gSamplerState, input.uv);
+	float4 cColor = gtxTmpTexture[0].Sample(gSamplerState, input.uv);
 
 	return(cColor);
 }

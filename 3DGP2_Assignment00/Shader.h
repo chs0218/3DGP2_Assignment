@@ -1,6 +1,7 @@
 #pragma once
 
 class CTexture;
+class CMesh;
 class CCamera;
 class CGameObject;
 class CTexturedRectMesh;
@@ -152,7 +153,31 @@ public:
 	virtual void ReleaseUploadBuffers();
 	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera);
 };
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+class CGSBillboardObjectsShader : public CShader
+{
+protected:
+	std::shared_ptr<CTexture> pTexture;
+	std::shared_ptr<CMesh> pMesh;
+public:
+	static CGSBillboardObjectsShader* Instance();
+public:
+	CGSBillboardObjectsShader();
+	virtual ~CGSBillboardObjectsShader();
 
+	virtual void CreateShader(ID3D12Device* pd3dDevice, ID3D12RootSignature* pd3dGraphicsRootSignature);
+	virtual D3D12_BLEND_DESC CreateBlendState();
+
+	virtual D3D12_INPUT_LAYOUT_DESC CreateInputLayout();
+	virtual D3D12_SHADER_BYTECODE CreateVertexShader(ID3DBlob** ppd3dShaderBlob);
+	virtual D3D12_SHADER_BYTECODE CreateGeometryShader(ID3DBlob** ppd3dShaderBlob);
+	virtual D3D12_SHADER_BYTECODE CreatePixelShader(ID3DBlob** ppd3dShaderBlob);
+
+	virtual void BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, void* pContext = NULL);
+	virtual void ReleaseUploadBuffers();
+	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera);
+};
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class CRippleWaterShader : public CShader
 {

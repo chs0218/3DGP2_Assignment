@@ -48,6 +48,15 @@ public:
 	CDiffused2TexturedVertex(XMFLOAT3 xmf3Position, XMFLOAT4 xmf4Diffuse = XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f), XMFLOAT2 xmf2TexCoord0 = XMFLOAT2(0.0f, 0.0f), XMFLOAT2 xmf2TexCoord1 = XMFLOAT2(0.0f, 0.0f)) { m_xmf3Position = xmf3Position; m_xmf4Diffuse = xmf4Diffuse; m_xmf2TexCoord0 = xmf2TexCoord0; m_xmf2TexCoord1 = xmf2TexCoord1; }
 	~CDiffused2TexturedVertex() { }
 };
+
+class CTreeVertex {
+public:
+	XMFLOAT3 m_xmf3Position;
+	XMFLOAT2 m_xmf2Size;
+	CTreeVertex() { m_xmf3Position = XMFLOAT3(0.0f, 0.0f, 0.0f); m_xmf2Size = XMFLOAT2(0.0f, 0.0f); }
+	CTreeVertex(XMFLOAT3 xmf3Position, XMFLOAT2 xmf2Size) { m_xmf3Position = xmf3Position; m_xmf2Size = xmf2Size; }
+	~CTreeVertex() {};
+};
 //-----------------------------------------------------------------------------
 
 
@@ -149,6 +158,12 @@ public:
 	virtual ~CTexturedRectMesh();
 };
 
+class CBillBoardPointMesh : public CMesh
+{
+public:
+	CBillBoardPointMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
+	virtual ~CBillBoardPointMesh();
+};
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class CRawFormatImage
 {

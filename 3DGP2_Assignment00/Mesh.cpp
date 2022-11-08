@@ -825,3 +825,34 @@ XMFLOAT4 CHeightMapGridMesh::OnGetColor(int x, int z, void* pContext)
 	}
 	return(xmf4Color);
 }
+
+CBillBoardPointMesh::CBillBoardPointMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
+{
+	m_nStride = sizeof(CTreeVertex);
+	m_nVertices = 1;
+	m_nOffset = 0;
+	m_nSlot = 0;
+	m_d3dPrimitiveTopology = D3D_PRIMITIVE_TOPOLOGY_POINTLIST;
+
+	std::vector<CTreeVertex> pVertices(m_nVertices);
+
+	XMFLOAT3 xmf3Position;
+	xmf3Position.x = 1030.0f;
+	xmf3Position.y = 300.0f;
+	xmf3Position.z = 1400.0f;
+
+	pVertices[0] = CTreeVertex(xmf3Position, XMFLOAT2(50.0f, 50.0f));
+
+	m_pd3dPositionBuffer = CreateBufferResource(pd3dDevice, pd3dCommandList, pVertices.data(), m_nStride * m_nVertices, D3D12_HEAP_TYPE_DEFAULT, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER, &m_pd3dPositionUploadBuffer);
+
+	D3D12_VERTEX_BUFFER_VIEW m_d3dVertexBufferView;
+	m_d3dVertexBufferView.BufferLocation = m_pd3dPositionBuffer->GetGPUVirtualAddress();
+	m_d3dVertexBufferView.StrideInBytes = m_nStride;
+	m_d3dVertexBufferView.SizeInBytes = m_nStride * m_nVertices;
+
+	m_pd3dVertexBufferViews.push_back(m_d3dVertexBufferView);
+}
+
+CBillBoardPointMesh::~CBillBoardPointMesh()
+{
+}
