@@ -22,9 +22,10 @@ float4 PS_Water(VS_WATER_OUTPUT input) : SV_TARGET
 {
 	//float4 cBaseTexColor = gtxtWaterBaseTexture.Sample(gSamplerState, input.uv0);
 	float4 cBaseTexColor = gtxtWaterBaseTexture.Sample(gSamplerState, float2(input.uv0.x, input.uv0.y - abs(sin(gfCurrentTime)) * 0.0151f));
-	float4 cDetailTexColor = gtxtWaterDetailTexture.Sample(gSamplerState, input.uv0 * 10.0f);
+	float4 cDetailTexColor = gtxtWaterDetailTexture.Sample(gSamplerState, float2((input.uv0.x + (gfCurrentTime * 0.01f)) * 10.0f, input.uv0.y * 10.0f));
 
 	float4 cColor = (cBaseTexColor * 0.3f + cDetailTexColor * 0.7f) + float4(0.0f, 0.0f, 0.15f, 0.0f);
+	
 	cColor.a = 0.55f;
 	/*cColor *= input.color;*/
 	return(cColor);
