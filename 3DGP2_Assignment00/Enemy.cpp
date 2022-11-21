@@ -77,7 +77,7 @@ void CEnemy::UpdateDirection(CGameObject* pPlayer, float fTimeElapsed)
 		else
 		{
 			fWanderingTime += fTimeElapsed;
-			if (fWanderingTime > 10.0f)
+			if (fWanderingTime > 5.0f)
 			{
 				fWanderingTime = 0.0f;
 				direction = RandomDirection();

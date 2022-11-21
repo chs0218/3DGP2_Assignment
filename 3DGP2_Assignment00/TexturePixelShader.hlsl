@@ -20,7 +20,6 @@ cbuffer cbCameraInfo : register(b1)
 }
 
 Texture2D gtxMappedTexture[7] : register(t0);
-Texture2D gtxtSkyBoxTexture : register(t7);
 SamplerState gSamplerState : register(s0);
 
 struct VS_OUTPUT

@@ -223,7 +223,6 @@ void CScene::CheckCollision()
 	for (std::vector<CEnemy*>::iterator i = CObjectShader::Instance()->getObjectsBegin();
 		i != CObjectShader::Instance()->getObjectsEnd(); ++i)
 	{
-		(*i)->UpdateBoundingBox();
 		(*i)->CheckCollision(((CTerrianFlyingPlayer*)m_pPlayer)->getBullets());
 	}
 }

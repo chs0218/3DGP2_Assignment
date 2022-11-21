@@ -710,9 +710,6 @@ D3D12_INPUT_LAYOUT_DESC CObjectShader::CreateInputLayout()
 
 void CObjectShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, void* pContext)
 {
-	m_nObjects = 120;
-	m_ppObjects.resize(m_nObjects);
-
 	CreateCbvSrvDescriptorHeaps(pd3dDevice, 0, 19); //SuperCobra(17), Gunship(2)
 
 	std::shared_ptr<CGameObject> pSuperCobraObject = std::make_shared<CGameObject>();
@@ -721,6 +718,9 @@ void CObjectShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommand
 	std::shared_ptr<CGameObject> pGunshipObject = std::make_shared<CGameObject>();
 	pGunshipObject = pGunshipObject->LoadGeometryFromFile(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature, "Model/Gunship.bin", this);
 	
+	m_nObjects = 120;
+	m_ppObjects.resize(m_nObjects);
+
 	int nColumnSpace = 5, nColumnSize = 30;
 	int nFirstPassColumnSize = (m_nObjects % nColumnSize) > 0 ? (nColumnSize - 1) : nColumnSize;
 
@@ -821,25 +821,6 @@ CMultiSpriteObjectsShader::~CMultiSpriteObjectsShader()
 {
 }
 
-D3D12_RASTERIZER_DESC CMultiSpriteObjectsShader::CreateRasterizerState()
-{
-	D3D12_RASTERIZER_DESC d3dRasterizerDesc;
-	::ZeroMemory(&d3dRasterizerDesc, sizeof(D3D12_RASTERIZER_DESC));
-	d3dRasterizerDesc.FillMode = D3D12_FILL_MODE_SOLID;
-	d3dRasterizerDesc.CullMode = D3D12_CULL_MODE_BACK;
-	d3dRasterizerDesc.FrontCounterClockwise = FALSE;
-	d3dRasterizerDesc.DepthBias = 0;
-	d3dRasterizerDesc.DepthBiasClamp = 0.0f;
-	d3dRasterizerDesc.SlopeScaledDepthBias = 0.0f;
-	d3dRasterizerDesc.DepthClipEnable = TRUE;
-	d3dRasterizerDesc.MultisampleEnable = FALSE;
-	d3dRasterizerDesc.AntialiasedLineEnable = FALSE;
-	d3dRasterizerDesc.ForcedSampleCount = 0;
-	d3dRasterizerDesc.ConservativeRaster = D3D12_CONSERVATIVE_RASTERIZATION_MODE_OFF;
-
-	return(d3dRasterizerDesc);
-}
-
 D3D12_BLEND_DESC CMultiSpriteObjectsShader::CreateBlendState()
 {
 	D3D12_BLEND_DESC d3dBlendDesc;
@@ -915,11 +896,13 @@ void CMultiSpriteObjectsShader::Render(ID3D12GraphicsCommandList* pd3dCommandLis
 	CShader::Render(pd3dCommandList, pCamera);
 	if (!m_ppObject.empty())
 	{
-		for (CMultiSpriteObject* pObject : m_ppObject)
+		for (std::list<CMultiSpriteObject*>::iterator it = m_ppObject.begin(); 
+			it !=m_ppObject.end();
+			++it)
 		{
-			pObject->SetLookAt(xmf3CameraPosition, XMFLOAT3(0.0f, 1.0f, 0.0f));
-			pObject->UpdateTransform(NULL);
-			pObject->Render(pd3dCommandList, pCamera);
+			(*it)->SetLookAt(xmf3CameraPosition, XMFLOAT3(0.0f, 1.0f, 0.0f));
+			(*it)->UpdateTransform(NULL);
+			(*it)->Render(pd3dCommandList, pCamera);
 		}
 	}			
 }

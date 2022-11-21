@@ -83,7 +83,7 @@ public:
 class CTerrianFlyingPlayer : public CPlayer
 {
 protected:
-	int nMaxBullet = 10;
+	int nMaxBullet = 100;
 
 	CGameObject* m_pMainRotorFrame = NULL;
 	CGameObject* m_pTailRotorFrame = NULL;
