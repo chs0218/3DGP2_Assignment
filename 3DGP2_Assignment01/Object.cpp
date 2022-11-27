@@ -101,7 +101,7 @@ void CGameObject::SetTexture(std::shared_ptr<CTexture> pTexture)
 void CGameObject::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera)
 {
 	OnPrepareRender();
-	
+
 	if (m_pMesh)
 	{
 		// CGameObject의 정보를 넘길 버퍼가 있고, 해당 버퍼에 대한 CPU 포인터가 있으면 UpdateShaderVariables 함수를 호출한다.
@@ -811,7 +811,9 @@ void CBullet::Update(float fTimeElapsed)
 void CBullet::ShootBullet(CGameObject* pPlayer)
 {
 	isEnable = true;
-	SetPosition(pPlayer->GetPosition());
+	XMFLOAT3 pos = pPlayer->GetPosition();
+	pos.y -= 5.0f;
+	SetPosition(pos);
 }
 
 void CBullet::Reset()

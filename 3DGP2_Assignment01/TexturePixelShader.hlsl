@@ -46,6 +46,7 @@ float4 PS_Tex(VS_OUTPUT input) : SV_TARGET
 	if (gnTexturesMask & MATERIAL_EMISSION_MAP) cEmissionColor = gtxMappedTexture[4].Sample(gSamplerState, input.uv);
 
 	float4 cColor = cAlbedoColor + cSpecularColor + cEmissionColor;
+	cColor.a = cAlbedoColor.a + 0.3f;
 
-	return(cColor);
+	return cColor;
 }

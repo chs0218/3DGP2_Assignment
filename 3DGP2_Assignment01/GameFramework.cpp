@@ -11,7 +11,7 @@ CGameFramework::CGameFramework()
 	m_nWndClientWidth = FRAME_BUFFER_WIDTH;
 	m_nWndClientHeight = FRAME_BUFFER_HEIGHT;
 
-	_tcscpy_s(m_pszFrameRate, _T("3DGP2_Assignment00 ("));
+	_tcscpy_s(m_pszFrameRate, _T("3DGP2_Assignment01 ("));
 }
 
 CGameFramework::~CGameFramework()
@@ -312,7 +312,7 @@ void CGameFramework::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPA
 		case VK_F1:
 		case VK_F2:
 		case VK_F3:
-			//m_pCamera = m_pPlayer->ChangeCamera((DWORD)(wParam - VK_F1 + 1), m_GameTimer.GetFrameTimeElapsed());
+			m_pCamera = m_pPlayer->ChangeCamera((DWORD)(wParam - VK_F1 + 1), m_GameTimer.GetFrameTimeElapsed());
 			break;
 		case VK_F9:
 			ChangeSwapChainState();

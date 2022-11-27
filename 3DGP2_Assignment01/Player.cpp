@@ -150,7 +150,7 @@ void CPlayer::Update(float fTimeElapsed)
 	if (m_pPlayerUpdatedContext) OnPlayerUpdateCallback(fTimeElapsed);
 
 	DWORD nCurrentCameraMode = m_pCamera->GetMode();
-	if (nCurrentCameraMode == THIRD_PERSON_CAMERA) m_pCamera->Update(m_xmf3Position, fTimeElapsed);
+	if (nCurrentCameraMode == FIRST_PERSON_CAMERA || nCurrentCameraMode == THIRD_PERSON_CAMERA) m_pCamera->Update(m_xmf3Position, fTimeElapsed);
 	if (m_pCameraUpdatedContext) OnCameraUpdateCallback(fTimeElapsed);
 	if (nCurrentCameraMode == THIRD_PERSON_CAMERA) m_pCamera->SetLookAt(m_xmf3Position);
 	m_pCamera->RegenerateViewMatrix();
@@ -270,9 +270,7 @@ void CTerrianFlyingPlayer::Render(ID3D12GraphicsCommandList* pd3dCommandList)
 {
 	DWORD nCameraMode = (m_pCamera) ? m_pCamera->GetMode() : 0x00;
 	m_pShader->Render(pd3dCommandList);
-	if (nCameraMode == THIRD_PERSON_CAMERA) {
-		CGameObject::Render(pd3dCommandList, m_pCamera);
-	}
+
 	if (m_pBullets.data())
 	{
 		for (int i = 0; i < m_pBullets.size(); ++i)
@@ -283,6 +281,15 @@ void CTerrianFlyingPlayer::Render(ID3D12GraphicsCommandList* pd3dCommandList)
 				m_pBullets[i]->Render(pd3dCommandList);
 			}
 		}
+	}
+
+	if (nCameraMode == THIRD_PERSON_CAMERA) {
+		CGameObject::Render(pd3dCommandList, m_pCamera);
+	}
+	else
+	{
+		CGameObject::Render(pd3dCommandList, m_pCamera);
+		OnPrepareRender();
 	}
 }
 
@@ -391,8 +398,8 @@ CCamera* CTerrianFlyingPlayer::ChangeCamera(DWORD nNewCameraMode, float fTimeEla
 		SetMaxVelocityY(120.0f);
 		m_pCamera = OnChangeCamera(FIRST_PERSON_CAMERA, nCurrentCameraMode);
 		m_pCamera->SetTimeLag(0.0f);
-		m_pCamera->SetOffset(XMFLOAT3(0.0f, 0.0f, 0.0f));
-		m_pCamera->GenerateProjectionMatrix(1.01f, 5000.0f, ASPECT_RATIO, 60.0f);
+		m_pCamera->SetOffset(XMFLOAT3(0.0f, -1.75f, 9.5f));
+		m_pCamera->GenerateProjectionMatrix(0.5f, 5000.0f, ASPECT_RATIO, 60.0f);
 		m_pCamera->SetViewport(0, 0, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT, 0.0f, 1.0f);
 		m_pCamera->SetScissorRect(0, 0, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT);
 		break;
@@ -403,8 +410,8 @@ CCamera* CTerrianFlyingPlayer::ChangeCamera(DWORD nNewCameraMode, float fTimeEla
 		SetMaxVelocityY(120.0f);
 		m_pCamera = OnChangeCamera(SPACESHIP_CAMERA, nCurrentCameraMode);
 		m_pCamera->SetTimeLag(0.0f);
-		m_pCamera->SetOffset(XMFLOAT3(0.0f, 0.0f, 0.0f));
-		m_pCamera->GenerateProjectionMatrix(1.01f, 5000.0f, ASPECT_RATIO, 60.0f);
+		m_pCamera->SetOffset(XMFLOAT3(0.0f, -1.5f, 9.5f));
+		m_pCamera->GenerateProjectionMatrix(1.01f, 5000.0f, ASPECT_RATIO, 45.0f);
 		m_pCamera->SetViewport(0, 0, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT, 0.0f, 1.0f);
 		m_pCamera->SetScissorRect(0, 0, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT);
 		break;
@@ -424,6 +431,7 @@ CCamera* CTerrianFlyingPlayer::ChangeCamera(DWORD nNewCameraMode, float fTimeEla
 	default:
 		break;
 	}
+	m_pCamera->SetPosition(Vector3::Add(m_xmf3Position, m_pCamera->GetOffset()));
 	Update(fTimeElapsed);
 
 	return(m_pCamera);
