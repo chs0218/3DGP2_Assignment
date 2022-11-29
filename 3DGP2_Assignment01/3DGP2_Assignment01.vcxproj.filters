@@ -122,6 +122,8 @@
     <FxCompile Include="TextureVertexShader.hlsl" />
     <FxCompile Include="WaterPixelShader.hlsl" />
     <FxCompile Include="WaterVertexShader.hlsl" />
+    <FxCompile Include="LaplacianVertexShader.hlsl" />
+    <FxCompile Include="LaplacianPixelShader.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="3DGP2_Assignment01.ico">

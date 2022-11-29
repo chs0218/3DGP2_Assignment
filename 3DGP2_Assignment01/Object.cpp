@@ -534,9 +534,11 @@ CSkyBox::CSkyBox(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dComman
 	pSkyBoxTexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Image/SkyBox_Top_0.dds", RESOURCE_TEXTURE2D, 4);
 	pSkyBoxTexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Image/SkyBox_Bottom_0.dds", RESOURCE_TEXTURE2D, 5);
 
+	DXGI_FORMAT pdxgiRtvFormats = { DXGI_FORMAT_R8G8B8A8_UNORM };
+
 	// Shader »ý¼º
 	std::shared_ptr<CShader> pSkyBoxShader = std::make_shared<CSkyBoxShader>();
-	pSkyBoxShader->CreateShader(pd3dDevice, pd3dGraphicsRootSignature);
+	pSkyBoxShader->CreateShader(pd3dDevice, pd3dGraphicsRootSignature, 1, &pdxgiRtvFormats);
 	pSkyBoxShader->CreateShaderVariables(pd3dDevice, pd3dCommandList);
 	pSkyBoxShader->CreateCbvSrvDescriptorHeaps(pd3dDevice, 0, 6);
 	pSkyBoxShader->CreateShaderResourceViews(pd3dDevice, pSkyBoxTexture.get(), 0, 3);
@@ -641,8 +643,10 @@ CHeightMapTerrain::CHeightMapTerrain(ID3D12Device* pd3dDevice, ID3D12GraphicsCom
 	pTerrainTexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Image/Detail_Texture_7.dds", RESOURCE_TEXTURE2D, 1);
 	pTerrainTexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Image/HeightMap(Alpha).dds", RESOURCE_TEXTURE2D, 2);
 
+	DXGI_FORMAT pdxgiRtvFormats = { DXGI_FORMAT_R8G8B8A8_UNORM };
+
 	std::shared_ptr<CTerrainShader> pTerrainShader = std::make_shared<CTerrainShader>();
-	pTerrainShader->CreateShader(pd3dDevice, pd3dGraphicsRootSignature);
+	pTerrainShader->CreateShader(pd3dDevice, pd3dGraphicsRootSignature, 1, &pdxgiRtvFormats);
 	pTerrainShader->CreateShaderVariables(pd3dDevice, pd3dCommandList);
 	pTerrainShader->CreateCbvSrvDescriptorHeaps(pd3dDevice, 0, 3);
 	pTerrainShader->CreateShaderResourceViews(pd3dDevice, pTerrainTexture.get(), 0, 4);
@@ -728,9 +732,10 @@ CRippleWater::CRippleWater(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* 
 
 	pWaterTexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Image/Water_Base_Texture_0.dds", RESOURCE_TEXTURE2D, 0);
 	pWaterTexture->LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, L"Image/Water_Detail_Texture_0.dds", RESOURCE_TEXTURE2D, 1);
+	DXGI_FORMAT pdxgiRtvFormats = { DXGI_FORMAT_R8G8B8A8_UNORM };
 
 	std::shared_ptr<CRippleWaterShader> pRippleWaterShader = std::make_shared<CRippleWaterShader>();
-	pRippleWaterShader->CreateShader(pd3dDevice, pd3dGraphicsRootSignature);
+	pRippleWaterShader->CreateShader(pd3dDevice, pd3dGraphicsRootSignature, 1, &pdxgiRtvFormats);
 	pRippleWaterShader->CreateShaderVariables(pd3dDevice, pd3dCommandList);
 	pRippleWaterShader->CreateCbvSrvDescriptorHeaps(pd3dDevice, 0, 2);
 	pRippleWaterShader->CreateShaderResourceViews(pd3dDevice, pWaterTexture.get(), 0, 4);

@@ -230,9 +230,11 @@ CTerrianFlyingPlayer::CTerrianFlyingPlayer(ID3D12Device* pd3dDevice, ID3D12Graph
 
 	CreateShaderVariables(pd3dDevice, pd3dCommandList);
 
+	DXGI_FORMAT pdxgiRtvFormats = { DXGI_FORMAT_R8G8B8A8_UNORM };
+
 	// Shader »ý¼º
 	m_pShader = std::make_unique<CModeledTexturedShader>();
-	m_pShader->CreateShader(pd3dDevice, pd3dGraphicsRootSignature);
+	m_pShader->CreateShader(pd3dDevice, pd3dGraphicsRootSignature, 1, &pdxgiRtvFormats);
 	m_pShader->CreateShaderVariables(pd3dDevice, pd3dCommandList);
 	m_pShader->CreateCbvSrvDescriptorHeaps(pd3dDevice, 0, 2);
 
@@ -392,6 +394,9 @@ CCamera* CTerrianFlyingPlayer::ChangeCamera(DWORD nNewCameraMode, float fTimeEla
 	switch (nNewCameraMode)
 	{
 	case FIRST_PERSON_CAMERA:
+		m_pCamera->SetTimeLag(0.0f);
+		Update(fTimeElapsed);
+
 		SetFriction(2.0f);
 		SetGravity(XMFLOAT3(0.0f, 0.0f, 0.0f));
 		SetMaxVelocityXZ(125.0f);

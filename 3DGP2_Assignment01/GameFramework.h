@@ -43,6 +43,7 @@ private:
 	//렌더 타겟 버퍼, 서술자 힙 인터페이스 포인터, 렌더 타겟 서술자 원소의 크기이다.
 	ComPtr<ID3D12Resource> m_ppd3dRenderTargetBuffers[m_nSwapChainBuffers];
 	ComPtr<ID3D12DescriptorHeap> m_pd3dRtvDescriptorHeap;
+	D3D12_CPU_DESCRIPTOR_HANDLE	m_pd3dSwapRTVCPUHandles[m_nSwapChainBuffers];
 	UINT m_nRtvDescriptorIncrementSize;
 
 	//깊이-스텐실 버퍼, 서술자 힙 인터페이스 포인터, 깊이-스텐실 서술자 원소의 크기이다.
@@ -60,7 +61,7 @@ private:
 
 	//펜스 인터페이스 포인터, 펜스의 값, 이벤트 핸들이다.
 	ComPtr<ID3D12Fence> m_pd3dFence;
-	UINT64 m_nFenceValue;
+	UINT64 m_nFenceValues[m_nSwapChainBuffers];
 	HANDLE m_hFenceEvent;
 
 	std::unique_ptr<CScene> m_pScene = NULL;
