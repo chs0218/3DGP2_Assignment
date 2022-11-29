@@ -3,6 +3,7 @@
 
 UINT gnCbvSrvDescriptorIncrementSize = 0;
 UINT gnRtvDescriptorIncrementSize = 0;
+UINT gnDsvDescriptorIncrementSize = 0;
 
 float Random(float fMin, float fMax)
 {

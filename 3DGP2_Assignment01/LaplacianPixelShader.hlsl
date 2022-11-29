@@ -1,10 +1,5 @@
 SamplerState gSamplerState : register(s0);
-Texture2D gtxtInputTextures[7] : register(t1); //Color, NormalW, Texture, Illumination, ObjectID+zDepth, NormalV, Depth 
-
-cbuffer cbDrawOptions : register(b5)
-{
-	int4 gvDrawOptions : packoffset(c0);
-};
+Texture2D gtxtInputTextures[7] : register(t18); //Color, NormalW, Texture, Illumination, ObjectID+zDepth, NormalV, Depth 
 
 struct VS_SCREEN_RECT_TEXTURED_OUTPUT
 {
@@ -91,59 +86,6 @@ float4 GetColorFromDepth(float fDepth)
 float4 PSScreenRectSamplingTextured(VS_SCREEN_RECT_TEXTURED_OUTPUT input) : SV_Target
 {
 	float4 cColor = float4(0.0f, 0.0f, 0.0f, 1.0f);
-
-	switch (gvDrawOptions.x)
-	{
-		case 84: //'T'
-		{
-			cColor = gtxtInputTextures[2].Sample(gSamplerState, input.uv);
-			break;
-		}
-		case 76: //'L'
-		{
-			cColor = gtxtInputTextures[3].Sample(gSamplerState, input.uv);
-			break;
-		}
-		case 78: //'N'
-		{
-			cColor = gtxtInputTextures[1].Sample(gSamplerState, input.uv);
-			break;
-		}
-		case 68: //'D'
-		{
-			float fDepth = gtxtInputTextures[6].Load(uint3((uint)input.position.x, (uint)input.position.y, 0)).r;
-			cColor = GetColorFromDepth(1.0f - fDepth);
-			break;
-		}
-		case 90: //'Z' 
-		{
-			float fDepth = gtxtInputTextures[5].Load(uint3((uint)input.position.x, (uint)input.position.y, 0)).r;
-			cColor = GetColorFromDepth(fDepth);
-			break;
-		}
-		case 79: //'O'
-		{
-			uint fObjectID = (uint)gtxtInputTextures[4].Load(uint3((uint)input.position.x, (uint)input.position.y, 0)).r;
-//			uint fObjectID = (uint)gtxtInputTextures[4][int2(input.position.xy)].r;
-			if (fObjectID == 0) cColor.rgb = float3(1.0f, 1.0f, 1.0f);
-			else if (fObjectID <= 1000) cColor.rgb = float3(1.0f, 0.0f, 0.0f);
-			else if (fObjectID <= 2000) cColor.rgb = float3(0.0f, 1.0f, 0.0f);
-			else if (fObjectID <= 3000) cColor.rgb = float3(0.0f, 0.0f, 1.0f);
-			else if (fObjectID <= 4000) cColor.rgb = float3(0.0f, 1.0f, 1.0f);
-			else if (fObjectID <= 5000) cColor.rgb = float3(1.0f, 1.0f, 0.0f);
-			else if (fObjectID <= 6000) cColor.rgb = float3(1.0f, 1.0f, 1.0f);
-			else if (fObjectID <= 7000) cColor.rgb = float3(1.0f, 0.5f, 0.5f);
-			else cColor.rgb = float3(0.3f, 0.75f, 0.5f);
-
-//			cColor.rgb = fObjectID;
-			break;
-		}
-		case 69: //'E'
-		{
-			//cColor = LaplacianEdge(input.position);
-			cColor = Outline(input);
-			break;
-		}
-	}
+	cColor = Outline(input);
 	return(cColor);
 }

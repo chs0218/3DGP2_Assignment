@@ -44,12 +44,10 @@ private:
 	ComPtr<ID3D12Resource> m_ppd3dRenderTargetBuffers[m_nSwapChainBuffers];
 	ComPtr<ID3D12DescriptorHeap> m_pd3dRtvDescriptorHeap;
 	D3D12_CPU_DESCRIPTOR_HANDLE	m_pd3dSwapRTVCPUHandles[m_nSwapChainBuffers];
-	UINT m_nRtvDescriptorIncrementSize;
 
 	//깊이-스텐실 버퍼, 서술자 힙 인터페이스 포인터, 깊이-스텐실 서술자 원소의 크기이다.
 	ComPtr<ID3D12Resource> m_pd3dDepthStencilBuffer;
 	ComPtr<ID3D12DescriptorHeap> m_pd3dDsvDescriptorHeap;
-	UINT m_nDsvDescriptorIncrementSize;
 
 	//명령 큐, 명령 할당자, 명령 리스트 인터페이스 포인터이다.
 	ComPtr<ID3D12CommandQueue> m_pd3dCommandQueue;

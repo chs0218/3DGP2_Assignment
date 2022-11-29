@@ -55,6 +55,7 @@ using Microsoft::WRL::ComPtr;
 //----------------------------------------------------------------------------
 extern UINT	gnCbvSrvDescriptorIncrementSize;
 extern UINT gnRtvDescriptorIncrementSize;
+extern UINT gnDsvDescriptorIncrementSize;
 
 extern float Random();
 extern float Random(float fMin, float fMax);
