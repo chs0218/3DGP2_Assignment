@@ -9,8 +9,10 @@ cbuffer cbCameraInfo : register(b1)
 {
 	matrix gmtxView : packoffset(c0);
 	matrix gmtxProjection : packoffset(c4);
-	float3 gf3CameraPosition : packoffset(c8);
-}
+	matrix gmtxInverseProjection : packoffset(c8);
+	float3 gf3CameraPosition : packoffset(c12);
+	float3 gf3CameraDirection : packoffset(c13);
+};
 
 struct VS_TERRAIN_INPUT
 {

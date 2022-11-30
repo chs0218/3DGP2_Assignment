@@ -362,12 +362,12 @@ D3D12_RASTERIZER_DESC CModeledTexturedShader::CreateRasterizerState()
 
 D3D12_SHADER_BYTECODE CModeledTexturedShader::CreateVertexShader(ID3DBlob** ppd3dShaderBlob)
 {
-	return(CShader::ReadCompiledShaderFile(L"TextureVertexShader.cso", ppd3dShaderBlob));
+	return(CShader::ReadCompiledShaderFile(L"PlayerVertexShader.cso", ppd3dShaderBlob));
 }
 
 D3D12_SHADER_BYTECODE CModeledTexturedShader::CreatePixelShader(ID3DBlob** ppd3dShaderBlob)
 {
-	return(CShader::ReadCompiledShaderFile(L"TexturePixelShader.cso", ppd3dShaderBlob));
+	return(CShader::ReadCompiledShaderFile(L"PlayerPixelShader.cso", ppd3dShaderBlob));
 }
 
 D3D12_INPUT_LAYOUT_DESC CModeledTexturedShader::CreateInputLayout()
@@ -762,12 +762,12 @@ void CObjectShader::CreateShader(ID3D12Device* pd3dDevice, ID3D12RootSignature* 
 
 D3D12_SHADER_BYTECODE CObjectShader::CreateVertexShader(ID3DBlob** ppd3dShaderBlob)
 {
-	return(CShader::ReadCompiledShaderFile(L"TextureVertexShader.cso", ppd3dShaderBlob));
+	return(CShader::ReadCompiledShaderFile(L"ObjectVertexShader.cso", ppd3dShaderBlob));
 }
 
 D3D12_SHADER_BYTECODE CObjectShader::CreatePixelShader(ID3DBlob** ppd3dShaderBlob)
 {
-	return(CShader::ReadCompiledShaderFile(L"TexturePixelShader.cso", ppd3dShaderBlob));
+	return(CShader::ReadCompiledShaderFile(L"ObjectPixelShader.cso", ppd3dShaderBlob));
 }
 
 D3D12_INPUT_LAYOUT_DESC CObjectShader::CreateInputLayout()

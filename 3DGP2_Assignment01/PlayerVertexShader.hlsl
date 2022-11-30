@@ -9,8 +9,10 @@ cbuffer cbCameraInfo : register(b1)
 {
 	matrix gmtxView : packoffset(c0);
 	matrix gmtxProjection : packoffset(c4);
-	float3 gf3CameraPosition : packoffset(c8);
-}
+	matrix gmtxInverseProjection : packoffset(c8);
+	float3 gf3CameraPosition : packoffset(c12);
+	float3 gf3CameraDirection : packoffset(c13);
+};
 
 struct VS_INPUT
 {
@@ -27,7 +29,7 @@ struct VS_OUTPUT
 	float2 uv : TEXCOORD;
 };
 
-VS_OUTPUT VS_Tex(VS_INPUT input)
+VS_OUTPUT VS_Player(VS_INPUT input)
 {
 	VS_OUTPUT output;
 	output.positionW = (float3)mul(float4(input.position, 1.0f), gmtxGameObject);

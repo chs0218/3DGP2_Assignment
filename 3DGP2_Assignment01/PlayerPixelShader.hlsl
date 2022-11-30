@@ -17,7 +17,10 @@ cbuffer cbCameraInfo : register(b1)
 {
 	matrix gmtxView : packoffset(c0);
 	matrix gmtxProjection : packoffset(c4);
-}
+	matrix gmtxInverseProjection : packoffset(c8);
+	float3 gf3CameraPosition : packoffset(c12);
+	float3 gf3CameraDirection : packoffset(c13);
+};
 
 Texture2D gtxMappedTexture[7] : register(t0);
 SamplerState gSamplerState : register(s0);
@@ -31,7 +34,7 @@ struct VS_OUTPUT
 };
 
 [earlydepthstencil]
-float4 PS_Tex(VS_OUTPUT input) : SV_TARGET
+float4 PS_Player(VS_OUTPUT input) : SV_TARGET
 {
 	float4 cAlbedoColor = float4(0.0f, 0.0f, 0.0f, 1.0f);
 	float4 cSpecularColor = float4(0.0f, 0.0f, 0.0f, 1.0f);

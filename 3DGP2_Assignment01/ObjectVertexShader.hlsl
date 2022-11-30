@@ -18,18 +18,23 @@ struct VS_INPUT
 {
 	float3 position : POSITION;
 	float2 uv : TEXCOORD;
+	float3 normal : NORMAL;
 };
 
 struct VS_OUTPUT
 {
 	float4 position : SV_POSITION;
+	float3 positionW : POSITION;
+	float3 normalW : NORMAL;
 	float2 uv : TEXCOORD;
 };
 
-VS_OUTPUT VS_SkyBox(VS_INPUT input)
+VS_OUTPUT VS_Object(VS_INPUT input)
 {
 	VS_OUTPUT output;
-	output.position = mul(mul(mul(float4(input.position, 1.0f), gmtxGameObject), gmtxView), gmtxProjection);
+	output.positionW = (float3)mul(float4(input.position, 1.0f), gmtxGameObject);
+	output.normalW = mul(input.normal, (float3x3)gmtxGameObject);
+	output.position = mul(mul(float4(output.positionW, 1.0f), gmtxView), gmtxProjection);
 	output.uv = input.uv;
 	return(output);
 }
