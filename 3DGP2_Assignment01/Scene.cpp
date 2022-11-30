@@ -211,16 +211,16 @@ void CScene::AnimateObjects(CGameObject* pPlayer, float fTimeElapsed)
 	CMultiSpriteObjectsShader::Instance()->AnimateObjects(fTimeElapsed);
 }
 
-void CScene::PrepareRender(ID3D12GraphicsCommandList* pd3dCommandList)
+void CScene::PrepareRender(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera)
 {
 	pd3dCommandList->SetGraphicsRootSignature(m_pd3dGraphicsRootSignature.Get());
+
+	pCamera->SetViewportsAndScissorRects(pd3dCommandList);
+	pCamera->UpdateShaderVariables(pd3dCommandList);
 }
 
 void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera)
 {
-	pCamera->SetViewportsAndScissorRects(pd3dCommandList);
-	pCamera->UpdateShaderVariables(pd3dCommandList);
-
 	if (m_pSkyBox)
 		m_pSkyBox->Render(pd3dCommandList, pCamera);
 	if (m_pTerrain)

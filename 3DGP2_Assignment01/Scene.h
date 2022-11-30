@@ -30,7 +30,7 @@ public:
 
 	virtual bool ProcessInput(UCHAR* pKeysBuffer);
 	virtual void AnimateObjects(CGameObject* pPlayer, float fTimeElapsed);
-	void PrepareRender(ID3D12GraphicsCommandList* pd3dCommandList);
+	void PrepareRender(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera = NULL);
 	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera = NULL);
 
 	CHeightMapTerrain* GetTerrain() { return(m_pTerrain.get()); }

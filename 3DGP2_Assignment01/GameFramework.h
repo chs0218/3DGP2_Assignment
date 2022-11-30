@@ -49,6 +49,7 @@ private:
 	//깊이-스텐실 버퍼, 서술자 힙 인터페이스 포인터, 깊이-스텐실 서술자 원소의 크기이다.
 	ComPtr<ID3D12Resource> m_pd3dDepthStencilBuffer;
 	ComPtr<ID3D12DescriptorHeap> m_pd3dDsvDescriptorHeap;
+	D3D12_CPU_DESCRIPTOR_HANDLE m_d3dDsvDescriptorCPUHandle;
 
 	//명령 큐, 명령 할당자, 명령 리스트 인터페이스 포인터이다.
 	ComPtr<ID3D12CommandQueue> m_pd3dCommandQueue;
@@ -100,6 +101,7 @@ public:
 	void ProcessInput();
 	void AnimateObjects();
 	void FrameAdvance();
+	void MoveToNextFrame();
 
 	//프레임워크의 현재 시간, 경과 시간, 마우스 x 좌표, 마우스 y 좌표를 업데이트해주는 함수이다.
 	void UpdateShaderVariables();
