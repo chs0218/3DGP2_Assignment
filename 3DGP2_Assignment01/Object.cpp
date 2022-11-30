@@ -13,7 +13,6 @@ CGameObject::CGameObject()
 
 CGameObject::~CGameObject()
 {
-	ReleaseShaderVariables();
 }
 
 void CGameObject::ReleaseShaderVariables()
@@ -78,6 +77,11 @@ void CGameObject::Animate(float fTimeElapsed, XMFLOAT4X4* pxmf4x4Parent)
 void CGameObject::SetLookAt(const XMFLOAT3& xmf3Target, const XMFLOAT3& xmf3Up)
 {
 	XMFLOAT3 xmf3Position(m_xmf4x4Transform._41, m_xmf4x4Transform._42, m_xmf4x4Transform._43);
+	XMVECTOR EyeDirection = XMVectorSubtract(XMLoadFloat3(&xmf3Position), XMLoadFloat3(&xmf3Target));
+
+	if (XMVector3Equal(EyeDirection, XMVectorZero()))
+		return;
+
 	XMFLOAT4X4 mtxLookAt = Matrix4x4::LookAtLH(xmf3Position, xmf3Target, xmf3Up);
 	m_xmf4x4Transform._11 = mtxLookAt._11; m_xmf4x4Transform._12 = mtxLookAt._21; m_xmf4x4Transform._13 = mtxLookAt._31;
 	m_xmf4x4Transform._21 = mtxLookAt._12; m_xmf4x4Transform._22 = mtxLookAt._22; m_xmf4x4Transform._23 = mtxLookAt._32;

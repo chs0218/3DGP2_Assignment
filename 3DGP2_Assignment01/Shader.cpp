@@ -11,6 +11,7 @@ CShader::CShader()
 
 CShader::~CShader()
 {
+	ReleaseShaderVariables();
 }
 
 D3D12_SHADER_BYTECODE CShader::CreateVertexShader(ID3DBlob** ppd3dShaderBlob)
@@ -788,10 +789,10 @@ void CObjectShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommand
 {
 	CreateCbvSrvDescriptorHeaps(pd3dDevice, 0, 19); //SuperCobra(17), Gunship(2)
 
-	std::shared_ptr<CGameObject> pSuperCobraObject = std::make_shared<CGameObject>();
+	pSuperCobraObject = std::make_shared<CGameObject>();
 	pSuperCobraObject = pSuperCobraObject->LoadGeometryFromFile(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature, "Model/SuperCobra.bin", this);
 
-	std::shared_ptr<CGameObject> pGunshipObject = std::make_shared<CGameObject>();
+	pGunshipObject = std::make_shared<CGameObject>();
 	pGunshipObject = pGunshipObject->LoadGeometryFromFile(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature, "Model/Gunship.bin", this);
 	
 	m_nObjects = 120;

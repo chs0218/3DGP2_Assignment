@@ -10,9 +10,9 @@ class CEnemy;
 class CShader
 {
 protected:
-	ComPtr<ID3D12PipelineState> m_pd3dPipelineState = NULL;
-	ID3D12DescriptorHeap* m_pd3dCbvSrvDescriptorHeap = NULL;
-
+	ComPtr<ID3D12PipelineState> m_pd3dPipelineState;
+	ID3D12DescriptorHeap* m_pd3dCbvSrvDescriptorHeap;
+	
 	D3D12_CPU_DESCRIPTOR_HANDLE	m_d3dCbvCPUDescriptorStartHandle;
 	D3D12_GPU_DESCRIPTOR_HANDLE	m_d3dCbvGPUDescriptorStartHandle;
 
@@ -86,6 +86,8 @@ class CObjectShader : public CShader
 {
 protected:
 	int	m_nObjects = 0;
+	std::shared_ptr<CGameObject> pSuperCobraObject;
+	std::shared_ptr<CGameObject> pGunshipObject;
 	std::vector<CEnemy*> m_ppObjects;
 public:
 	static CObjectShader* Instance();

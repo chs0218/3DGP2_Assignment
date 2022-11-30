@@ -133,9 +133,6 @@ int CTexture::LoadTextureFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsComman
 		{
 			LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, m_ppstrTextureNames[nIndex], RESOURCE_TEXTURE2D, nIndex);
 			pShader->CreateShaderResourceView(pd3dDevice, this, nIndex);
-#ifdef _WITH_STANDARD_TEXTURE_MULTIPLE_DESCRIPTORS
-			m_pnRootParameterIndices[nIndex] = PARAMETER_STANDARD_TEXTURE + nIndex;
-#endif
 		}
 		else
 		{

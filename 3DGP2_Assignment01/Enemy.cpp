@@ -49,7 +49,10 @@ void CEnemy::Update(CGameObject* pPlayer, float fTimeElapsed)
 		if (Vector3::Length(direction) > 0.0f)
 			m_pObject->SetLookAt(XMFLOAT3(cur_Position.x + direction.x, cur_Position.y, cur_Position.z + direction.z), XMFLOAT3(0.0f, 1.0f, 0.0f));
 		else if (m_pPlayer)
+		{
+			
 			m_pObject->SetLookAt(m_pPlayer->GetPosition(), XMFLOAT3(0.0f, 1.0f, 0.0f));
+		}
 
 		XMFLOAT3 deltaPos = Vector3::ScalarProduct(direction, fVelocity * fTimeElapsed);
 		reult_Position = Vector3::Add(cur_Position, deltaPos);
