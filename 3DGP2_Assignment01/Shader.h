@@ -262,6 +262,6 @@ public:
 	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera, void* pContext = NULL);
 
 protected:
-	ID3D12Resource* m_pd3dcbDrawOptions = NULL;
+	ComPtr<ID3D12Resource> m_pd3dcbDrawOptions = NULL;
 	PS_CB_DRAW_OPTIONS* m_pcbMappedDrawOptions = NULL;
 };

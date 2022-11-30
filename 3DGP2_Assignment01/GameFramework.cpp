@@ -47,12 +47,6 @@ void CGameFramework::OnDestroy()
 	::CloseHandle(m_hFenceEvent);
 
 	m_pdxgiSwapChain->SetFullscreenState(FALSE, NULL);
-
-#if defined(_DEBUG)
-	ComPtr<IDXGIDebug1> pdxgiDebug = NULL;
-	DXGIGetDebugInterface1(0, __uuidof(IDXGIDebug1), (void**)pdxgiDebug.GetAddressOf());
-	HRESULT hResult = pdxgiDebug->ReportLiveObjects(DXGI_DEBUG_ALL, DXGI_DEBUG_RLO_DETAIL);
-#endif
 }
 
 void CGameFramework::CreateSwapChain()
@@ -263,7 +257,7 @@ void CGameFramework::BuildObjects()
 	m_pScene = std::make_unique<CScene>();
 	m_pScene->BuildObjects(m_pd3dDevice.Get(), m_pd3dCommandList.Get());
 
-	CLaplacianEdgeShader::Instance()->CreateShader(m_pd3dDevice.Get(), m_pScene->GetGraphicsRootSignature(), 1, NULL);
+	//CLaplacianEdgeShader::Instance()->CreateShader(m_pd3dDevice.Get(), m_pScene->GetGraphicsRootSignature(), 1, NULL);
 	
 	//D3D12_CPU_DESCRIPTOR_HANDLE d3dRtvCPUDescriptorHandle = m_pd3dRtvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
 	//d3dRtvCPUDescriptorHandle.ptr += (::gnRtvDescriptorIncrementSize * m_nSwapChainBuffers);
@@ -275,11 +269,11 @@ void CGameFramework::BuildObjects()
 	//CLaplacianEdgeShader::Instance()->CreateShaderResourceViews(m_pd3dDevice.Get(), 1, &m_pd3dDepthStencilBuffer, pdxgiDepthSrvFormats);
 
 	m_pPlayer = std::make_unique<CTerrianFlyingPlayer>(m_pd3dDevice.Get(), m_pd3dCommandList.Get(), m_pScene->GetGraphicsRootSignature(), m_pScene->GetTerrain());
-	m_pPlayer->PrepareAnimate();
+	/*m_pPlayer->PrepareAnimate();
 	m_pPlayer->SetScale(20.0f, 20.0f, 20.0f);
 	m_pPlayer->SetPosition(XMFLOAT3(1030.0f, 300.0f, 1400.0f));
 	m_pScene->SetPlayer(m_pPlayer.get());
-	m_pCamera = m_pPlayer->GetCamera();
+	m_pCamera = m_pPlayer->GetCamera();*/
 
 	//씬 객체를 생성하기 위하여 필요한 그래픽 명령 리스트들을 명령 큐에 추가한다. 
 	m_pd3dCommandList->Close();
@@ -287,7 +281,7 @@ void CGameFramework::BuildObjects()
 	m_pd3dCommandQueue->ExecuteCommandLists(1, ppd3dCommandLists->GetAddressOf());
 
 	WaitForGpuComplete();
-	m_pPlayer->ReleaseUploadBuffers();
+	//m_pPlayer->ReleaseUploadBuffers();
 	m_GameTimer.Reset();
 }
 
@@ -385,7 +379,7 @@ LRESULT CALLBACK CGameFramework::OnProcessingWindowMessage(HWND hWnd, UINT nMess
 
 void CGameFramework::ProcessInput()
 {
-	static UCHAR pKeysBuffer[256];
+	/*static UCHAR pKeysBuffer[256];
 	bool bProcessedByScene = false;
 	if (GetKeyboardState(pKeysBuffer) && m_pScene) bProcessedByScene = m_pScene->ProcessInput(pKeysBuffer);
 	if (!bProcessedByScene)
@@ -421,7 +415,7 @@ void CGameFramework::ProcessInput()
 			if (dwDirection) m_pPlayer->Move(dwDirection, 100.0f * m_GameTimer.GetFrameTimeElapsed(), true);
 		}
 	}
-	m_pPlayer->Update(m_GameTimer.GetFrameTimeElapsed());
+	m_pPlayer->Update(m_GameTimer.GetFrameTimeElapsed());*/
 }
 
 void CGameFramework::AnimateObjects()

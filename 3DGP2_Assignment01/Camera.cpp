@@ -128,7 +128,6 @@ void CCamera::ReleaseShaderVariables()
 	if (m_pd3dcbCamera)
 	{
 		m_pd3dcbCamera->Unmap(0, NULL);
-		m_pd3dcbCamera->Release();
 	}
 }
 

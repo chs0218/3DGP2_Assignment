@@ -158,33 +158,33 @@ void CScene::CreateGraphicsRootSignature(ID3D12Device* pd3dDevice)
 void CScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
 {
 	CreateGraphicsRootSignature(pd3dDevice);
-	XMFLOAT3 xmf3TerrainScale(8.0f, 2.0f, 8.0f);
-	XMFLOAT4 xmf4TerrainColor(0.0f, 0.5f, 0.0f, 0.0f);
-	m_pTerrain = std::make_unique<CHeightMapTerrain>(pd3dDevice, pd3dCommandList, GetGraphicsRootSignature(), _T("Image/HeightMap.raw"), 257, 257, 257, 257, xmf3TerrainScale, xmf4TerrainColor);
-	
-	m_pSkyBox = std::make_unique<CSkyBox>(pd3dDevice, pd3dCommandList, GetGraphicsRootSignature());
+	//XMFLOAT3 xmf3TerrainScale(8.0f, 2.0f, 8.0f);
+	//XMFLOAT4 xmf4TerrainColor(0.0f, 0.5f, 0.0f, 0.0f);
+	//m_pTerrain = std::make_unique<CHeightMapTerrain>(pd3dDevice, pd3dCommandList, GetGraphicsRootSignature(), _T("Image/HeightMap.raw"), 257, 257, 257, 257, xmf3TerrainScale, xmf4TerrainColor);
+	//
+	//m_pSkyBox = std::make_unique<CSkyBox>(pd3dDevice, pd3dCommandList, GetGraphicsRootSignature());
 
-	XMFLOAT3 xmf3WaterScale(8.0f, 1.0f, 8.0f);
-	XMFLOAT4 xmf4WaterColor(0.0f, 0.0f, 0.7f, 1.0f);
-	m_pWater = std::make_unique<CRippleWater>(pd3dDevice, pd3dCommandList, GetGraphicsRootSignature(), 257, 257, 257, 257, xmf3WaterScale, xmf4WaterColor);
-	m_pWater->SetPosition(XMFLOAT3(0.0f, 130.0f, 0.0f));
+	//XMFLOAT3 xmf3WaterScale(8.0f, 1.0f, 8.0f);
+	//XMFLOAT4 xmf4WaterColor(0.0f, 0.0f, 0.7f, 1.0f);
+	//m_pWater = std::make_unique<CRippleWater>(pd3dDevice, pd3dCommandList, GetGraphicsRootSignature(), 257, 257, 257, 257, xmf3WaterScale, xmf4WaterColor);
+	//m_pWater->SetPosition(XMFLOAT3(0.0f, 130.0f, 0.0f));
 
-	DXGI_FORMAT pdxgiRtvFormats = { DXGI_FORMAT_R8G8B8A8_UNORM };
+	//DXGI_FORMAT pdxgiRtvFormats = { DXGI_FORMAT_R8G8B8A8_UNORM };
 
-	DXGI_FORMAT pdxgiObjectRtvFormats[7] = { DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R32_FLOAT, DXGI_FORMAT_R32_FLOAT };
-	CBillboardObjectsShader::Instance()->CreateShader(pd3dDevice, GetGraphicsRootSignature(), 7, pdxgiObjectRtvFormats);
-	CBillboardObjectsShader::Instance()->BuildObjects(pd3dDevice, pd3dCommandList, m_pTerrain.get());
+	//DXGI_FORMAT pdxgiObjectRtvFormats[7] = { DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R32_FLOAT, DXGI_FORMAT_R32_FLOAT };
+	//CBillboardObjectsShader::Instance()->CreateShader(pd3dDevice, GetGraphicsRootSignature(), 7, pdxgiObjectRtvFormats);
+	//CBillboardObjectsShader::Instance()->BuildObjects(pd3dDevice, pd3dCommandList, m_pTerrain.get());
 
-	CObjectShader::Instance()->CreateShader(pd3dDevice, GetGraphicsRootSignature(), 1, &pdxgiRtvFormats);
-	CObjectShader::Instance()->BuildObjects(pd3dDevice, pd3dCommandList, GetGraphicsRootSignature(), m_pTerrain.get());
+	//CObjectShader::Instance()->CreateShader(pd3dDevice, GetGraphicsRootSignature(), 1, &pdxgiRtvFormats);
+	//CObjectShader::Instance()->BuildObjects(pd3dDevice, pd3dCommandList, GetGraphicsRootSignature(), m_pTerrain.get());
 
-	CMultiSpriteObjectsShader::Instance()->CreateShader(pd3dDevice, GetGraphicsRootSignature(), 1, &pdxgiRtvFormats);
-	CMultiSpriteObjectsShader::Instance()->BuildObjects(pd3dDevice, pd3dCommandList, GetGraphicsRootSignature());
+	//CMultiSpriteObjectsShader::Instance()->CreateShader(pd3dDevice, GetGraphicsRootSignature(), 1, &pdxgiRtvFormats);
+	//CMultiSpriteObjectsShader::Instance()->BuildObjects(pd3dDevice, pd3dCommandList, GetGraphicsRootSignature());
 }
 
 void CScene::ReleaseObjects()
 {
-	if (CBillboardObjectsShader::Instance())
+	/*if (CBillboardObjectsShader::Instance())
 	{
 		CBillboardObjectsShader::Instance()->ReleaseShaderVariables();
 		CBillboardObjectsShader::Instance()->ReleaseObjects();
@@ -193,7 +193,7 @@ void CScene::ReleaseObjects()
 	{
 		CObjectShader::Instance()->ReleaseShaderVariables();
 		CObjectShader::Instance()->ReleaseObjects();
-	}
+	}*/
 }
 
 bool CScene::ProcessInput(UCHAR* pKeysBuffer)
@@ -203,12 +203,12 @@ bool CScene::ProcessInput(UCHAR* pKeysBuffer)
 
 void CScene::AnimateObjects(CGameObject* pPlayer, float fTimeElapsed)
 {
-	if (CObjectShader::Instance())
+	/*if (CObjectShader::Instance())
 	{
 		CObjectShader::Instance()->AnimateObjects(pPlayer, fTimeElapsed);
 	}
 
-	CMultiSpriteObjectsShader::Instance()->AnimateObjects(fTimeElapsed);
+	CMultiSpriteObjectsShader::Instance()->AnimateObjects(fTimeElapsed);*/
 }
 
 void CScene::PrepareRender(ID3D12GraphicsCommandList* pd3dCommandList)
@@ -218,7 +218,7 @@ void CScene::PrepareRender(ID3D12GraphicsCommandList* pd3dCommandList)
 
 void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera)
 {
-	pCamera->SetViewportsAndScissorRects(pd3dCommandList);
+	/*pCamera->SetViewportsAndScissorRects(pd3dCommandList);
 	pCamera->UpdateShaderVariables(pd3dCommandList);
 
 	if (m_pSkyBox)
@@ -229,14 +229,14 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 		m_pWater->Render(pd3dCommandList, pCamera);
 	CBillboardObjectsShader::Instance()->Render(pd3dCommandList, pCamera);
 	CObjectShader::Instance()->Render(pd3dCommandList, pCamera);
-	CMultiSpriteObjectsShader::Instance()->Render(pd3dCommandList, pCamera);
+	CMultiSpriteObjectsShader::Instance()->Render(pd3dCommandList, pCamera);*/
 }
 
 void CScene::CheckCollision()
 {
-	for (std::vector<CEnemy*>::iterator i = CObjectShader::Instance()->getObjectsBegin();
+	/*for (std::vector<CEnemy*>::iterator i = CObjectShader::Instance()->getObjectsBegin();
 		i != CObjectShader::Instance()->getObjectsEnd(); ++i)
 	{
 		(*i)->CheckCollision(((CTerrianFlyingPlayer*)m_pPlayer)->getBullets());
-	}
+	}*/
 }

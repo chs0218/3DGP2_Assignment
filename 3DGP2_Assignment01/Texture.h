@@ -16,8 +16,8 @@ public:
 private:
 	UINT m_nTextureType;		// Texture 타입
 	int	m_nTextures = 0;		// Texture 개수
-	ID3D12Resource** m_ppd3dTextures;	// Texture 리소스
-	ID3D12Resource** m_ppd3dTextureUploadBuffers;	//Texture 업로드 버퍼
+	std::vector<ComPtr<ID3D12Resource>> m_ppd3dTextures;	// Texture 리소스
+	std::vector<ComPtr<ID3D12Resource>> m_ppd3dTextureUploadBuffers;	//Texture 업로드 버퍼
 
 	UINT* m_pnResourceTypes;		// 각각의 Texture 들의 타입
 	_TCHAR(*m_ppstrTextureNames)[64] = NULL;	// Texture의 이름
@@ -30,7 +30,7 @@ private:
 	D3D12_GPU_DESCRIPTOR_HANDLE* m_pd3dSrvGpuDescriptorHandles;	// Srv 디스크립터 핸들
 public:
 	int GetTextures() { return(m_nTextures); }
-	ID3D12Resource* GetResource(int nIndex) { return(m_ppd3dTextures[nIndex]); }
+	ID3D12Resource* GetResource(int nIndex) { return(m_ppd3dTextures[nIndex].Get()); }
 	_TCHAR* GetTextureName(int nIndex) { return(m_ppstrTextureNames[nIndex]); }
 	D3D12_GPU_DESCRIPTOR_HANDLE GetGpuDescriptorHandle(int nIndex) { return(m_pd3dSrvGpuDescriptorHandles[nIndex]); }
 	int GetRootParameter(int nIndex) { return(m_pnRootParameterIndices[nIndex]); }

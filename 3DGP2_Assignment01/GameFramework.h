@@ -18,6 +18,7 @@ class CTerrianFlyingPlayer;
 class CGameFramework
 {
 private:
+	LiveObjectReporter reporter;
 	HINSTANCE m_hInstance;
 	HWND m_hWnd;
 	int m_nWndClientWidth;
