@@ -230,11 +230,11 @@ CTerrianFlyingPlayer::CTerrianFlyingPlayer(ID3D12Device* pd3dDevice, ID3D12Graph
 
 	CreateShaderVariables(pd3dDevice, pd3dCommandList);
 
-	DXGI_FORMAT pdxgiRtvFormats = { DXGI_FORMAT_R8G8B8A8_UNORM };
-
+	DXGI_FORMAT pdxgiObjectRtvFormats[7] = { DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R32_FLOAT, DXGI_FORMAT_R32_FLOAT };
+	
 	// Shader »ý¼º
 	m_pShader = std::make_unique<CModeledTexturedShader>();
-	m_pShader->CreateShader(pd3dDevice, pd3dGraphicsRootSignature, 1, &pdxgiRtvFormats);
+	m_pShader->CreateShader(pd3dDevice, pd3dGraphicsRootSignature, 7, pdxgiObjectRtvFormats);
 	m_pShader->CreateShaderVariables(pd3dDevice, pd3dCommandList);
 	m_pShader->CreateCbvSrvDescriptorHeaps(pd3dDevice, 0, 2);
 

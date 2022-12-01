@@ -17,9 +17,22 @@ cbuffer cbFrameworkInfo : register(b2)
 	float2		gf2CursorPos;
 };
 
-[earlydepthstencil]
-float4 PS_Water(VS_WATER_OUTPUT input) : SV_TARGET
+struct PS_MULTIPLE_RENDER_TARGETS_OUTPUT
 {
+	float4 f4Scene : SV_TARGET0; //Swap Chain Back Buffer
+	float4 f4Color : SV_TARGET1;
+	float4 f4Normal : SV_TARGET2;
+	float4 f4Texture : SV_TARGET3;
+	float4 f4Illumination : SV_TARGET4;
+	float2 f2ObjectIDzDepth : SV_TARGET5;
+	float4 f4CameraNormal : SV_TARGET6;
+};
+
+[earlydepthstencil]
+PS_MULTIPLE_RENDER_TARGETS_OUTPUT PS_Water(VS_WATER_OUTPUT input) : SV_TARGET
+{
+	PS_MULTIPLE_RENDER_TARGETS_OUTPUT output;
+
 	//float4 cBaseTexColor = gtxtWaterBaseTexture.Sample(gSamplerState, input.uv0);
 	float4 cBaseTexColor = gtxtWaterBaseTexture.Sample(gSamplerState, float2(input.uv0.x, input.uv0.y - abs(sin(gfCurrentTime)) * 0.0151f));
 	float4 cDetailTexColor = gtxtWaterDetailTexture.Sample(gSamplerState, float2((input.uv0.x + (gfCurrentTime * 0.01f)) * 10.0f, input.uv0.y * 10.0f));
@@ -29,6 +42,8 @@ float4 PS_Water(VS_WATER_OUTPUT input) : SV_TARGET
 
 	
 	cColor.a = 0.55f;
+
+	output.f4Scene = output.f4Color = cColor;
 	/*cColor *= input.color;*/
-	return(cColor);
+	return(output);
 }

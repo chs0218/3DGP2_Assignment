@@ -169,16 +169,15 @@ void CScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 	m_pWater = std::make_unique<CRippleWater>(pd3dDevice, pd3dCommandList, GetGraphicsRootSignature(), 257, 257, 257, 257, xmf3WaterScale, xmf4WaterColor);
 	m_pWater->SetPosition(XMFLOAT3(0.0f, 130.0f, 0.0f));
 
-	DXGI_FORMAT pdxgiRtvFormats = { DXGI_FORMAT_R8G8B8A8_UNORM };
-
 	DXGI_FORMAT pdxgiObjectRtvFormats[7] = { DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R32_FLOAT, DXGI_FORMAT_R32_FLOAT };
+
 	CBillboardObjectsShader::Instance()->CreateShader(pd3dDevice, GetGraphicsRootSignature(), 7, pdxgiObjectRtvFormats);
 	CBillboardObjectsShader::Instance()->BuildObjects(pd3dDevice, pd3dCommandList, m_pTerrain.get());
 
-	CObjectShader::Instance()->CreateShader(pd3dDevice, GetGraphicsRootSignature(), 1, &pdxgiRtvFormats);
+	CObjectShader::Instance()->CreateShader(pd3dDevice, GetGraphicsRootSignature(), 7, pdxgiObjectRtvFormats);
 	CObjectShader::Instance()->BuildObjects(pd3dDevice, pd3dCommandList, GetGraphicsRootSignature(), m_pTerrain.get());
 
-	CMultiSpriteObjectsShader::Instance()->CreateShader(pd3dDevice, GetGraphicsRootSignature(), 1, &pdxgiRtvFormats);
+	CMultiSpriteObjectsShader::Instance()->CreateShader(pd3dDevice, GetGraphicsRootSignature(), 7, pdxgiObjectRtvFormats);
 	CMultiSpriteObjectsShader::Instance()->BuildObjects(pd3dDevice, pd3dCommandList, GetGraphicsRootSignature());
 }
 
@@ -221,6 +220,7 @@ void CScene::PrepareRender(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* 
 
 void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera)
 {
+	CObjectShader::Instance()->Render(pd3dCommandList, pCamera);
 	if (m_pSkyBox)
 		m_pSkyBox->Render(pd3dCommandList, pCamera);
 	if (m_pTerrain)
@@ -228,7 +228,6 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 	if (m_pWater)
 		m_pWater->Render(pd3dCommandList, pCamera);
 	CBillboardObjectsShader::Instance()->Render(pd3dCommandList, pCamera);
-	CObjectShader::Instance()->Render(pd3dCommandList, pCamera);
 	CMultiSpriteObjectsShader::Instance()->Render(pd3dCommandList, pCamera); 
 }
 
