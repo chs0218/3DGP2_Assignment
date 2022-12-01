@@ -1121,24 +1121,14 @@ D3D12_SHADER_BYTECODE CLaplacianEdgeShader::CreatePixelShader(ID3DBlob** ppd3dSh
 
 void CLaplacianEdgeShader::CreateShaderVariables(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
 {
-	UINT ncbElementBytes = ((sizeof(PS_CB_DRAW_OPTIONS) + 255) & ~255); //256ÀÇ ¹è¼ö
-	m_pd3dcbDrawOptions = ::CreateBufferResource(pd3dDevice, pd3dCommandList, NULL, ncbElementBytes, D3D12_HEAP_TYPE_UPLOAD, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER, NULL);
-	m_pd3dcbDrawOptions->Map(0, NULL, (void**)&m_pcbMappedDrawOptions);
-
-	CPostProcessingShader::CreateShaderVariables(pd3dDevice, pd3dCommandList);
 }
 
 void CLaplacianEdgeShader::ReleaseShaderVariables()
 {
-	if (m_pd3dcbDrawOptions) m_pd3dcbDrawOptions->Release();
 }
 
 void CLaplacianEdgeShader::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList, void* pContext)
 {
-	m_pcbMappedDrawOptions->m_xmn4DrawOptions.x = *((int*)pContext);
-	D3D12_GPU_VIRTUAL_ADDRESS d3dGpuVirtualAddress = m_pd3dcbDrawOptions->GetGPUVirtualAddress();
-	pd3dCommandList->SetGraphicsRootConstantBufferView(7, d3dGpuVirtualAddress);
-
 	CPostProcessingShader::UpdateShaderVariables(pd3dCommandList);
 }
 

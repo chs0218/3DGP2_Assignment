@@ -235,12 +235,6 @@ public:
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//
-struct PS_CB_DRAW_OPTIONS
-{
-	XMINT4							m_xmn4DrawOptions;
-};
-
 class CLaplacianEdgeShader : public CPostProcessingShader
 {
 public:
@@ -262,8 +256,4 @@ public:
 	virtual void OnPostRenderTarget(ID3D12GraphicsCommandList* pd3dCommandList);
 
 	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera, void* pContext = NULL);
-
-protected:
-	ComPtr<ID3D12Resource> m_pd3dcbDrawOptions = NULL;
-	PS_CB_DRAW_OPTIONS* m_pcbMappedDrawOptions = NULL;
 };

@@ -1,6 +1,9 @@
 SamplerState gSamplerState : register(s0);
 Texture2D gtxtInputTextures[7] : register(t18); //Color, NormalW, Texture, Illumination, ObjectID+zDepth, NormalV, Depth 
 
+static float gfLaplacians[9] = { -1.0f, -1.0f, -1.0f, -1.0f, 8.0f, -1.0f, -1.0f, -1.0f, -1.0f };
+static int2 gnOffsets[9] = { { -1,-1 }, { 0,-1 }, { 1,-1 }, { -1,0 }, { 0,0 }, { 1,0 }, { -1,1 }, { 0,1 }, { 1,1 } };
+
 struct VS_SCREEN_RECT_TEXTURED_OUTPUT
 {
 	float4 position : SV_POSITION;
@@ -16,51 +19,33 @@ float4 AlphaBlend(float4 top, float4 bottom)
 	return(float4(color, alpha));
 }
 
-float4 Outline(VS_SCREEN_RECT_TEXTURED_OUTPUT input)
+float4 LaplacianEdge(float4 position)
 {
-	float fHalfScaleFloor = floor(1.0f * 0.5f);
-	float fHalfScaleCeil = ceil(1.0f * 0.5f);
+	float fObjectEdgeness = 0.0f, fNormalEdgeness = 0.0f, fDepthEdgeness = 0.0f;
+	float3 f3NormalEdgeness = float3(0.0f, 0.0f, 0.0f), f3DepthEdgeness = float3(0.0f, 0.0f, 0.0f);
+	if ((uint(position.x) >= 1) || (uint(position.y) >= 1) || (uint(position.x) <= gtxtInputTextures[0].Length.x - 2) || (uint(position.y) <= gtxtInputTextures[0].Length.y - 2))
+	{
+		for (int input = 0; input < 9; input++)
+		{
+			float3 f3Normal = gtxtInputTextures[1][int2(position.xy) + gnOffsets[input]].xyz * 2.0f - 1.0f;
+			float3 f3Depth = gtxtInputTextures[6][int2(position.xy) + gnOffsets[input]].xyz * 2.0f - 1.0f;
+			f3NormalEdgeness += gfLaplacians[input] * f3Normal;
+			f3DepthEdgeness += gfLaplacians[input] * f3Depth;
+		}
+		fNormalEdgeness = f3NormalEdgeness.r * 0.3f + f3NormalEdgeness.g * 0.59f + f3NormalEdgeness.b * 0.11f;
+		fDepthEdgeness = f3DepthEdgeness.r * 0.3f + f3DepthEdgeness.g * 0.59f + f3DepthEdgeness.b * 0.11f;
+	}
+	float3 cColor = gtxtInputTextures[0][int2(position.xy)].rgb;
+	
+	if (fObjectEdgeness == 1.0f)
+		cColor = float3(1.0f, 0.0f, 0.0f);
+	else
+	{
+		cColor.g += fNormalEdgeness;
+		cColor.r += fDepthEdgeness;
+	}
 
-	float2 f2BottomLeftUV = input.uv - float2((1.0f / gtxtInputTextures[0].Length.x), (1.0f / gtxtInputTextures[0].Length.y)) * fHalfScaleFloor;
-	float2 f2TopRightUV = input.uv + float2((1.0f / gtxtInputTextures[0].Length.x), (1.0f / gtxtInputTextures[0].Length.y)) * fHalfScaleCeil;
-	float2 f2BottomRightUV = input.uv + float2((1.0f / gtxtInputTextures[0].Length.x) * fHalfScaleCeil, -(1.0f / gtxtInputTextures[0].Length.y * fHalfScaleFloor));
-	float2 f2TopLeftUV = input.uv + float2(-(1.0f / gtxtInputTextures[0].Length.x) * fHalfScaleFloor, (1.0f / gtxtInputTextures[0].Length.y) * fHalfScaleCeil);
-
-	float3 f3NormalV0 = gtxtInputTextures[5].Sample(gSamplerState, f2BottomLeftUV).rgb;
-	float3 f3NormalV1 = gtxtInputTextures[5].Sample(gSamplerState, f2TopRightUV).rgb;
-	float3 f3NormalV2 = gtxtInputTextures[5].Sample(gSamplerState, f2BottomRightUV).rgb;
-	float3 f3NormalV3 = gtxtInputTextures[5].Sample(gSamplerState, f2TopLeftUV).rgb;
-
-	float fDepth0 = gtxtInputTextures[6].Sample(gSamplerState, f2BottomLeftUV).r;
-	float fDepth1 = gtxtInputTextures[6].Sample(gSamplerState, f2TopRightUV).r;
-	float fDepth2 = gtxtInputTextures[6].Sample(gSamplerState, f2BottomRightUV).r;
-	float fDepth3 = gtxtInputTextures[6].Sample(gSamplerState, f2TopLeftUV).r;
-
-	float3 f3NormalV = f3NormalV0 * 2.0f - 1.0f;
-	float fNdotV = 1.0f - dot(f3NormalV, -input.viewSpaceDir);
-
-	float fNormalThreshold01 = saturate((fNdotV - 0.5f) / (1.0f - 0.5f));
-	float fNormalThreshold = (fNormalThreshold01 * 7.0f) + 1.0f;
-
-	float fDepthThreshold = 1.5f * fDepth0 * fNormalThreshold;
-
-	float fDepthDifference0 = fDepth1 - fDepth0;
-	float fDepthDifference1 = fDepth3 - fDepth2;
-	float fDdgeDepth = sqrt(pow(fDepthDifference0, 2) + pow(fDepthDifference1, 2)) * 100.0f;
-	fDdgeDepth = (fDdgeDepth > 1.5f) ? 1.0f : 0.0f;
-
-	float3 fNormalDifference0 = f3NormalV1 - f3NormalV0;
-	float3 fNormalDifference1 = f3NormalV3 - f3NormalV2;
-	float fEdgeNormal = sqrt(dot(fNormalDifference0, fNormalDifference0) + dot(fNormalDifference1, fNormalDifference1));
-	fEdgeNormal = (fEdgeNormal > 0.4f) ? 1.0f : 0.0f;
-
-	float fEdge = max(fDdgeDepth, fEdgeNormal);
-	float4 f4EdgeColor = float4(1.0f, 1.0f, 1.0f, 1.0f * fEdge);
-
-	float4 f4Color = float4(0.0f, 0.0f, 0.0f, 1.0f);
-	//float4 f4Color = gtxtInputTextures[0].Sample(gSamplerState, input.uv);
-
-	return(AlphaBlend(f4EdgeColor, f4Color));
+	return(float4(cColor, 1.0f));
 }
 
 float4 GetColorFromDepth(float fDepth)
@@ -86,6 +71,6 @@ float4 GetColorFromDepth(float fDepth)
 float4 PSScreenRectSamplingTextured(VS_SCREEN_RECT_TEXTURED_OUTPUT input) : SV_Target
 {
 	float4 cColor = float4(0.0f, 0.0f, 0.0f, 1.0f);
-	cColor = Outline(input);
+	cColor = LaplacianEdge(input.position);
 	return(cColor);
 }

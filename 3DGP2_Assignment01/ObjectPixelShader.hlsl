@@ -30,12 +30,26 @@ struct VS_OUTPUT
 	float4 position : SV_POSITION;
 	float3 positionW : POSITION;
 	float3 normalW : NORMAL;
+	float3 normalV : NORMAL1;
 	float2 uv : TEXCOORD;
 };
 
-[earlydepthstencil]
-float4 PS_Object(VS_OUTPUT input) : SV_TARGET
+struct PS_MULTIPLE_RENDER_TARGETS_OUTPUT
 {
+	float4 f4Scene : SV_TARGET0; //Swap Chain Back Buffer
+	float4 f4Color : SV_TARGET1;
+	float4 f4Normal : SV_TARGET2;
+	float4 f4Texture : SV_TARGET3;
+	float4 f4Illumination : SV_TARGET4;
+	float2 f2ObjectIDzDepth : SV_TARGET5;
+	float4 f4CameraNormal : SV_TARGET6;
+};
+
+[earlydepthstencil]
+PS_MULTIPLE_RENDER_TARGETS_OUTPUT PS_Object(VS_OUTPUT input)
+{
+	PS_MULTIPLE_RENDER_TARGETS_OUTPUT output;
+
 	float4 cAlbedoColor = float4(0.0f, 0.0f, 0.0f, 1.0f);
 	float4 cSpecularColor = float4(0.0f, 0.0f, 0.0f, 1.0f);
 	float4 cNormalColor = float4(0.0f, 0.0f, 0.0f, 1.0f);
@@ -48,8 +62,16 @@ float4 PS_Object(VS_OUTPUT input) : SV_TARGET
 	if (gnTexturesMask & MATERIAL_METALLIC_MAP) cMetallicColor = gtxMappedTexture[3].Sample(gSamplerState, input.uv);
 	if (gnTexturesMask & MATERIAL_EMISSION_MAP) cEmissionColor = gtxMappedTexture[4].Sample(gSamplerState, input.uv);
 
-	float4 cColor = cAlbedoColor + cSpecularColor + cEmissionColor;
-	cColor.a = cAlbedoColor.a + 0.3f;
+	output.f4Scene = cAlbedoColor + cSpecularColor + cEmissionColor;
+	output.f4Color = cAlbedoColor + cSpecularColor + cEmissionColor;
 
-	return cColor;
+	input.normalW = normalize(input.normalW);
+	output.f4Normal = float4(input.normalW.xyz * 0.5f + 0.5f, input.position.z);
+
+	output.f4Texture = cAlbedoColor + cSpecularColor + cEmissionColor;
+	output.f4Illumination = float4(0.0f, 0.0f, 0.0f, 1.0f);
+	output.f2ObjectIDzDepth = float4(0.0f, 0.0f, 0.0f, 1.0f);
+	output.f4CameraNormal = float4(input.normalV.xyz * 0.5f + 0.5f, input.position.z);
+
+	return output;
 }

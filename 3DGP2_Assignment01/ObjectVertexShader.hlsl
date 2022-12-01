@@ -26,6 +26,7 @@ struct VS_OUTPUT
 	float4 position : SV_POSITION;
 	float3 positionW : POSITION;
 	float3 normalW : NORMAL;
+	float3 normalV : NORMAL1;
 	float2 uv : TEXCOORD;
 };
 
@@ -34,6 +35,7 @@ VS_OUTPUT VS_Object(VS_INPUT input)
 	VS_OUTPUT output;
 	output.positionW = (float3)mul(float4(input.position, 1.0f), gmtxGameObject);
 	output.normalW = mul(input.normal, (float3x3)gmtxGameObject);
+	output.normalV = mul(float4(output.normalW, 1.0f), gmtxView).xyz;
 	output.position = mul(mul(float4(output.positionW, 1.0f), gmtxView), gmtxProjection);
 	output.uv = input.uv;
 	return(output);

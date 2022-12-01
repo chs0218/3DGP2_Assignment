@@ -51,44 +51,6 @@ void CGameFramework::OnDestroy()
 
 void CGameFramework::CreateSwapChain()
 {
-	//RECT rcClient;
-
-	//::GetClientRect(m_hWnd, &rcClient);
-
-	//m_nWndClientWidth = rcClient.right - rcClient.left;
-	//m_nWndClientHeight = rcClient.bottom - rcClient.top;
-
-	//DXGI_SWAP_CHAIN_DESC1 dxgiSwapChainDesc;
-	//::ZeroMemory(&dxgiSwapChainDesc, sizeof(DXGI_SWAP_CHAIN_DESC1));
-	//dxgiSwapChainDesc.Width = m_nWndClientWidth;
-	//dxgiSwapChainDesc.Height = m_nWndClientHeight;
-	//dxgiSwapChainDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-	//dxgiSwapChainDesc.SampleDesc.Count = (m_bMsaa4xEnable) ? 4 : 1;
-	//dxgiSwapChainDesc.SampleDesc.Quality = (m_bMsaa4xEnable) ? (m_nMsaa4xQualityLevels - 1) : 0;
-	//dxgiSwapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-	//dxgiSwapChainDesc.BufferCount = m_nSwapChainBuffers;
-	//dxgiSwapChainDesc.Scaling = DXGI_SCALING_NONE;
-	//dxgiSwapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
-	//dxgiSwapChainDesc.AlphaMode = DXGI_ALPHA_MODE_UNSPECIFIED;
-	//dxgiSwapChainDesc.Flags = 0;
-
-	//DXGI_SWAP_CHAIN_FULLSCREEN_DESC dxgiSwapChainFullScreenDesc;
-	//::ZeroMemory(&dxgiSwapChainFullScreenDesc, sizeof(DXGI_SWAP_CHAIN_FULLSCREEN_DESC));
-	//dxgiSwapChainFullScreenDesc.RefreshRate.Numerator = 60;
-	//dxgiSwapChainFullScreenDesc.RefreshRate.Denominator = 1;
-	//dxgiSwapChainFullScreenDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
-	//dxgiSwapChainFullScreenDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
-	//dxgiSwapChainFullScreenDesc.Windowed = TRUE;
-
-	////스왑체인을 생성한다. 
-	//m_pdxgiFactory->CreateSwapChainForHwnd(m_pd3dCommandQueue.Get(), m_hWnd, &dxgiSwapChainDesc, &dxgiSwapChainFullScreenDesc, NULL, (IDXGISwapChain1**)m_pdxgiSwapChain.GetAddressOf());
-
-	////“Alt+Enter” 키의 동작을 비활성화한다. 
-	//m_pdxgiFactory->MakeWindowAssociation(m_hWnd, DXGI_MWA_NO_ALT_ENTER);
-
-	////스왑체인의 현재 후면버퍼 인덱스를 저장한다.
-	//m_nSwapChainBufferIndex = m_pdxgiSwapChain->GetCurrentBackBufferIndex();
-
 	DXGI_SWAP_CHAIN_DESC dxgiSwapChainDesc;
 	::ZeroMemory(&dxgiSwapChainDesc, sizeof(dxgiSwapChainDesc));
 	dxgiSwapChainDesc.BufferCount = m_nSwapChainBuffers;
@@ -501,6 +463,8 @@ void CGameFramework::FrameAdvance()
 	CLaplacianEdgeShader::Instance()->OnPrepareRenderTarget(m_pd3dCommandList.Get(), 1, &m_pd3dSwapRTVCPUHandles[m_nSwapChainBufferIndex], m_d3dDsvDescriptorCPUHandle);
 	
 	m_pScene->Render(m_pd3dCommandList.Get(), m_pCamera);
+
+	CLaplacianEdgeShader::Instance()->Render(m_pd3dCommandList.Get(), m_pCamera);
 
 	if (m_pPlayer)
 	{
