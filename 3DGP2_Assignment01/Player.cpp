@@ -177,7 +177,7 @@ CCamera* CPlayer::OnChangeCamera(DWORD nNewCameraMode, DWORD nCurrentCameraMode)
 		pNewCamera = new CSpaceShipCamera(m_pCamera);
 		break;
 	}
-	if (nCurrentCameraMode == SPACESHIP_CAMERA)
+	if (nCurrentCameraMode == SPACESHIP_CAMERA )
 	{
 		m_xmf3Right = Vector3::Normalize(XMFLOAT3(m_xmf3Right.x, 0.0f, m_xmf3Right.z));
 		m_xmf3Up = Vector3::Normalize(XMFLOAT3(0.0f, 1.0f, 0.0f));
@@ -395,8 +395,9 @@ CCamera* CTerrianFlyingPlayer::ChangeCamera(DWORD nNewCameraMode, float fTimeEla
 	{
 	case FIRST_PERSON_CAMERA:
 		m_pCamera->SetTimeLag(0.0f);
+		m_fPitch = 0.0f;
+		m_fRoll = 0.0f;
 		Update(fTimeElapsed);
-
 		SetFriction(2.0f);
 		SetGravity(XMFLOAT3(0.0f, 0.0f, 0.0f));
 		SetMaxVelocityXZ(125.0f);

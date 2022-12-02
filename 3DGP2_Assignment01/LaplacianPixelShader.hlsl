@@ -4,6 +4,14 @@ Texture2D gtxtInputTextures[7] : register(t18); //Color, NormalW, Texture, Illum
 static float gfLaplacians[9] = { -1.0f, -1.0f, -1.0f, -1.0f, 8.0f, -1.0f, -1.0f, -1.0f, -1.0f };
 static int2 gnOffsets[9] = { { -1,-1 }, { 0,-1 }, { 1,-1 }, { -1,0 }, { 0,0 }, { 1,0 }, { -1,1 }, { 0,1 }, { 1,1 } };
 
+cbuffer cbFrameworkInfo : register(b2)
+{
+	float 		gfCurrentTime : packoffset(c0.x);
+	float		gfElapsedTime : packoffset(c0.y);
+	float2		gf2CursorPos : packoffset(c0.z);
+	int4		gvDrawOptions : packoffset(c1);
+};
+
 struct VS_SCREEN_RECT_TEXTURED_OUTPUT
 {
 	float4 position : SV_POSITION;
@@ -71,6 +79,18 @@ float4 GetColorFromDepth(float fDepth)
 float4 PSScreenRectSamplingTextured(VS_SCREEN_RECT_TEXTURED_OUTPUT input) : SV_Target
 {
 	float4 cColor = float4(0.0f, 0.0f, 0.0f, 1.0f);
-	cColor = LaplacianEdge(input.position);
+	switch (gvDrawOptions.x)
+	{
+		case 83: //'S'
+		{
+			cColor = gtxtInputTextures[0].Sample(gSamplerState, input.uv);
+			break;
+		}
+		case 70: //'F'
+		{
+			cColor = LaplacianEdge(input.position);
+			break;
+		}
+	}
 	return(cColor);
 }

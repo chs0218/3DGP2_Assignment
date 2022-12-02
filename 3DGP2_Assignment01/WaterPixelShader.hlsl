@@ -12,9 +12,10 @@ struct VS_WATER_OUTPUT
 
 cbuffer cbFrameworkInfo : register(b2)
 {
-	float 		gfCurrentTime;
-	float		gfElapsedTime;
-	float2		gf2CursorPos;
+	float 		gfCurrentTime : packoffset(c0.x);
+	float		gfElapsedTime : packoffset(c0.y);
+	float2		gf2CursorPos : packoffset(c0.z);
+	int4		gvDrawOptions : packoffset(c4);
 };
 
 struct PS_MULTIPLE_RENDER_TARGETS_OUTPUT

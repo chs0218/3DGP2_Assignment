@@ -16,9 +16,10 @@ cbuffer cbCameraInfo : register(b1)
 
 cbuffer cbFrameworkInfo : register(b2)
 {
-	float 		gfCurrentTime;
-	float		gfElapsedTime;
-	float2		gf2CursorPos;
+	float 		gfCurrentTime : packoffset(c0.x);
+	float		gfElapsedTime : packoffset(c0.y);
+	float2		gf2CursorPos : packoffset(c0.z);
+	int4		gvDrawOptions : packoffset(c4);
 };
 
 struct VS_WATER_INPUT

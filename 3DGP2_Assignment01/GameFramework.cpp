@@ -232,6 +232,8 @@ void CGameFramework::BuildObjects()
 {
 	m_pd3dCommandList->Reset(m_pd3dCommandAllocator.Get(), NULL);
 
+	CreateShaderVariables();
+
 	// CScene 积己(RootSignature 积己)
 	m_pScene = std::make_unique<CScene>();
 	m_pScene->BuildObjects(m_pd3dDevice.Get(), m_pd3dCommandList.Get());
@@ -298,6 +300,10 @@ void CGameFramework::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPA
 		{
 		case VK_ESCAPE:
 			::PostQuitMessage(0);
+			break;
+		case 'F':
+		case 'f':
+			ChangeShowEdge();
 			break;
 		case VK_RETURN:
 			break;
@@ -497,23 +503,34 @@ void CGameFramework::FrameAdvance()
 	::SetWindowText(m_hWnd, m_pszFrameRate);
 }
 
+void CGameFramework::CreateShaderVariables()
+{
+	UINT ncbElementBytes = ((sizeof(CB_FRAME_INFO) + 255) & ~255); //256狼 硅荐
+	m_pd3dcbFrame = ::CreateBufferResource(m_pd3dDevice.Get(), m_pd3dCommandList.Get(), NULL, ncbElementBytes, D3D12_HEAP_TYPE_UPLOAD, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER, NULL);
+	m_pd3dcbFrame->Map(0, NULL, (void**)&m_pcbMappedFrame);
+}
+
 #define _WITH_DEBUG_FRAME_TIME
 void CGameFramework::UpdateShaderVariables()
 {
-	float fCurrentTime = m_GameTimer.GetTotalTime();
-	float fElapsedTime = m_GameTimer.GetFrameTimeElapsed();
-
-	m_pd3dCommandList->SetGraphicsRoot32BitConstants(7, 1, &fCurrentTime, 0);
-	m_pd3dCommandList->SetGraphicsRoot32BitConstants(7, 1, &fElapsedTime, 1);
-
 	POINT ptCursorPos;
 	::GetCursorPos(&ptCursorPos);
 	::ScreenToClient(m_hWnd, &ptCursorPos);
 	float fxCursorPos = (ptCursorPos.x < 0) ? 0.0f : float(ptCursorPos.x);
 	float fyCursorPos = (ptCursorPos.y < 0) ? 0.0f : float(ptCursorPos.y);
 
-	m_pd3dCommandList->SetGraphicsRoot32BitConstants(7, 1, &fxCursorPos, 2);
-	m_pd3dCommandList->SetGraphicsRoot32BitConstants(7, 1, &fyCursorPos, 3);
+	m_pcbMappedFrame->fCurrentTime = m_GameTimer.GetTotalTime();
+	m_pcbMappedFrame->fElapsedTime = m_GameTimer.GetTotalTime();
+	m_pcbMappedFrame->f2CursorPos.x = m_GameTimer.GetTotalTime();
+	m_pcbMappedFrame->f2CursorPos.y = m_GameTimer.GetTotalTime();
+
+	/*m_pcbMappedFrame->fElapsedTime = m_GameTimer.GetFrameTimeElapsed();
+	m_pcbMappedFrame->f2CursorPos.x = fxCursorPos;
+	m_pcbMappedFrame->f2CursorPos.y = fyCursorPos;*/
+	m_pcbMappedFrame->m_xmn4DrawOptions.x = m_nDrawOptions;
+
+	D3D12_GPU_VIRTUAL_ADDRESS d3dGpuVirtualAddress = m_pd3dcbFrame->GetGPUVirtualAddress();
+	m_pd3dCommandList->SetGraphicsRootConstantBufferView(7, d3dGpuVirtualAddress);
 }
 
 void CGameFramework::ChangeSwapChainState()

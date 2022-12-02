@@ -7,11 +7,15 @@
 #include "Camera.h"
 #include "Texture.h"
 
+#define DRAW_SCENE_COLOR 'S'
+#define DRAW_SCENE_EDGE 'F'
+
 struct CB_FRAME_INFO
 {
 	float 		fCurrentTime;
 	float		fElapsedTime;
 	XMFLOAT2	f2CursorPos;
+	XMINT4		m_xmn4DrawOptions;
 };
 
 class CTerrianFlyingPlayer;
@@ -69,12 +73,14 @@ private:
 	std::unique_ptr<CGameObject> m_pObject = NULL;
 	CCamera* m_pCamera = NULL;
 
-	ID3D12Resource* m_pd3dcbFrame = NULL;
+	ComPtr<ID3D12Resource> m_pd3dcbFrame = NULL;
 	CB_FRAME_INFO* m_pcbMappedFrame = NULL;
 
 	CGameTimer					m_GameTimer;
 	POINT						m_ptOldCursorPos;
 	_TCHAR						m_pszFrameRate[50];
+
+	int	m_nDrawOptions = DRAW_SCENE_COLOR;
 public:
 	CGameFramework();
 	~CGameFramework();
@@ -104,6 +110,7 @@ public:
 	void MoveToNextFrame();
 
 	//프레임워크의 현재 시간, 경과 시간, 마우스 x 좌표, 마우스 y 좌표를 업데이트해주는 함수이다.
+	void CreateShaderVariables();
 	void UpdateShaderVariables();
 
 	//CPU와 GPU를 동기화하는 함수이다.
@@ -116,4 +123,10 @@ public:
 
 	//전체화면 모드 <-> 윈도우 모드의 전환을 구현하는 함수이다.
 	void ChangeSwapChainState();
+	void ChangeShowEdge() { 
+		if (m_nDrawOptions == DRAW_SCENE_COLOR)
+			m_nDrawOptions = DRAW_SCENE_EDGE;
+		else
+			m_nDrawOptions = DRAW_SCENE_COLOR;
+	}
 };

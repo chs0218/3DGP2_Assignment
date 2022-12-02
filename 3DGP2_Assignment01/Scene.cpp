@@ -105,10 +105,9 @@ void CScene::CreateGraphicsRootSignature(ID3D12Device* pd3dDevice)
 	pd3dRootParameters[6].DescriptorTable.pDescriptorRanges = &pd3dDescriptorRanges[4];
 	pd3dRootParameters[6].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
 
-	pd3dRootParameters[7].ParameterType = D3D12_ROOT_PARAMETER_TYPE_32BIT_CONSTANTS;
-	pd3dRootParameters[7].Constants.Num32BitValues = 4; //Time, ElapsedTime, xCursor, yCursor
-	pd3dRootParameters[7].Constants.ShaderRegister = 2;
-	pd3dRootParameters[7].Constants.RegisterSpace = 0;
+	pd3dRootParameters[7].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
+	pd3dRootParameters[7].Descriptor.ShaderRegister = 2; // b2 : Camera
+	pd3dRootParameters[7].Descriptor.RegisterSpace = 0;
 	pd3dRootParameters[7].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
 
 	pd3dRootParameters[8].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
