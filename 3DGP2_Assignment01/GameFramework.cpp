@@ -468,7 +468,7 @@ void CGameFramework::FrameAdvance()
 	m_pd3dCommandList->ClearDepthStencilView(m_d3dDsvDescriptorCPUHandle, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, NULL);
 	CLaplacianEdgeShader::Instance()->OnPrepareRenderTarget(m_pd3dCommandList.Get(), 1, &m_pd3dSwapRTVCPUHandles[m_nSwapChainBufferIndex], m_d3dDsvDescriptorCPUHandle);
 	
-	m_pScene->Render(m_pd3dCommandList.Get(), m_pCamera);
+	m_pScene->Render(m_pd3dCommandList.Get(), m_pCamera, m_nDrawOptions == DRAW_SCENE_EDGE);
 
 	CLaplacianEdgeShader::Instance()->Render(m_pd3dCommandList.Get(), m_pCamera);
 

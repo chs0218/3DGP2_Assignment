@@ -86,6 +86,7 @@ class CObjectShader : public CShader
 {
 protected:
 	int	m_nObjects = 0;
+	ComPtr<ID3D12PipelineState> m_pd3dPipelineState_NoDepths;
 	std::shared_ptr<CGameObject> pSuperCobraObject;
 	std::shared_ptr<CGameObject> pGunshipObject;
 	std::vector<CEnemy*> m_ppObjects;
@@ -102,6 +103,7 @@ public:
 	virtual void ReleaseObjects();
 
 	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera);
+	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera, bool bNoDepth);
 	std::vector<CEnemy*>::iterator getObjectsBegin() { return m_ppObjects.begin(); }
 	std::vector<CEnemy*>::iterator getObjectsEnd() { return m_ppObjects.end(); }
 };
