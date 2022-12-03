@@ -965,6 +965,7 @@ void CParticleObject::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera
 
 	if (m_pMesh)((CParticleMesh*)(m_pMesh.get()))->PreRender(pd3dCommandList, 0); //Stream Output
 	if (m_pMesh)((CParticleMesh*)(m_pMesh.get()))->Render(pd3dCommandList, 0); //Stream Output
+
 	if (m_pMesh)((CParticleMesh*)(m_pMesh.get()))->PostRender(pd3dCommandList, 0); //Stream Output
 	
 	if (m_ppMaterials[0] && m_ppMaterials[0]->m_pShader) m_ppMaterials[0]->m_pShader->OnPrepareRender(pd3dCommandList, 1);

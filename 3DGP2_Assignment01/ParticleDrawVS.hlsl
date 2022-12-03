@@ -25,11 +25,18 @@ struct VS_PARTICLE_INPUT
 	uint type : PARTICLETYPE;
 };
 
+cbuffer cbGameObjectInfo : register(b0)
+{
+	matrix gmtxGameObject : packoffset(c0);
+	matrix gmtxTexture : packoffset(c4);
+	uint gnTexturesMask : packoffset(c8);
+}
+
 VS_PARTICLE_DRAW_OUTPUT VSParticleDraw(VS_PARTICLE_INPUT input)
 {
 	VS_PARTICLE_DRAW_OUTPUT output = (VS_PARTICLE_DRAW_OUTPUT)0;
 
-	output.position = input.position;
+	output.position = mul(float4(input.position, 1.0f), gmtxGameObject);
 	output.size = 2.5f;
 	output.type = input.type;
 
