@@ -13,6 +13,33 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="BillBoardShader">
+      <UniqueIdentifier>{25871293-e741-462f-8372-a76aa00f9755}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LaplacianShader">
+      <UniqueIdentifier>{21d64de0-7e5e-42d0-8cf4-4bd881821443}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="MultiSpriteShader">
+      <UniqueIdentifier>{51dd4fbf-ec33-4e5a-a362-e23f38a43ed7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ObjectShader">
+      <UniqueIdentifier>{a8dcb2bc-6c43-4a18-9bc1-1df35ccd5ab1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SkyBoxShader">
+      <UniqueIdentifier>{1eb98354-ec0a-4bab-b5e1-bb6576aea83f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="PlayerShader">
+      <UniqueIdentifier>{d504ee15-92b1-40c3-a316-eee57bd4191d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="TerrainShader">
+      <UniqueIdentifier>{6046c99e-8bd3-4bd8-a83f-54a29bb34e09}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="WaterShader">
+      <UniqueIdentifier>{455f8c86-47e7-4411-99a5-eded2045817b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ParticleShader">
+      <UniqueIdentifier>{70621c6d-529f-461d-a88b-929295d3604a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -109,23 +136,72 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="BillBoardGeometryShader.hlsl" />
-    <FxCompile Include="BillBoardPixelShader.hlsl" />
-    <FxCompile Include="BillBoardVertexShader.hlsl" />
-    <FxCompile Include="MultiSpritePixelShader.hlsl" />
-    <FxCompile Include="MultiSpriteVertexShader.hlsl" />
-    <FxCompile Include="SkyBoxPixelShader.hlsl" />
-    <FxCompile Include="SkyBoxVertexShader.hlsl" />
-    <FxCompile Include="TerrainPixelShader.hlsl" />
-    <FxCompile Include="TerrainVertexShader.hlsl" />
-    <FxCompile Include="ObjectPixelShader.hlsl" />
-    <FxCompile Include="ObjectVertexShader.hlsl" />
-    <FxCompile Include="WaterPixelShader.hlsl" />
-    <FxCompile Include="WaterVertexShader.hlsl" />
-    <FxCompile Include="LaplacianVertexShader.hlsl" />
-    <FxCompile Include="LaplacianPixelShader.hlsl" />
-    <FxCompile Include="PlayerVertexShader.hlsl" />
-    <FxCompile Include="PlayerPixelShader.hlsl" />
+    <FxCompile Include="BillBoardGeometryShader.hlsl">
+      <Filter>BillBoardShader</Filter>
+    </FxCompile>
+    <FxCompile Include="BillBoardPixelShader.hlsl">
+      <Filter>BillBoardShader</Filter>
+    </FxCompile>
+    <FxCompile Include="BillBoardVertexShader.hlsl">
+      <Filter>BillBoardShader</Filter>
+    </FxCompile>
+    <FxCompile Include="LaplacianPixelShader.hlsl">
+      <Filter>LaplacianShader</Filter>
+    </FxCompile>
+    <FxCompile Include="LaplacianVertexShader.hlsl">
+      <Filter>LaplacianShader</Filter>
+    </FxCompile>
+    <FxCompile Include="MultiSpritePixelShader.hlsl">
+      <Filter>MultiSpriteShader</Filter>
+    </FxCompile>
+    <FxCompile Include="MultiSpriteVertexShader.hlsl">
+      <Filter>MultiSpriteShader</Filter>
+    </FxCompile>
+    <FxCompile Include="ObjectPixelShader.hlsl">
+      <Filter>ObjectShader</Filter>
+    </FxCompile>
+    <FxCompile Include="ObjectVertexShader.hlsl">
+      <Filter>ObjectShader</Filter>
+    </FxCompile>
+    <FxCompile Include="SkyBoxPixelShader.hlsl">
+      <Filter>SkyBoxShader</Filter>
+    </FxCompile>
+    <FxCompile Include="SkyBoxVertexShader.hlsl">
+      <Filter>SkyBoxShader</Filter>
+    </FxCompile>
+    <FxCompile Include="PlayerPixelShader.hlsl">
+      <Filter>PlayerShader</Filter>
+    </FxCompile>
+    <FxCompile Include="PlayerVertexShader.hlsl">
+      <Filter>PlayerShader</Filter>
+    </FxCompile>
+    <FxCompile Include="TerrainPixelShader.hlsl">
+      <Filter>TerrainShader</Filter>
+    </FxCompile>
+    <FxCompile Include="TerrainVertexShader.hlsl">
+      <Filter>TerrainShader</Filter>
+    </FxCompile>
+    <FxCompile Include="WaterPixelShader.hlsl">
+      <Filter>WaterShader</Filter>
+    </FxCompile>
+    <FxCompile Include="WaterVertexShader.hlsl">
+      <Filter>WaterShader</Filter>
+    </FxCompile>
+    <FxCompile Include="ParticleStreamOutputVS.hlsl">
+      <Filter>ParticleShader</Filter>
+    </FxCompile>
+    <FxCompile Include="ParticleStreamOutputGS.hlsl">
+      <Filter>ParticleShader</Filter>
+    </FxCompile>
+    <FxCompile Include="ParticleDrawVS.hlsl">
+      <Filter>ParticleShader</Filter>
+    </FxCompile>
+    <FxCompile Include="ParticleDrawGS.hlsl">
+      <Filter>ParticleShader</Filter>
+    </FxCompile>
+    <FxCompile Include="ParticleDrawPS.hlsl">
+      <Filter>ParticleShader</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="3DGP2_Assignment01.ico">
