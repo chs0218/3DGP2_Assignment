@@ -51,7 +51,7 @@ public:
 	virtual void UpdateShaderVariable(ID3D12GraphicsCommandList* pd3dCommandList, XMFLOAT4X4* pxmf4x4World);
 	virtual void ReleaseUploadBuffers();
 
-	virtual void OnPrepareRender(ID3D12GraphicsCommandList* pd3dCommandListint, int nPipelineState);
+	virtual void OnPrepareRender(ID3D12GraphicsCommandList* pd3dCommandList, int nPipelineState);
 	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, int nPipelineState);
 	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera, int nPipelineState);
 	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera, int nPipelineState, void* pContext);
@@ -89,13 +89,13 @@ class CObjectShader : public CShader
 {
 protected:
 	int	m_nObjects = 0;
-	ComPtr<ID3D12PipelineState> m_pd3dPipelineState_NoDepths;
-	std::shared_ptr<CGameObject> pSuperCobraObject;
-	std::shared_ptr<CGameObject> pGunshipObject;
 	std::vector<CEnemy*> m_ppObjects;
 public:
 	static CObjectShader* Instance();
 public:
+	CObjectShader();
+	~CObjectShader();
+
 	virtual void CreateShader(ID3D12Device* pd3dDevice, ID3D12RootSignature* pd3dGraphicsRootSignature, UINT nRenderTargets, DXGI_FORMAT* pdxgiRtvFormats, int nPipelineState);
 	virtual D3D12_SHADER_BYTECODE CreateVertexShader(ID3DBlob** ppd3dShaderBlob, int nPipelineState);
 	virtual D3D12_SHADER_BYTECODE CreatePixelShader(ID3DBlob** ppd3dShaderBlob, int nPipelineState);
@@ -171,8 +171,6 @@ public:
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class CRippleWaterShader : public CShader
 {
-public:
-	static CRippleWaterShader* Instance();
 public:
 	CRippleWaterShader();
 	virtual ~CRippleWaterShader();
@@ -273,4 +271,23 @@ public:
 	virtual void OnPostRenderTarget(ID3D12GraphicsCommandList* pd3dCommandList);
 
 	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera, int nPipelineState, void* pContext);
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+class CParticleShader : public CShader
+{
+public:
+	CParticleShader();
+	virtual ~CParticleShader();
+
+	virtual D3D12_SHADER_BYTECODE CreateVertexShader(ID3DBlob** ppd3dShaderBlob, int nPipelineState);
+	virtual D3D12_SHADER_BYTECODE CreateGeometryShader(ID3DBlob** ppd3dShaderBlob, int nPipelineState);
+	virtual D3D12_SHADER_BYTECODE CreatePixelShader(ID3DBlob** ppd3dShaderBlob, int nPipelineState);
+
+	virtual D3D12_INPUT_LAYOUT_DESC CreateInputLayout(int nPipelineState);
+	virtual D3D12_STREAM_OUTPUT_DESC CreateStreamOuputState(int nPipelineState);
+	virtual D3D12_BLEND_DESC CreateBlendState(int nPipelineState);
+	virtual D3D12_DEPTH_STENCIL_DESC CreateDepthStencilState(int nPipelineState);
+
+	virtual void CreateShader(ID3D12Device* pd3dDevice, ID3D12RootSignature* pd3dGraphicsRootSignature, UINT nRenderTargets, DXGI_FORMAT* pdxgiRtvFormats, int nPipelineState);
 };

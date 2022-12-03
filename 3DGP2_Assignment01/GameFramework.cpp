@@ -238,7 +238,7 @@ void CGameFramework::BuildObjects()
 	m_pScene = std::make_unique<CScene>();
 	m_pScene->BuildObjects(m_pd3dDevice.Get(), m_pd3dCommandList.Get());
 
-	CLaplacianEdgeShader::Instance()->CreateShader(m_pd3dDevice.Get(), m_pScene->GetGraphicsRootSignature(), 1, NULL, 0);
+	CLaplacianEdgeShader::Instance()->CreateShader(m_pd3dDevice.Get(), m_pScene->GetGraphicsRootSignature(), 1, 0, NULL);
 	
 	D3D12_CPU_DESCRIPTOR_HANDLE d3dRtvCPUDescriptorHandle = m_pd3dRtvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
 	d3dRtvCPUDescriptorHandle.ptr += (::gnRtvDescriptorIncrementSize * m_nSwapChainBuffers);
@@ -477,6 +477,7 @@ void CGameFramework::FrameAdvance()
 		m_pPlayer->UpdateTransform(NULL);
 		m_pPlayer->Render(m_pd3dCommandList.Get());
 	}
+	m_pScene->RenderParticle(m_pd3dCommandList.Get(), m_pCamera);
 
 	CLaplacianEdgeShader::Instance()->OnPostRenderTarget(m_pd3dCommandList.Get());
 
@@ -492,6 +493,8 @@ void CGameFramework::FrameAdvance()
 
 	//GPU가 모든 명령 리스트를 실행할 때 까지 기다린다.
 	WaitForGpuComplete();
+
+	m_pScene->OnPostRenderParticle();
 
 	/*스왑체인을 프리젠트한다. 프리젠트를 하면 현재 렌더 타겟(후면버퍼)의 내용이 전면버퍼로 옮겨지고 렌더 타겟 인
 	덱스가 바뀔 것이다.*/
@@ -520,14 +523,14 @@ void CGameFramework::UpdateShaderVariables()
 	float fyCursorPos = (ptCursorPos.y < 0) ? 0.0f : float(ptCursorPos.y);
 
 	m_pcbMappedFrame->fCurrentTime = m_GameTimer.GetTotalTime();
-	m_pcbMappedFrame->fElapsedTime = m_GameTimer.GetTotalTime();
-	m_pcbMappedFrame->f2CursorPos.x = m_GameTimer.GetTotalTime();
-	m_pcbMappedFrame->f2CursorPos.y = m_GameTimer.GetTotalTime();
-
-	/*m_pcbMappedFrame->fElapsedTime = m_GameTimer.GetFrameTimeElapsed();
+	m_pcbMappedFrame->fElapsedTime = m_GameTimer.GetFrameTimeElapsed();
 	m_pcbMappedFrame->f2CursorPos.x = fxCursorPos;
-	m_pcbMappedFrame->f2CursorPos.y = fyCursorPos;*/
+	m_pcbMappedFrame->f2CursorPos.y = fyCursorPos;
 	m_pcbMappedFrame->m_xmn4DrawOptions.x = m_nDrawOptions;
+	m_pcbMappedFrame->m_xmf3Gravity = XMFLOAT3(0.0f, -9.8f, 0.0f);
+	m_pcbMappedFrame->m_nMaxFlareType2Particles = 15 * 1.5f;
+	m_pcbMappedFrame->m_fSecondsPerFirework = 0.4f;
+	m_pcbMappedFrame->m_nFlareParticlesToEmit = 100;
 
 	D3D12_GPU_VIRTUAL_ADDRESS d3dGpuVirtualAddress = m_pd3dcbFrame->GetGPUVirtualAddress();
 	m_pd3dCommandList->SetGraphicsRootConstantBufferView(7, d3dGpuVirtualAddress);

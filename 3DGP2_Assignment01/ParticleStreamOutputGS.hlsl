@@ -9,18 +9,21 @@
 #define FLARE02_PARTICLE_LIFETIME	1.5f
 #define FLARE03_PARTICLE_LIFETIME	2.0f
 
-Buffer<float4> gRandomBuffer : register(t2); // 수정
-Buffer<float4> gRandomSphereBuffer : register(t3); // 수정
+Buffer<float4> gRandomBuffer : register(t26); // 수정
+Buffer<float4> gRandomSphereBuffer : register(t27); // 수정
 
-cbuffer cbFrameworkInfo : register(b3) // 수정
+cbuffer cbFrameworkInfo : register(b2)
 {
-	float		gfCurrentTime : packoffset(c0.x);
+	float 		gfCurrentTime : packoffset(c0.x);
 	float		gfElapsedTime : packoffset(c0.y);
-	float		gfSecondsPerFirework : packoffset(c0.z);
-	int			gnFlareParticlesToEmit : packoffset(c0.w);;
-	float3		gf3Gravity : packoffset(c1.x);
-	int			gnMaxFlareType2Particles : packoffset(c1.w);;
+	float2		gf2CursorPos : packoffset(c0.z);
+	int4		gvDrawOptions : packoffset(c1);
+	float3		gf3Gravity : packoffset(c2.x);
+	int			gnMaxFlareType2Particles : packoffset(c2.w);;
+	float		gfSecondsPerFirework : packoffset(c3.x);
+	int			gnFlareParticlesToEmit : packoffset(c3.y);;
 };
+
 
 struct VS_PARTICLE_INPUT
 {

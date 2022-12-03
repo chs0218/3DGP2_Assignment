@@ -36,6 +36,8 @@ public:
 	CHeightMapTerrain* GetTerrain() { return(m_pTerrain.get()); }
 	void SetPlayer(CPlayer* pPlayer) { m_pPlayer = pPlayer; }
 	void CheckCollision();
+	void RenderParticle(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera);
+	void OnPostRenderParticle();
 private:
 	ComPtr<ID3D12RootSignature> m_pd3dGraphicsRootSignature = nullptr;
 
@@ -46,5 +48,8 @@ private:
 	std::unique_ptr<CRippleWater> m_pWater = NULL;
 	XMFLOAT4 m_fClearColor = {0.0f, 0.0f, 0.0f, 0.0f};
 	CPlayer* m_pPlayer = NULL;
+
+	CParticleObject** m_ppParticleObjects = NULL;
+	int	m_nParticleObjects = 0;
 };
 

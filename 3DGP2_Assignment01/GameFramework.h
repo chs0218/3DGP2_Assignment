@@ -16,7 +16,12 @@ struct CB_FRAME_INFO
 	float		fElapsedTime;
 	XMFLOAT2	f2CursorPos;
 	XMINT4		m_xmn4DrawOptions;
+	XMFLOAT3	m_xmf3Gravity = XMFLOAT3(0.0f, -9.8f, 0.0f);
+	int			m_nMaxFlareType2Particles = 15;
+	float		m_fSecondsPerFirework = 1.0f;
+	int			m_nFlareParticlesToEmit = 30;
 };
+
 
 class CTerrianFlyingPlayer;
 class CGameFramework

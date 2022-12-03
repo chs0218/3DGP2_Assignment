@@ -135,6 +135,8 @@ void CEnemy::OnUpdateCallback(float fTimeElapsed)
 void CEnemy::SetObject(std::shared_ptr<CGameObject> pObject, float f_Width, float f_Length, int nColumnSize, int nColumnSpace, int h)
 {
 	m_pObject = pObject;
+	long use_count = pObject.use_count();
+
 	if (h != -1)
 		m_pObject->SetPosition(RandomPositionInSphere(XMFLOAT3(f_Width / 2.0f, 300.0f, f_Length / 2.0f), Random(800.0f, 1000.0f), h - int(floor(nColumnSize / 2.0f)), nColumnSpace));
 	else

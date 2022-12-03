@@ -10,7 +10,12 @@ cbuffer cbFrameworkInfo : register(b2)
 	float		gfElapsedTime : packoffset(c0.y);
 	float2		gf2CursorPos : packoffset(c0.z);
 	int4		gvDrawOptions : packoffset(c1);
+	float3		gf3Gravity : packoffset(c2.x);
+	int			gnMaxFlareType2Particles : packoffset(c2.w);;
+	float		gfSecondsPerFirework : packoffset(c3.x);
+	int			gnFlareParticlesToEmit : packoffset(c3.y);;
 };
+
 
 struct VS_SCREEN_RECT_TEXTURED_OUTPUT
 {

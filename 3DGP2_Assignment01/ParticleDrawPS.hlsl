@@ -1,4 +1,4 @@
-Texture2D<float4> gtxtParticleTexture : register(t1);
+Texture2D<float4> gtxtParticleTexture : register(t25);
 SamplerState gSamplerState : register(s0);
 
 struct GS_PARTICLE_DRAW_OUTPUT
