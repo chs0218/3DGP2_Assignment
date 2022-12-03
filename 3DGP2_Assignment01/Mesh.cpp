@@ -50,6 +50,7 @@ void CMesh::Render(ID3D12GraphicsCommandList* pd3dCommandList, UINT nSubset)
 	}
 	else
 	{
+		
 		pd3dCommandList->DrawInstanced(m_nVertices, 1, m_nOffset, 0);
 	}
 }
@@ -1002,7 +1003,7 @@ void CParticleMesh::Render(ID3D12GraphicsCommandList* pd3dCommandList, int nPipe
 	{
 		pd3dCommandList->SOSetTargets(0, 1, NULL);
 		CMesh::OnPreRender(pd3dCommandList);
-		CMesh::Render(pd3dCommandList, 0); //Render m_pd3dDrawBuffer 
+		CMesh::Render(pd3dCommandList, 0); //Render m_pd3dDrawBuffer
 	}
 }
 

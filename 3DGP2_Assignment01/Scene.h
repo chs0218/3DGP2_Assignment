@@ -40,7 +40,7 @@ public:
 	void OnPostRenderParticle();
 private:
 	ComPtr<ID3D12RootSignature> m_pd3dGraphicsRootSignature = nullptr;
-
+	bool RenderOnce = false;
 	float m_fElapsedTime = 0.0f;
 
 	std::unique_ptr<CSkyBox> m_pSkyBox = NULL;

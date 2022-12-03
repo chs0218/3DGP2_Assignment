@@ -477,12 +477,12 @@ void CGameFramework::FrameAdvance()
 		m_pPlayer->UpdateTransform(NULL);
 		m_pPlayer->Render(m_pd3dCommandList.Get());
 	}
+
 	m_pScene->RenderParticle(m_pd3dCommandList.Get(), m_pCamera);
 
 	CLaplacianEdgeShader::Instance()->OnPostRenderTarget(m_pd3dCommandList.Get());
 
 	::SynchronizeResourceTransition(m_pd3dCommandList.Get(), m_ppd3dRenderTargetBuffers[m_nSwapChainBufferIndex].Get(), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
-
 
 	//명령 리스트를 닫힌 상태로 만든다. 
 	hResult = m_pd3dCommandList->Close();
