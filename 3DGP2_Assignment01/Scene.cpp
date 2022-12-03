@@ -170,13 +170,13 @@ void CScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 
 	DXGI_FORMAT pdxgiObjectRtvFormats[7] = { DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R32_FLOAT, DXGI_FORMAT_R32_FLOAT };
 
-	CBillboardObjectsShader::Instance()->CreateShader(pd3dDevice, GetGraphicsRootSignature(), 7, pdxgiObjectRtvFormats);
+	CBillboardObjectsShader::Instance()->CreateShader(pd3dDevice, GetGraphicsRootSignature(), 7, pdxgiObjectRtvFormats, 0);
 	CBillboardObjectsShader::Instance()->BuildObjects(pd3dDevice, pd3dCommandList, m_pTerrain.get());
 
-	CObjectShader::Instance()->CreateShader(pd3dDevice, GetGraphicsRootSignature(), 7, pdxgiObjectRtvFormats);
+	CObjectShader::Instance()->CreateShader(pd3dDevice, GetGraphicsRootSignature(), 7, pdxgiObjectRtvFormats, 0);
 	CObjectShader::Instance()->BuildObjects(pd3dDevice, pd3dCommandList, GetGraphicsRootSignature(), m_pTerrain.get());
 
-	CMultiSpriteObjectsShader::Instance()->CreateShader(pd3dDevice, GetGraphicsRootSignature(), 7, pdxgiObjectRtvFormats);
+	CMultiSpriteObjectsShader::Instance()->CreateShader(pd3dDevice, GetGraphicsRootSignature(), 7, pdxgiObjectRtvFormats, 0);
 	CMultiSpriteObjectsShader::Instance()->BuildObjects(pd3dDevice, pd3dCommandList, GetGraphicsRootSignature());
 }
 
@@ -206,7 +206,7 @@ void CScene::AnimateObjects(CGameObject* pPlayer, float fTimeElapsed)
 		CObjectShader::Instance()->AnimateObjects(pPlayer, fTimeElapsed);
 	}
 
-	CMultiSpriteObjectsShader::Instance()->AnimateObjects(fTimeElapsed);
+	CMultiSpriteObjectsShader::Instance()->AnimateObjects(fTimeElapsed); 
 }
 
 void CScene::PrepareRender(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera)
@@ -225,9 +225,9 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 		m_pTerrain->Render(pd3dCommandList, pCamera);
 	if (m_pWater)
 		m_pWater->Render(pd3dCommandList, pCamera);
-	CObjectShader::Instance()->Render(pd3dCommandList, pCamera, bEdge);
-	CBillboardObjectsShader::Instance()->Render(pd3dCommandList, pCamera);
-	CMultiSpriteObjectsShader::Instance()->Render(pd3dCommandList, pCamera); 
+	CObjectShader::Instance()->Render(pd3dCommandList, pCamera, 0);
+	CBillboardObjectsShader::Instance()->Render(pd3dCommandList, pCamera, 0);
+	CMultiSpriteObjectsShader::Instance()->Render(pd3dCommandList, pCamera, 0);
 }
 
 void CScene::CheckCollision()

@@ -22,6 +22,9 @@ CTexture::CTexture(int nTextures, UINT nTextureType, int nSamplers, int nRootPar
 		m_pnResourceTypes = new UINT[m_nTextures];
 		m_pdxgiBufferFormats = new DXGI_FORMAT[m_nTextures];
 		m_pnBufferElements = new int[m_nTextures];
+		for (int i = 0; i < m_nTextures; i++) m_pnBufferElements[i] = 0;
+		m_pnBufferStrides = new int[m_nTextures];
+		for (int i = 0; i < m_nTextures; i++) m_pnBufferStrides[i] = 0;
 	}
 	m_nRootParameters = nRootParameters;
 	if (nRootParameters > 0) m_pnRootParameterIndices = new int[nRootParameters];
@@ -35,6 +38,7 @@ CTexture::~CTexture()
 	if (m_pnResourceTypes) delete[] m_pnResourceTypes;
 	if (m_pdxgiBufferFormats) delete[] m_pdxgiBufferFormats;
 	if (m_pnBufferElements) delete[] m_pnBufferElements;
+	if (m_pnBufferStrides) delete[] m_pnBufferStrides;
 
 	if (m_pnRootParameterIndices) delete[] m_pnRootParameterIndices;
 	if (m_pd3dSrvGpuDescriptorHandles) delete[] m_pd3dSrvGpuDescriptorHandles;
@@ -88,6 +92,15 @@ void CTexture::LoadTextureFromDDSFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCo
 {
 	m_pnResourceTypes[nIndex] = nResourceType;
 	m_ppd3dTextures[nIndex] = ::CreateTextureResourceFromDDSFile(pd3dDevice, pd3dCommandList, pszFileName, &m_ppd3dTextureUploadBuffers[nIndex], D3D12_RESOURCE_STATE_GENERIC_READ/*D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE*/);
+}
+
+void CTexture::CreateBuffer(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, void* pData, UINT nElements, UINT nStride, DXGI_FORMAT ndxgiFormat, D3D12_HEAP_TYPE d3dHeapType, D3D12_RESOURCE_STATES d3dResourceStates, UINT nIndex)
+{
+	m_pnResourceTypes[nIndex] = RESOURCE_BUFFER;
+	m_pdxgiBufferFormats[nIndex] = ndxgiFormat;
+	m_pnBufferElements[nIndex] = nElements;
+	m_pnBufferStrides[nIndex] = nStride;
+	m_ppd3dTextures[nIndex] = ::CreateBufferResource(pd3dDevice, pd3dCommandList, pData, nElements * nStride, d3dHeapType, d3dResourceStates, &m_ppd3dTextureUploadBuffers[nIndex]);
 }
 
 ID3D12Resource* CTexture::CreateTexture(ID3D12Device* pd3dDevice, UINT nWidth, UINT nHeight, DXGI_FORMAT dxgiFormat, D3D12_RESOURCE_FLAGS d3dResourceFlags, D3D12_RESOURCE_STATES d3dResourceStates, D3D12_CLEAR_VALUE* pd3dClearValue, UINT nResourceType, UINT nIndex)
@@ -167,6 +180,13 @@ D3D12_SHADER_RESOURCE_VIEW_DESC CTexture::GetShaderResourceViewDesc(int nIndex)
 	int nTextureType = m_pnResourceTypes[nIndex];
 	switch (nTextureType)
 	{
+	case RESOURCE_TEXTURE1D: //(d3dResourceDesc.Dimension == D3D12_RESOURCE_DIMENSION_TEXTURE2D)(d3dResourceDesc.DepthOrArraySize == 1)
+		d3dShaderResourceViewDesc.Format = d3dResourceDesc.Format;
+		d3dShaderResourceViewDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE1D;
+		d3dShaderResourceViewDesc.Texture1D.MipLevels = -1;
+		d3dShaderResourceViewDesc.Texture1D.MostDetailedMip = 0;
+		d3dShaderResourceViewDesc.Texture2D.ResourceMinLODClamp = 0.0f;
+		break;
 	case RESOURCE_TEXTURE2D: //(d3dResourceDesc.Dimension == D3D12_RESOURCE_DIMENSION_TEXTURE2D)(d3dResourceDesc.DepthOrArraySize == 1)
 	case RESOURCE_TEXTURE2D_ARRAY: //[]
 		d3dShaderResourceViewDesc.Format = d3dResourceDesc.Format;
@@ -189,7 +209,7 @@ D3D12_SHADER_RESOURCE_VIEW_DESC CTexture::GetShaderResourceViewDesc(int nIndex)
 	case RESOURCE_TEXTURE_CUBE: //(d3dResourceDesc.Dimension == D3D12_RESOURCE_DIMENSION_TEXTURE2D)(d3dResourceDesc.DepthOrArraySize == 6)
 		d3dShaderResourceViewDesc.Format = d3dResourceDesc.Format;
 		d3dShaderResourceViewDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURECUBE;
-		d3dShaderResourceViewDesc.TextureCube.MipLevels = 1;
+		d3dShaderResourceViewDesc.TextureCube.MipLevels = -1;
 		d3dShaderResourceViewDesc.TextureCube.MostDetailedMip = 0;
 		d3dShaderResourceViewDesc.TextureCube.ResourceMinLODClamp = 0.0f;
 		break;
@@ -199,6 +219,14 @@ D3D12_SHADER_RESOURCE_VIEW_DESC CTexture::GetShaderResourceViewDesc(int nIndex)
 		d3dShaderResourceViewDesc.Buffer.FirstElement = 0;
 		d3dShaderResourceViewDesc.Buffer.NumElements = m_pnBufferElements[nIndex];
 		d3dShaderResourceViewDesc.Buffer.StructureByteStride = 0;
+		d3dShaderResourceViewDesc.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_NONE;
+		break;
+	case RESOURCE_STRUCTURED_BUFFER: //(d3dResourceDesc.Dimension == D3D12_RESOURCE_DIMENSION_BUFFER)
+		d3dShaderResourceViewDesc.Format = m_pdxgiBufferFormats[nIndex];
+		d3dShaderResourceViewDesc.ViewDimension = D3D12_SRV_DIMENSION_BUFFER;
+		d3dShaderResourceViewDesc.Buffer.FirstElement = 0;
+		d3dShaderResourceViewDesc.Buffer.NumElements = m_pnBufferElements[nIndex];
+		d3dShaderResourceViewDesc.Buffer.StructureByteStride = m_pnBufferStrides[nIndex];
 		d3dShaderResourceViewDesc.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_NONE;
 		break;
 	}

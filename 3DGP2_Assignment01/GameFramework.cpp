@@ -238,7 +238,7 @@ void CGameFramework::BuildObjects()
 	m_pScene = std::make_unique<CScene>();
 	m_pScene->BuildObjects(m_pd3dDevice.Get(), m_pd3dCommandList.Get());
 
-	CLaplacianEdgeShader::Instance()->CreateShader(m_pd3dDevice.Get(), m_pScene->GetGraphicsRootSignature(), 1, NULL);
+	CLaplacianEdgeShader::Instance()->CreateShader(m_pd3dDevice.Get(), m_pScene->GetGraphicsRootSignature(), 1, NULL, 0);
 	
 	D3D12_CPU_DESCRIPTOR_HANDLE d3dRtvCPUDescriptorHandle = m_pd3dRtvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
 	d3dRtvCPUDescriptorHandle.ptr += (::gnRtvDescriptorIncrementSize * m_nSwapChainBuffers);
@@ -470,7 +470,7 @@ void CGameFramework::FrameAdvance()
 	
 	m_pScene->Render(m_pd3dCommandList.Get(), m_pCamera, m_nDrawOptions == DRAW_SCENE_EDGE);
 
-	CLaplacianEdgeShader::Instance()->Render(m_pd3dCommandList.Get(), m_pCamera);
+	CLaplacianEdgeShader::Instance()->Render(m_pd3dCommandList.Get(), m_pCamera, 0, NULL);
 
 	if (m_pPlayer)
 	{

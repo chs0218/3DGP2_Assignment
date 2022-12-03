@@ -114,7 +114,7 @@ void CGameObject::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pC
 		{
 			if (m_ppMaterials[i])
 			{
-				if (m_ppMaterials[i]->m_pShader) m_ppMaterials[0]->m_pShader->Render(pd3dCommandList);
+				if (m_ppMaterials[i]->m_pShader) m_ppMaterials[0]->m_pShader->Render(pd3dCommandList, 0);
 				m_ppMaterials[i]->UpdateShaderVariables(pd3dCommandList);
 			}
 			// 여기서 메쉬의 렌더를 한다.
@@ -542,7 +542,7 @@ CSkyBox::CSkyBox(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dComman
 
 	// Shader 생성
 	std::shared_ptr<CShader> pSkyBoxShader = std::make_shared<CSkyBoxShader>();
-	pSkyBoxShader->CreateShader(pd3dDevice, pd3dGraphicsRootSignature, 7, pdxgiObjectRtvFormats);
+	pSkyBoxShader->CreateShader(pd3dDevice, pd3dGraphicsRootSignature, 7, pdxgiObjectRtvFormats, 0);
 	pSkyBoxShader->CreateShaderVariables(pd3dDevice, pd3dCommandList);
 	pSkyBoxShader->CreateCbvSrvDescriptorHeaps(pd3dDevice, 0, 6);
 	pSkyBoxShader->CreateShaderResourceViews(pd3dDevice, pSkyBoxTexture.get(), 0, 3);
@@ -588,7 +588,7 @@ void CSkyBox::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamer
 	{
 		if (m_ppMaterials[0]->m_pShader)
 		{
-			m_ppMaterials[0]->m_pShader->Render(pd3dCommandList);
+			m_ppMaterials[0]->m_pShader->Render(pd3dCommandList, 0);
 		}
 	}
 
@@ -650,7 +650,7 @@ CHeightMapTerrain::CHeightMapTerrain(ID3D12Device* pd3dDevice, ID3D12GraphicsCom
 	DXGI_FORMAT pdxgiObjectRtvFormats[7] = { DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R32_FLOAT, DXGI_FORMAT_R32_FLOAT };
 
 	std::shared_ptr<CTerrainShader> pTerrainShader = std::make_shared<CTerrainShader>();
-	pTerrainShader->CreateShader(pd3dDevice, pd3dGraphicsRootSignature, 7, pdxgiObjectRtvFormats);
+	pTerrainShader->CreateShader(pd3dDevice, pd3dGraphicsRootSignature, 7, pdxgiObjectRtvFormats, 0);
 	pTerrainShader->CreateShaderVariables(pd3dDevice, pd3dCommandList);
 	pTerrainShader->CreateCbvSrvDescriptorHeaps(pd3dDevice, 0, 3);
 	pTerrainShader->CreateShaderResourceViews(pd3dDevice, pTerrainTexture.get(), 0, 4);
@@ -680,7 +680,7 @@ void CHeightMapTerrain::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCame
 	{
 		if (m_ppMaterials[0]->m_pShader)
 		{
-			m_ppMaterials[0]->m_pShader->Render(pd3dCommandList);
+			m_ppMaterials[0]->m_pShader->Render(pd3dCommandList, 0);
 		}
 
 		if (m_ppMaterials[0]->m_pTexture)
@@ -740,7 +740,7 @@ CRippleWater::CRippleWater(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* 
 	DXGI_FORMAT pdxgiObjectRtvFormats[7] = { DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R32_FLOAT, DXGI_FORMAT_R32_FLOAT };
 
 	std::shared_ptr<CRippleWaterShader> pRippleWaterShader = std::make_shared<CRippleWaterShader>();
-	pRippleWaterShader->CreateShader(pd3dDevice, pd3dGraphicsRootSignature, 7, pdxgiObjectRtvFormats);
+	pRippleWaterShader->CreateShader(pd3dDevice, pd3dGraphicsRootSignature, 7, pdxgiObjectRtvFormats, 0);
 	pRippleWaterShader->CreateShaderVariables(pd3dDevice, pd3dCommandList);
 	pRippleWaterShader->CreateCbvSrvDescriptorHeaps(pd3dDevice, 0, 2);
 	pRippleWaterShader->CreateShaderResourceViews(pd3dDevice, pWaterTexture.get(), 0, 4);
@@ -770,7 +770,7 @@ void CRippleWater::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* p
 	{
 		if (m_ppMaterials[0]->m_pShader)
 		{
-			m_ppMaterials[0]->m_pShader->Render(pd3dCommandList);
+			m_ppMaterials[0]->m_pShader->Render(pd3dCommandList, 0);
 		}
 
 		if (m_ppMaterials[0]->m_pTexture)

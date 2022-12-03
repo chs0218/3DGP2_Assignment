@@ -1,11 +1,5 @@
 #pragma once
 
-#define RESOURCE_TEXTURE2D			0x01
-#define RESOURCE_TEXTURE2D_ARRAY	0x02
-#define RESOURCE_TEXTURE2DARRAY		0x03
-#define RESOURCE_TEXTURE_CUBE		0x04
-#define RESOURCE_BUFFER				0x05
-
 class CShader;
 class CGameObject;
 class CTexture
@@ -24,6 +18,7 @@ private:
 
 	DXGI_FORMAT* m_pdxgiBufferFormats = NULL;	// Texture Dxgi 포맷
 	int* m_pnBufferElements;
+	int* m_pnBufferStrides;
 
 	int	m_nRootParameters = 0;		// 루트파라미터 번호
 	int* m_pnRootParameterIndices;		// 루트파라미터 인덱스
@@ -42,6 +37,7 @@ public:
 	void UpdateShaderVariable(ID3D12GraphicsCommandList* pd3dCommandList, int nParameterIndex, int nTextureIndex);
 	void ReleaseShaderVariables();
 
+	void CreateBuffer(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, void* pData, UINT nElements, UINT nStride, DXGI_FORMAT dxgiFormat, D3D12_HEAP_TYPE d3dHeapType, D3D12_RESOURCE_STATES d3dResourceStates, UINT nIndex);
 	ID3D12Resource* CreateTexture(ID3D12Device* pd3dDevice, UINT nWidth, UINT nHeight, DXGI_FORMAT dxgiFormat, D3D12_RESOURCE_FLAGS d3dResourceFlags, D3D12_RESOURCE_STATES d3dResourceStates, D3D12_CLEAR_VALUE* pd3dClearValue, UINT nResourceType, UINT nIndex);
 	void LoadTextureFromDDSFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, const wchar_t* pszFileName, UINT nResourceType, UINT nIndex);
 	int LoadTextureFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, CGameObject* pParent, FILE* pInFile, CShader* pShader, UINT nIndex);

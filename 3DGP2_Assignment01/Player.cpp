@@ -234,7 +234,7 @@ CTerrianFlyingPlayer::CTerrianFlyingPlayer(ID3D12Device* pd3dDevice, ID3D12Graph
 	
 	// Shader »ý¼º
 	m_pShader = std::make_unique<CModeledTexturedShader>();
-	m_pShader->CreateShader(pd3dDevice, pd3dGraphicsRootSignature, 7, pdxgiObjectRtvFormats);
+	m_pShader->CreateShader(pd3dDevice, pd3dGraphicsRootSignature, 7, pdxgiObjectRtvFormats, 0);
 	m_pShader->CreateShaderVariables(pd3dDevice, pd3dCommandList);
 	m_pShader->CreateCbvSrvDescriptorHeaps(pd3dDevice, 0, 2);
 
@@ -271,7 +271,7 @@ void CTerrianFlyingPlayer::OnPrepareRender()
 void CTerrianFlyingPlayer::Render(ID3D12GraphicsCommandList* pd3dCommandList)
 {
 	DWORD nCameraMode = (m_pCamera) ? m_pCamera->GetMode() : 0x00;
-	m_pShader->Render(pd3dCommandList);
+	m_pShader->Render(pd3dCommandList, 0);
 
 	if (m_pBullets.data())
 	{

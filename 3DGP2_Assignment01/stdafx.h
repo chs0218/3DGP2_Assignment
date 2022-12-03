@@ -49,7 +49,13 @@ using Microsoft::WRL::ComPtr;
 #define FRAME_BUFFER_WIDTH 800
 #define FRAME_BUFFER_HEIGHT 600
 #define CORRECTION 20.0f
-
+#define RESOURCE_TEXTURE1D			0x01
+#define RESOURCE_TEXTURE2D			0x02
+#define RESOURCE_TEXTURE2D_ARRAY	0x03	//[]
+#define RESOURCE_TEXTURE2DARRAY		0x04
+#define RESOURCE_TEXTURE_CUBE		0x05
+#define RESOURCE_BUFFER				0x06
+#define RESOURCE_STRUCTURED_BUFFER	0x07
 //----------------------------------------------------------------------------
 // 22/09/21 CreateBufferResource 함수 정의 - ChoiHS
 //----------------------------------------------------------------------------
