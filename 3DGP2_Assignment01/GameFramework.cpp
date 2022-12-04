@@ -455,6 +455,9 @@ void CGameFramework::FrameAdvance()
 	ProcessInput();
 	AnimateObjects();
 	m_pScene->CheckCollision();
+
+	//m_pScene->OnPreRender(m_pd3dDevice.Get(), m_pd3dCommandQueue.Get(), m_pd3dFence.Get(), m_hFenceEvent);
+
 	//명령 할당자와 명령 리스트를 리셋한다.
 	HRESULT hResult = m_pd3dCommandAllocator->Reset();
 	hResult = m_pd3dCommandList->Reset(m_pd3dCommandAllocator.Get(), NULL);

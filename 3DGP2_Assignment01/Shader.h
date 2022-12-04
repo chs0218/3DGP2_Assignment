@@ -7,6 +7,7 @@ class CGameObject;
 class CTexturedRectMesh;
 class CMultiSpriteObject;
 class CEnemy;
+class CScene;
 class CShader
 {
 protected:
@@ -291,4 +292,38 @@ public:
 	virtual D3D12_DEPTH_STENCIL_DESC CreateDepthStencilState(int nPipelineState);
 
 	virtual void CreateShader(ID3D12Device* pd3dDevice, ID3D12RootSignature* pd3dGraphicsRootSignature, UINT nRenderTargets, DXGI_FORMAT* pdxgiRtvFormats, int nPipelineState);
+};
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+class CDynamicCubeMappingShader : public CShader
+{
+public:
+	static CDynamicCubeMappingShader* Instance();
+public:
+	CDynamicCubeMappingShader(UINT nCubeMapSize = 256);
+	virtual ~CDynamicCubeMappingShader();
+
+	virtual void CreateShader(ID3D12Device* pd3dDevice, ID3D12RootSignature* pd3dGraphicsRootSignature, UINT nRenderTargets, DXGI_FORMAT* pdxgiRtvFormats, int nPipelineState);
+	virtual D3D12_INPUT_LAYOUT_DESC CreateInputLayout(int nPipelineState);
+	virtual D3D12_SHADER_BYTECODE CreateVertexShader(ID3DBlob** ppd3dShaderBlob, int nPipelineState);
+	virtual D3D12_SHADER_BYTECODE CreatePixelShader(ID3DBlob** ppd3dShaderBlob, int nPipelineState);
+
+	virtual void BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, void* pContext = NULL);
+	virtual void ReleaseObjects();
+
+	virtual void ReleaseUploadBuffers();
+
+	void OnPreRender(ID3D12Device* pd3dDevice, ID3D12CommandQueue* pd3dCommandQueue, ID3D12Fence* pd3dFence, HANDLE hFenceEvent, CScene* pScene);
+	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera, int nPipelineState);
+protected:
+	ULONG m_nCubeMapSize = 256;
+
+	int	m_nObjects = 0;
+	std::vector<std::unique_ptr<CGameObject>> m_ppObjects;
+
+	ComPtr<ID3D12CommandAllocator> m_pd3dCommandAllocator = NULL;
+	ComPtr<ID3D12GraphicsCommandList> m_pd3dCommandList = NULL;
+
+	ComPtr<ID3D12DescriptorHeap> m_pd3dRtvDescriptorHeap = NULL;
+	ComPtr<ID3D12DescriptorHeap> m_pd3dDsvDescriptorHeap = NULL;
 };

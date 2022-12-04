@@ -743,11 +743,11 @@ CHeightMapGridMesh::CHeightMapGridMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsC
 
 	m_pd3dPositionBuffer = CreateBufferResource(pd3dDevice, pd3dCommandList, pVertices.data(), m_nStride * m_nVertices, D3D12_HEAP_TYPE_DEFAULT, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER, &m_pd3dPositionUploadBuffer);
 
-	D3D12_VERTEX_BUFFER_VIEW m_d3dVertexBufferView;
-	m_d3dVertexBufferView.BufferLocation = m_pd3dPositionBuffer->GetGPUVirtualAddress();
-	m_d3dVertexBufferView.StrideInBytes = m_nStride;
-	m_d3dVertexBufferView.SizeInBytes = m_nStride * m_nVertices;
-	m_pd3dVertexBufferViews.push_back(m_d3dVertexBufferView);
+	D3D12_VERTEX_BUFFER_VIEW d3dVertexBufferView;
+	d3dVertexBufferView.BufferLocation = m_pd3dPositionBuffer->GetGPUVirtualAddress();
+	d3dVertexBufferView.StrideInBytes = m_nStride;
+	d3dVertexBufferView.SizeInBytes = m_nStride * m_nVertices;
+	m_pd3dVertexBufferViews.push_back(d3dVertexBufferView);
 
 	m_nIndices = ((nWidth * 2) * (nLength - 1)) + ((nLength - 1) - 1);
 	std::vector<UINT> pnIndices(m_nIndices);
@@ -1030,5 +1030,179 @@ void CParticleMesh::OnPostRender(int nPipelineState)
 		OutputDebugString(pstrDebug);
 #endif
 		if ((m_nVertices == 0) || (m_nVertices >= MAX_PARTICLES)) m_bStart = true;
+	}
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////
+CSphereMeshIlluminated::CSphereMeshIlluminated(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, float fRadius, UINT nSlices, UINT nStacks)
+{
+	m_nStride = sizeof(CIlluminatedVertex);
+	m_d3dPrimitiveTopology = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+
+	int k = 0;
+	float fDeltaPhi = float(XM_PI / nStacks);
+	float fDeltaTheta = float((2.0f * XM_PI) / nSlices);
+
+	m_nVertices = 2 + (nSlices * (nStacks - 1));
+
+	m_pxmf3Positions.resize(m_nVertices);
+
+	m_pxmf3Positions[k++] = XMFLOAT3(0.0f, +fRadius, 0.0f);
+	float theta_i, phi_j;
+	for (UINT j = 1; j < nStacks; j++)
+	{
+		phi_j = fDeltaPhi * j;
+		for (UINT i = 0; i < nSlices; i++)
+		{
+			theta_i = fDeltaTheta * i;
+			m_pxmf3Positions[k++] = XMFLOAT3(fRadius * sinf(phi_j) * cosf(theta_i), fRadius * cosf(phi_j), fRadius * sinf(phi_j) * sinf(theta_i));
+		}
+	}
+	m_pxmf3Positions[k] = XMFLOAT3(0.0f, -fRadius, 0.0f);
+
+	m_nIndices = (nSlices * 3) * 2 + (nSlices * (nStacks - 2) * 3 * 2);
+
+	m_pnIndices.resize(m_nIndices);
+
+	k = 0;
+	for (UINT i = 0; i < nSlices; i++)
+	{
+		m_pnIndices[k++] = 0;
+		m_pnIndices[k++] = 1 + ((i + 1) % nSlices);
+		m_pnIndices[k++] = 1 + i;
+	}
+	for (UINT j = 0; j < nStacks - 2; j++)
+	{
+		for (UINT i = 0; i < nSlices; i++)
+		{
+			m_pnIndices[k++] = 1 + (i + (j * nSlices));
+			m_pnIndices[k++] = 1 + (((i + 1) % nSlices) + (j * nSlices));
+			m_pnIndices[k++] = 1 + (i + ((j + 1) * nSlices));
+			m_pnIndices[k++] = 1 + (i + ((j + 1) * nSlices));
+			m_pnIndices[k++] = 1 + (((i + 1) % nSlices) + (j * nSlices));
+			m_pnIndices[k++] = 1 + (((i + 1) % nSlices) + ((j + 1) * nSlices));
+		}
+	}
+	for (UINT i = 0; i < nSlices; i++)
+	{
+		m_pnIndices[k++] = (m_nVertices - 1);
+		m_pnIndices[k++] = ((m_nVertices - 1) - nSlices) + i;
+		m_pnIndices[k++] = ((m_nVertices - 1) - nSlices) + ((i + 1) % nSlices);
+	}
+
+	m_pxmf3Normals.resize(m_nVertices);
+
+	CalculateVertexNormals(m_pxmf3Normals.data(), m_pxmf3Positions.data(), m_nVertices, m_pnIndices.data(), m_nIndices);
+
+	std::vector<CIlluminatedVertex> pVertices(m_nVertices);
+	for (UINT i = 0; i < m_nVertices; i++) pVertices[i] = CIlluminatedVertex(m_pxmf3Positions[i], m_pxmf3Normals[i]);
+	m_pd3dPositionBuffer = ::CreateBufferResource(pd3dDevice, pd3dCommandList, pVertices.data(), m_nStride * m_nVertices, D3D12_HEAP_TYPE_DEFAULT, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER, m_pd3dPositionUploadBuffer.GetAddressOf());
+
+	D3D12_VERTEX_BUFFER_VIEW d3dVertexBufferView;
+	d3dVertexBufferView.BufferLocation = m_pd3dPositionBuffer->GetGPUVirtualAddress();
+	d3dVertexBufferView.StrideInBytes = m_nStride;
+	d3dVertexBufferView.SizeInBytes = m_nStride * m_nVertices;
+	m_pd3dVertexBufferViews.push_back(d3dVertexBufferView);
+
+	m_nSubMeshes = 1;
+	m_ppd3dIndexBuffers.resize(m_nSubMeshes);
+	m_ppd3dIndexUploadBuffers.resize(m_nSubMeshes);
+	m_pd3dIndexBufferViews.resize(m_nSubMeshes);
+	m_pnSubSetIndices.resize(m_nSubMeshes);
+
+	m_pnSubSetIndices[0] = m_nIndices;
+	m_ppd3dIndexBuffers[0] = ::CreateBufferResource(pd3dDevice, pd3dCommandList, m_pnIndices.data(), sizeof(UINT) * m_nIndices, D3D12_HEAP_TYPE_DEFAULT, D3D12_RESOURCE_STATE_INDEX_BUFFER, m_ppd3dIndexUploadBuffers[0].GetAddressOf());
+
+	m_pd3dIndexBufferViews[0].BufferLocation = m_ppd3dIndexBuffers[0]->GetGPUVirtualAddress();
+	m_pd3dIndexBufferViews[0].Format = DXGI_FORMAT_R32_UINT;
+	m_pd3dIndexBufferViews[0].SizeInBytes = sizeof(UINT) * m_nIndices;
+}
+
+CSphereMeshIlluminated::~CSphereMeshIlluminated()
+{
+}
+
+void CSphereMeshIlluminated::CalculateTriangleListVertexNormals(XMFLOAT3* pxmf3Normals, XMFLOAT3* pxmf3Positions, int nVertices)
+{
+	int nPrimitives = nVertices / 3;
+	UINT nIndex0, nIndex1, nIndex2;
+	for (int i = 0; i < nPrimitives; i++)
+	{
+		nIndex0 = i * 3 + 0;
+		nIndex1 = i * 3 + 1;
+		nIndex2 = i * 3 + 2;
+		XMFLOAT3 xmf3Edge01 = Vector3::Subtract(pxmf3Positions[nIndex1], pxmf3Positions[nIndex0]);
+		XMFLOAT3 xmf3Edge02 = Vector3::Subtract(pxmf3Positions[nIndex2], pxmf3Positions[nIndex0]);
+		pxmf3Normals[nIndex0] = pxmf3Normals[nIndex1] = pxmf3Normals[nIndex2] = Vector3::CrossProduct(xmf3Edge01, xmf3Edge02, true);
+	}
+}
+
+void CSphereMeshIlluminated::CalculateTriangleListVertexNormals(XMFLOAT3* pxmf3Normals, XMFLOAT3* pxmf3Positions, UINT nVertices, UINT* pnIndices, UINT nIndices)
+{
+	UINT nPrimitives = (pnIndices) ? (nIndices / 3) : (nVertices / 3);
+	XMFLOAT3 xmf3SumOfNormal, xmf3Edge01, xmf3Edge02, xmf3Normal;
+	UINT nIndex0, nIndex1, nIndex2;
+	for (UINT j = 0; j < nVertices; j++)
+	{
+		xmf3SumOfNormal = XMFLOAT3(0.0f, 0.0f, 0.0f);
+		for (UINT i = 0; i < nPrimitives; i++)
+		{
+			nIndex0 = pnIndices[i * 3 + 0];
+			nIndex1 = pnIndices[i * 3 + 1];
+			nIndex2 = pnIndices[i * 3 + 2];
+			if (pnIndices && ((nIndex0 == j) || (nIndex1 == j) || (nIndex2 == j)))
+			{
+				xmf3Edge01 = Vector3::Subtract(pxmf3Positions[nIndex1], pxmf3Positions[nIndex0]);
+				xmf3Edge02 = Vector3::Subtract(pxmf3Positions[nIndex2], pxmf3Positions[nIndex0]);
+				xmf3Normal = Vector3::CrossProduct(xmf3Edge01, xmf3Edge02, true);
+				xmf3SumOfNormal = Vector3::Normalize(Vector3::Add(xmf3SumOfNormal, xmf3Normal));
+			}
+		}
+		pxmf3Normals[j] = Vector3::Normalize(xmf3SumOfNormal);
+	}
+}
+
+void CSphereMeshIlluminated::CalculateTriangleStripVertexNormals(XMFLOAT3* pxmf3Normals, XMFLOAT3* pxmf3Positions, UINT nVertices, UINT* pnIndices, UINT nIndices)
+{
+	UINT nPrimitives = (pnIndices) ? (nIndices - 2) : (nVertices - 2);
+	XMFLOAT3 xmf3SumOfNormal(0.0f, 0.0f, 0.0f);
+	UINT nIndex0, nIndex1, nIndex2;
+	for (UINT j = 0; j < nVertices; j++)
+	{
+		xmf3SumOfNormal = XMFLOAT3(0.0f, 0.0f, 0.0f);
+		for (UINT i = 0; i < nPrimitives; i++)
+		{
+			nIndex0 = ((i % 2) == 0) ? (i + 0) : (i + 1);
+			if (pnIndices) nIndex0 = pnIndices[nIndex0];
+			nIndex1 = ((i % 2) == 0) ? (i + 1) : (i + 0);
+			if (pnIndices) nIndex1 = pnIndices[nIndex1];
+			nIndex2 = (pnIndices) ? pnIndices[i + 2] : (i + 2);
+			if ((nIndex0 == j) || (nIndex1 == j) || (nIndex2 == j))
+			{
+				XMFLOAT3 xmf3Edge01 = Vector3::Subtract(pxmf3Positions[nIndex1], pxmf3Positions[nIndex0]);
+				XMFLOAT3 xmf3Edge02 = Vector3::Subtract(pxmf3Positions[nIndex2], pxmf3Positions[nIndex0]);
+				XMFLOAT3 xmf3Normal = Vector3::CrossProduct(xmf3Edge01, xmf3Edge02, true);
+				xmf3SumOfNormal = Vector3::Normalize(Vector3::Add(xmf3SumOfNormal, xmf3Normal));
+			}
+		}
+		pxmf3Normals[j] = Vector3::Normalize(xmf3SumOfNormal);
+	}
+}
+
+void CSphereMeshIlluminated::CalculateVertexNormals(XMFLOAT3* pxmf3Normals, XMFLOAT3* pxmf3Positions, int nVertices, UINT* pnIndices, int nIndices)
+{
+	switch (m_d3dPrimitiveTopology)
+	{
+	case D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST:
+		if (pnIndices)
+			CalculateTriangleListVertexNormals(pxmf3Normals, pxmf3Positions, nVertices, pnIndices, nIndices);
+		else
+			CalculateTriangleListVertexNormals(pxmf3Normals, pxmf3Positions, nVertices);
+		break;
+	case D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP:
+		CalculateTriangleStripVertexNormals(pxmf3Normals, pxmf3Positions, nVertices, pnIndices, nIndices);
+		break;
+	default:
+		break;
 	}
 }

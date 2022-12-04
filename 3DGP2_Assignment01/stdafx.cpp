@@ -19,6 +19,17 @@ float Random()
 	return(rand() / float(RAND_MAX));
 }
 
+void WaitForGpuComplete(ID3D12CommandQueue* pd3dCommandQueue, ID3D12Fence* pd3dFence, UINT64 nFenceValue, HANDLE hFenceEvent)
+{
+	HRESULT hResult = pd3dCommandQueue->Signal(pd3dFence, nFenceValue);
+
+	if (pd3dFence->GetCompletedValue() < nFenceValue)
+	{
+		hResult = pd3dFence->SetEventOnCompletion(nFenceValue, hFenceEvent);
+		::WaitForSingleObject(hFenceEvent, INFINITE);
+	}
+}
+
 ComPtr<ID3D12Resource> CreateBufferResource(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, void* pData, UINT nBytes, D3D12_HEAP_TYPE d3dHeapType, D3D12_RESOURCE_STATES d3dResourceStates, ID3D12Resource** ppd3dUploadBuffer)
 {
 	ComPtr<ID3D12Resource> pd3dBuffer;

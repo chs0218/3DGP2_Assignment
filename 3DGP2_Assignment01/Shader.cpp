@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "Shader.h"
+#include "Scene.h"
 #include "Texture.h"
 #include "Object.h"
 #include "Camera.h"
@@ -1491,3 +1492,141 @@ void CParticleShader::CreateShader(ID3D12Device* pd3dDevice, ID3D12RootSignature
 	if (d3dPipelineStateDesc.InputLayout.pInputElementDescs) delete[] d3dPipelineStateDesc.InputLayout.pInputElementDescs;
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+CDynamicCubeMappingShader* CDynamicCubeMappingShader::Instance()
+{
+	static CDynamicCubeMappingShader instance;
+	return &instance;
+}
+
+CDynamicCubeMappingShader::CDynamicCubeMappingShader(UINT nCubeMapSize)
+{
+	m_nCubeMapSize = nCubeMapSize;
+}
+
+CDynamicCubeMappingShader::~CDynamicCubeMappingShader()
+{
+}
+
+void CDynamicCubeMappingShader::CreateShader(ID3D12Device* pd3dDevice, ID3D12RootSignature* pd3dGraphicsRootSignature, UINT nRenderTargets, DXGI_FORMAT* pdxgiRtvFormats, int nPipelineState)
+{
+	m_nPipelineStates = 1;
+	m_ppd3dPipelineStates.resize(m_nPipelineStates);
+
+	CShader::CreateShader(pd3dDevice, pd3dGraphicsRootSignature, nRenderTargets, pdxgiRtvFormats, 0);
+}
+
+D3D12_INPUT_LAYOUT_DESC CDynamicCubeMappingShader::CreateInputLayout(int nPipelineState)
+{
+	UINT nInputElementDescs = 2;
+	D3D12_INPUT_ELEMENT_DESC* pd3dInputElementDescs = new D3D12_INPUT_ELEMENT_DESC[nInputElementDescs];
+
+	pd3dInputElementDescs[0] = { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
+	pd3dInputElementDescs[1] = { "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
+
+	D3D12_INPUT_LAYOUT_DESC d3dInputLayoutDesc;
+	d3dInputLayoutDesc.pInputElementDescs = pd3dInputElementDescs;
+	d3dInputLayoutDesc.NumElements = nInputElementDescs;
+
+	return(d3dInputLayoutDesc);
+}
+
+D3D12_SHADER_BYTECODE CDynamicCubeMappingShader::CreateVertexShader(ID3DBlob** ppd3dShaderBlob, int nPipelineState)
+{
+	return(CShader::ReadCompiledShaderFile(L"CubeMappingVS.cso", ppd3dShaderBlob));
+}
+
+D3D12_SHADER_BYTECODE CDynamicCubeMappingShader::CreatePixelShader(ID3DBlob** ppd3dShaderBlob, int nPipelineState)
+{
+	return(CShader::ReadCompiledShaderFile(L"CubeMappingPS.cso", ppd3dShaderBlob));
+}
+
+void CDynamicCubeMappingShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, void* pContext)
+{
+	pd3dDevice->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, __uuidof(ID3D12CommandAllocator), (void**)m_pd3dCommandAllocator.GetAddressOf());
+	pd3dDevice->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, m_pd3dCommandAllocator.Get(), NULL, __uuidof(ID3D12GraphicsCommandList), (void**)m_pd3dCommandList.GetAddressOf());
+	m_pd3dCommandList->Close();
+
+	m_nObjects = 2;
+	m_ppObjects.resize(m_nObjects);
+
+	CreateCbvSrvDescriptorHeaps(pd3dDevice, 0, m_nObjects);
+
+	D3D12_GPU_DESCRIPTOR_HANDLE d3dCbvGPUDescriptorStartHandle = m_d3dCbvGPUDescriptorStartHandle;
+
+	D3D12_DESCRIPTOR_HEAP_DESC d3dDescriptorHeapDesc;
+	d3dDescriptorHeapDesc.NumDescriptors = m_nObjects;
+	d3dDescriptorHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_DSV;
+	d3dDescriptorHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
+	d3dDescriptorHeapDesc.NodeMask = 0;
+	HRESULT hResult = pd3dDevice->CreateDescriptorHeap(&d3dDescriptorHeapDesc, __uuidof(ID3D12DescriptorHeap), (void**)m_pd3dDsvDescriptorHeap.GetAddressOf());
+
+	D3D12_CPU_DESCRIPTOR_HANDLE d3dDsvCPUDescriptorHandle = m_pd3dDsvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
+
+	d3dDescriptorHeapDesc.NumDescriptors = m_nObjects * 6;
+	d3dDescriptorHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
+	pd3dDevice->CreateDescriptorHeap(&d3dDescriptorHeapDesc, __uuidof(ID3D12DescriptorHeap), (void**)m_pd3dRtvDescriptorHeap.GetAddressOf());
+
+	D3D12_CPU_DESCRIPTOR_HANDLE d3dRtvCPUDescriptorHandle = m_pd3dRtvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
+
+	std::shared_ptr<CMesh> pMeshIlluminated = std::make_shared<CSphereMeshIlluminated>(pd3dDevice, pd3dCommandList, 100.0f, 20, 20);
+
+	CHeightMapTerrain* pTerrain = (CHeightMapTerrain*)pContext;
+	XMFLOAT2 xmf2TerrainCenter = XMFLOAT2(pTerrain->GetWidth() * 0.5f, pTerrain->GetLength() * 0.5f);
+
+	for (int i = 0; i < m_nObjects; i++)
+	{
+		m_ppObjects[i] = std::make_unique<CDynamicCubeMappingObject>(pd3dDevice, pd3dCommandList, m_nCubeMapSize, d3dDsvCPUDescriptorHandle, d3dRtvCPUDescriptorHandle, this);
+
+		m_ppObjects[i]->SetMesh(pMeshIlluminated);
+
+		float xPosition = xmf2TerrainCenter.x + ((i + 1) * 150.0f) * ((i % 2) ? +1.0f : -1.0f);
+		float zPosition = xmf2TerrainCenter.y + ((i + 1) * 150.0f) * ((i % 2) ? +1.0f : -1.0f);
+		float fHeight = pTerrain->GetHeight(xPosition, zPosition);
+
+		m_ppObjects[i]->SetPosition(xPosition, fHeight + 150.0f, zPosition);
+
+		d3dDsvCPUDescriptorHandle.ptr += ::gnDsvDescriptorIncrementSize;
+		d3dRtvCPUDescriptorHandle.ptr += (::gnRtvDescriptorIncrementSize * 6);
+	}
+}
+
+void CDynamicCubeMappingShader::ReleaseObjects()
+{
+}
+
+void CDynamicCubeMappingShader::ReleaseUploadBuffers()
+{
+}
+
+void CDynamicCubeMappingShader::OnPreRender(ID3D12Device* pd3dDevice, ID3D12CommandQueue* pd3dCommandQueue, ID3D12Fence* pd3dFence, HANDLE hFenceEvent, CScene* pScene)
+{
+	for (int i = 0; i < m_nObjects; i++)
+	{
+		m_pd3dCommandAllocator->Reset();
+		m_pd3dCommandList->Reset(m_pd3dCommandAllocator.Get(), NULL);
+
+		m_ppObjects[i]->OnPreRender(m_pd3dCommandList.Get(), pScene);
+
+		m_pd3dCommandList->Close();
+
+		ID3D12CommandList* ppd3dCommandLists[] = { m_pd3dCommandList.Get() };
+		pd3dCommandQueue->ExecuteCommandLists(1, ppd3dCommandLists);
+
+		UINT64 nFenceValue = pd3dFence->GetCompletedValue();
+		::WaitForGpuComplete(pd3dCommandQueue, pd3dFence, nFenceValue + 1, hFenceEvent);
+	}
+}
+
+void CDynamicCubeMappingShader::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera, int nPipelineState)
+{
+	OnPrepareRender(pd3dCommandList, 0);
+
+	UpdateShaderVariables(pd3dCommandList);
+
+	for (int j = 0; j < m_nObjects; j++)
+	{
+		if (m_ppObjects[j]) m_ppObjects[j]->Render(pd3dCommandList, pCamera);
+	}
+}

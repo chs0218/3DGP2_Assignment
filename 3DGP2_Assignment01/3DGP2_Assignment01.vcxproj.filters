@@ -40,6 +40,9 @@
     <Filter Include="ParticleShader">
       <UniqueIdentifier>{70621c6d-529f-461d-a88b-929295d3604a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="CubeMappingShader">
+      <UniqueIdentifier>{2fda6017-4a81-4de3-a3bd-6233dc45a6f1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -201,6 +204,12 @@
     </FxCompile>
     <FxCompile Include="ParticleDrawPS.hlsl">
       <Filter>ParticleShader</Filter>
+    </FxCompile>
+    <FxCompile Include="CubeMappingVS.hlsl">
+      <Filter>CubeMappingShader</Filter>
+    </FxCompile>
+    <FxCompile Include="CubeMappingPS.hlsl">
+      <Filter>CubeMappingShader</Filter>
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
