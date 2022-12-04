@@ -217,10 +217,11 @@ void CScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 	CMultiSpriteObjectsShader::Instance()->CreateShader(pd3dDevice, GetGraphicsRootSignature(), 7, pdxgiObjectRtvFormats, 0);
 	CMultiSpriteObjectsShader::Instance()->BuildObjects(pd3dDevice, pd3dCommandList, GetGraphicsRootSignature());
 
-	m_nParticleObjects = 1;
-	m_ppParticleObjects = new CParticleObject * [m_nParticleObjects];
+	//m_nParticleObjects = 1;
+	//m_ppParticleObjects = new CParticleObject * [m_nParticleObjects];
 
-	m_ppParticleObjects[0] = new CParticleObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature.Get(), XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT3(0.0f, 65.0f, 0.0f), 0.0f, XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT3(1.0f, 0.0f, 0.0f), XMFLOAT2(8.0f, 8.0f), MAX_PARTICLES);
+	//m_ppParticleObjects[0] = new CParticleObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature.Get(), XMFLOAT3(1030.0f, 300.0f, 1400.0f), XMFLOAT3(0.0f, 65.0f, 0.0f), 0.0f, XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT3(1.0f, 0.0f, 0.0f), XMFLOAT2(8.0f, 8.0f), MAX_PARTICLES);
+	//m_ppParticleObjects[0]->SetPosition(XMFLOAT3(1030.0f, 300.0f, 1400.0f));
 }
 
 void CScene::ReleaseObjects()
@@ -249,10 +250,6 @@ void CScene::AnimateObjects(CGameObject* pPlayer, float fTimeElapsed)
 		CObjectShader::Instance()->AnimateObjects(pPlayer, fTimeElapsed);
 	}
 
-	if (m_ppParticleObjects[0])
-	{
-		m_ppParticleObjects[0]->SetPosition(m_pPlayer->GetPosition());
-	}
 	CMultiSpriteObjectsShader::Instance()->AnimateObjects(fTimeElapsed); 
 }
 
