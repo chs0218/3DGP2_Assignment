@@ -961,11 +961,11 @@ void CParticleMesh::PreRender(ID3D12GraphicsCommandList* pd3dCommandList, int nP
 			m_pd3dVertexBufferViews[0].StrideInBytes = m_nStride;
 			m_pd3dVertexBufferViews[0].SizeInBytes = m_nStride * m_nVertices;
 		}
+
 		m_d3dStreamOutputBufferView.BufferLocation = m_pd3dStreamOutputBuffer->GetGPUVirtualAddress();
 		m_d3dStreamOutputBufferView.SizeInBytes = m_nStride * m_nMaxParticles;
 		m_d3dStreamOutputBufferView.BufferFilledSizeLocation = m_pd3dDefaultBufferFilledSize->GetGPUVirtualAddress();
 
-		//		*m_pnUploadBufferFilledSize = m_nStride * m_nVertices;
 		*m_pnUploadBufferFilledSize = 0;
 
 		::SynchronizeResourceTransition(pd3dCommandList, m_pd3dDefaultBufferFilledSize.Get(), D3D12_RESOURCE_STATE_STREAM_OUT, D3D12_RESOURCE_STATE_COPY_DEST);
@@ -984,6 +984,7 @@ void CParticleMesh::PreRender(ID3D12GraphicsCommandList* pd3dCommandList, int nP
 		m_pd3dVertexBufferViews[0].SizeInBytes = m_nStride * m_nVertices;
 	}
 }
+#define _WITH_DEBUG_STREAM_OUTPUT_VERTICES
 
 void CParticleMesh::Render(ID3D12GraphicsCommandList* pd3dCommandList, int nPipelineState)
 {
@@ -1011,7 +1012,6 @@ void CParticleMesh::PostRender(ID3D12GraphicsCommandList* pd3dCommandList, int n
 {
 }
 
-#define _WITH_DEBUG_STREAM_OUTPUT_VERTICES
 
 void CParticleMesh::OnPostRender(int nPipelineState)
 {
@@ -1029,7 +1029,10 @@ void CParticleMesh::OnPostRender(int nPipelineState)
 		_stprintf_s(pstrDebug, 256, _T("Stream Output Vertices = %d\n"), m_nVertices);
 		OutputDebugString(pstrDebug);
 #endif
-		if ((m_nVertices == 0) || (m_nVertices >= MAX_PARTICLES)) m_bStart = true;
+		if ((m_nVertices == 0) || (m_nVertices >= MAX_PARTICLES))
+		{
+			m_bStart = true;
+		}
 	}
 }
 

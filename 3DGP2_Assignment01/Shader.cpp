@@ -1544,6 +1544,9 @@ D3D12_SHADER_BYTECODE CDynamicCubeMappingShader::CreatePixelShader(ID3DBlob** pp
 
 void CDynamicCubeMappingShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, void* pContext)
 {
+	m_hFenceEvent = ::CreateEvent(NULL, FALSE, FALSE, NULL);
+
+	pd3dDevice->CreateFence(0, D3D12_FENCE_FLAG_NONE, __uuidof(ID3D12Fence), (void**)m_pd3dFence.GetAddressOf());
 	pd3dDevice->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, __uuidof(ID3D12CommandAllocator), (void**)m_pd3dCommandAllocator.GetAddressOf());
 	pd3dDevice->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, m_pd3dCommandAllocator.Get(), NULL, __uuidof(ID3D12GraphicsCommandList), (void**)m_pd3dCommandList.GetAddressOf());
 	m_pd3dCommandList->Close();
@@ -1600,7 +1603,7 @@ void CDynamicCubeMappingShader::ReleaseUploadBuffers()
 {
 }
 
-void CDynamicCubeMappingShader::OnPreRender(ID3D12Device* pd3dDevice, ID3D12CommandQueue* pd3dCommandQueue, ID3D12Fence* pd3dFence, HANDLE hFenceEvent, CScene* pScene)
+void CDynamicCubeMappingShader::OnPreRender(ID3D12Device* pd3dDevice, ID3D12CommandQueue* pd3dCommandQueue, CScene* pScene)
 {
 	for (int i = 0; i < m_nObjects; i++)
 	{
@@ -1613,9 +1616,9 @@ void CDynamicCubeMappingShader::OnPreRender(ID3D12Device* pd3dDevice, ID3D12Comm
 
 		ID3D12CommandList* ppd3dCommandLists[] = { m_pd3dCommandList.Get() };
 		pd3dCommandQueue->ExecuteCommandLists(1, ppd3dCommandLists);
-
-		UINT64 nFenceValue = pd3dFence->GetCompletedValue();
-		::WaitForGpuComplete(pd3dCommandQueue, pd3dFence, nFenceValue + 1, hFenceEvent);
+	
+		UINT64 nFenceValue = m_pd3dFence->GetCompletedValue();
+		::WaitForGpuComplete(pd3dCommandQueue, m_pd3dFence.Get(), nFenceValue + 1, m_hFenceEvent);
 	}
 }
 

@@ -32,7 +32,7 @@ public:
 	virtual void AnimateObjects(CGameObject* pPlayer, float fTimeElapsed);
 	void OnPrepareRender(ID3D12GraphicsCommandList* pd3dCommandList);
 	void PrepareRender(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera = NULL);
-	void OnPreRender(ID3D12Device* pd3dDevice, ID3D12CommandQueue* pd3dCommandQueue, ID3D12Fence* pd3dFence, HANDLE hFenceEvent);
+	void OnPreRender(ID3D12Device* pd3dDevice, ID3D12CommandQueue* pd3dCommandQueue);
 	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera = NULL, bool bEdge = false);
 
 	CHeightMapTerrain* GetTerrain() { return(m_pTerrain.get()); }
@@ -51,7 +51,7 @@ private:
 	XMFLOAT4 m_fClearColor = {0.0f, 0.0f, 0.0f, 0.0f};
 	CPlayer* m_pPlayer = NULL;
 
-	CParticleObject** m_ppParticleObjects = NULL;
+	std::vector<std::unique_ptr<CParticleObject>> m_ppParticleObjects;
 	int	m_nParticleObjects = 0;
 };
 

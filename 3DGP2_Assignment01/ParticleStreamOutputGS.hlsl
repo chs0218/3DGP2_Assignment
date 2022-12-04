@@ -24,7 +24,6 @@ cbuffer cbFrameworkInfo : register(b2)
 	int			gnFlareParticlesToEmit : packoffset(c3.y);;
 };
 
-
 struct VS_PARTICLE_INPUT
 {
 	float3 position : POSITION;

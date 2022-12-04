@@ -39,7 +39,7 @@ bool CGameFramework::OnCreate(HINSTANCE hInstance, HWND hMainWnd)
 void CGameFramework::OnDestroy()
 {
 	//GPU가 모든 명령 리스트를 실행할 때 까지 기다린다. 
-	WaitForGpuComplete();
+	::WaitForGpuComplete(m_pd3dCommandQueue.Get(), m_pd3dFence.Get(), ++m_nFenceValues[m_nSwapChainBufferIndex], m_hFenceEvent);
 
 	//게임 객체(게임 월드 객체)를 소멸한다. 
 	ReleaseObjects();
@@ -261,7 +261,7 @@ void CGameFramework::BuildObjects()
 	ComPtr<ID3D12CommandList> ppd3dCommandLists[] = { m_pd3dCommandList };
 	m_pd3dCommandQueue->ExecuteCommandLists(1, ppd3dCommandLists->GetAddressOf());
 
-	WaitForGpuComplete();
+	::WaitForGpuComplete(m_pd3dCommandQueue.Get(), m_pd3dFence.Get(), ++m_nFenceValues[m_nSwapChainBufferIndex], m_hFenceEvent);
 	m_pPlayer->ReleaseUploadBuffers();
 	m_GameTimer.Reset();
 }
@@ -419,20 +419,20 @@ void CGameFramework::AnimateObjects()
 	}
 }
 
-void CGameFramework::WaitForGpuComplete()
-{
-	//CPU 펜스의 값을 증가한다.
-	const UINT64 nFenceValue = ++m_nFenceValues[m_nSwapChainBufferIndex];
-	HRESULT hResult = m_pd3dCommandQueue->Signal(m_pd3dFence.Get(), nFenceValue);
-
-	//GPU가 펜스의 값을 설정하는 명령을 명령 큐에 추가한다. 
-	if (m_pd3dFence->GetCompletedValue() < nFenceValue)
-	{
-		//펜스의 현재 값이 설정한 값보다 작으면 펜스의 현재 값이 설정한 값이 될 때까지 기다린다.
-		hResult = m_pd3dFence->SetEventOnCompletion(nFenceValue, m_hFenceEvent);
-		::WaitForSingleObject(m_hFenceEvent, INFINITE);
-	}
-}
+//void CGameFramework::WaitForGpuComplete()
+//{
+//	//CPU 펜스의 값을 증가한다.
+//	const UINT64 nFenceValue = ++m_nFenceValues[m_nSwapChainBufferIndex];
+//	HRESULT hResult = m_pd3dCommandQueue->Signal(m_pd3dFence.Get(), nFenceValue);
+//
+//	//GPU가 펜스의 값을 설정하는 명령을 명령 큐에 추가한다. 
+//	if (m_pd3dFence->GetCompletedValue() < nFenceValue)
+//	{
+//		//펜스의 현재 값이 설정한 값보다 작으면 펜스의 현재 값이 설정한 값이 될 때까지 기다린다.
+//		hResult = m_pd3dFence->SetEventOnCompletion(nFenceValue, m_hFenceEvent);
+//		::WaitForSingleObject(m_hFenceEvent, INFINITE);
+//	}
+//}
 
 void CGameFramework::MoveToNextFrame()
 {
@@ -456,7 +456,7 @@ void CGameFramework::FrameAdvance()
 	AnimateObjects();
 	m_pScene->CheckCollision();
 
-	//m_pScene->OnPreRender(m_pd3dDevice.Get(), m_pd3dCommandQueue.Get(), m_pd3dFence.Get(), m_hFenceEvent);
+	m_pScene->OnPreRender(m_pd3dDevice.Get(), m_pd3dCommandQueue.Get());
 
 	//명령 할당자와 명령 리스트를 리셋한다.
 	HRESULT hResult = m_pd3dCommandAllocator->Reset();
@@ -495,7 +495,7 @@ void CGameFramework::FrameAdvance()
 	m_pd3dCommandQueue->ExecuteCommandLists(1, ppd3dCommandLists);
 
 	//GPU가 모든 명령 리스트를 실행할 때 까지 기다린다.
-	WaitForGpuComplete();
+	::WaitForGpuComplete(m_pd3dCommandQueue.Get(), m_pd3dFence.Get(), ++m_nFenceValues[m_nSwapChainBufferIndex], m_hFenceEvent);
 
 	m_pScene->OnPostRenderParticle();
 
@@ -541,7 +541,7 @@ void CGameFramework::UpdateShaderVariables()
 
 void CGameFramework::ChangeSwapChainState()
 {
-	WaitForGpuComplete();
+	::WaitForGpuComplete(m_pd3dCommandQueue.Get(), m_pd3dFence.Get(), ++m_nFenceValues[m_nSwapChainBufferIndex], m_hFenceEvent);
 
 	// 현재 전체화면 상태인지 확인하고 ! 연산으로 현재 상태의 반대로 전환한다.
 	BOOL bFullScreenState = FALSE;

@@ -313,10 +313,13 @@ public:
 
 	virtual void ReleaseUploadBuffers();
 
-	void OnPreRender(ID3D12Device* pd3dDevice, ID3D12CommandQueue* pd3dCommandQueue, ID3D12Fence* pd3dFence, HANDLE hFenceEvent, CScene* pScene);
+	void OnPreRender(ID3D12Device* pd3dDevice, ID3D12CommandQueue* pd3dCommandQueue, CScene* pScene);
 	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera, int nPipelineState);
 protected:
 	ULONG m_nCubeMapSize = 256;
+	
+	HANDLE m_hFenceEvent;
+	ComPtr<ID3D12Fence> m_pd3dFence;
 
 	int	m_nObjects = 0;
 	std::vector<std::unique_ptr<CGameObject>> m_ppObjects;

@@ -257,11 +257,11 @@ public:
 
 class CParticleMesh : public CMesh
 {
+private:
+	bool m_bStart = true;
 public:
 	CParticleMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, XMFLOAT3 xmf3Position, XMFLOAT3 xmf3Velocity, float fLifetime, XMFLOAT3 xmf3Acceleration, XMFLOAT3 xmf3Color, XMFLOAT2 xmf2Size, UINT nMaxParticles);
 	virtual ~CParticleMesh();
-
-	bool								m_bStart = true;
 
 	UINT								m_nMaxParticles = MAX_PARTICLES;
 
@@ -271,13 +271,8 @@ public:
 	ComPtr<ID3D12Resource> m_pd3dDefaultBufferFilledSize = NULL;
 	ComPtr<ID3D12Resource> m_pd3dUploadBufferFilledSize = NULL;
 	UINT64* m_pnUploadBufferFilledSize = NULL;
-#ifdef _WITH_QUERY_DATA_SO_STATISTICS
-	ID3D12QueryHeap* m_pd3dSOQueryHeap = NULL;
-	ID3D12Resource* m_pd3dSOQueryBuffer = NULL;
-	D3D12_QUERY_DATA_SO_STATISTICS* m_pd3dSOQueryDataStatistics = NULL;
-#else
+
 	ComPtr<ID3D12Resource> m_pd3dReadBackBufferFilledSize = NULL;
-#endif
 
 	D3D12_STREAM_OUTPUT_BUFFER_VIEW		m_d3dStreamOutputBufferView;
 
