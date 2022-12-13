@@ -302,7 +302,6 @@ void CGameFramework::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPA
 			::PostQuitMessage(0);
 			break;
 		case 'F':
-		case 'f':
 			ChangeShowEdge();
 			break;
 		case VK_RETURN:
@@ -319,6 +318,9 @@ void CGameFramework::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPA
 			m_pPlayer->ShootBullet();
 			break;
 		case VK_F10:
+			break;
+		case 'P':
+			m_pScene->SetParticelPos(m_pPlayer.get());
 			break;
 		default:
 			break;

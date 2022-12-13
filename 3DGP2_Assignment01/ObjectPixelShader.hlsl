@@ -68,7 +68,7 @@ PS_MULTIPLE_RENDER_TARGETS_OUTPUT PS_Object(VS_OUTPUT input)
 	input.normalW = normalize(input.normalW);
 	output.f4Normal = float4(input.normalW.xyz * 0.5f + 0.5f, input.position.z);
 
-	output.f4Texture = cAlbedoColor + cSpecularColor + cEmissionColor;
+	output.f4Texture = float4(0.0f, 0.0f, 0.0f, 1.0f);
 	output.f4Illumination = float4(0.0f, 0.0f, 0.0f, 1.0f);
 	output.f2ObjectIDzDepth = float4(0.0f, 0.0f, 0.0f, 1.0f);
 	output.f4CameraNormal = float4(input.normalV.xyz * 0.5f + 0.5f, input.position.z);

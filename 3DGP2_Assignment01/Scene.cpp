@@ -277,7 +277,7 @@ void CScene::OnPreRender(ID3D12Device* pd3dDevice, ID3D12CommandQueue* pd3dComma
 	CDynamicCubeMappingShader::Instance()->OnPreRender(pd3dDevice, pd3dCommandQueue, this);
 }
 
-void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera, bool bEdge)
+void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera, bool bEdge, bool bRenderPlayer)
 {
 	pCamera->SetViewportsAndScissorRects(pd3dCommandList);
 	pCamera->UpdateShaderVariables(pd3dCommandList);
@@ -288,10 +288,19 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 		m_pTerrain->Render(pd3dCommandList, pCamera);
 	if (m_pWater)
 		m_pWater->Render(pd3dCommandList, pCamera);
+	if (bRenderPlayer && m_pPlayer)
+		m_pPlayer->Render(pd3dCommandList);
+
 	CObjectShader::Instance()->Render(pd3dCommandList, pCamera, bEdge);
 	CBillboardObjectsShader::Instance()->Render(pd3dCommandList, pCamera, 0);
 	CMultiSpriteObjectsShader::Instance()->Render(pd3dCommandList, pCamera, 0);
 	CDynamicCubeMappingShader::Instance()->Render(pd3dCommandList, pCamera, 0);
+}
+
+void CScene::SetParticelPos(CPlayer* pPlayer)
+{
+	if (m_ppParticleObjects[0])
+		m_ppParticleObjects[0]->SetPosition(pPlayer->GetPosition());
 }
 
 void CScene::CheckCollision()

@@ -35,7 +35,6 @@ void CGameObject::ReleaseUploadBuffers()
 
 void CGameObject::SetChild(std::shared_ptr<CGameObject> pChild, bool bReferenceUpdate)
 {
-	long count = pChild.use_count();
 	if (m_pChild)
 	{
 		if (pChild) pChild->m_pSibling = m_pChild->m_pSibling;
@@ -910,14 +909,14 @@ CParticleObject::CParticleObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommand
 
 	srand((unsigned)time(NULL));
 
-	XMFLOAT4* pxmf4RandomValues = new XMFLOAT4[1024];
+	std::vector<XMFLOAT4> pxmf4RandomValues(1024);
 	for (int i = 0; i < 1024; i++) { pxmf4RandomValues[i].x = float((rand() % 10000) - 5000) / 5000.0f; pxmf4RandomValues[i].y = float((rand() % 10000) - 5000) / 5000.0f; pxmf4RandomValues[i].z = float((rand() % 10000) - 5000) / 5000.0f; pxmf4RandomValues[i].w = float((rand() % 10000) - 5000) / 5000.0f; }
 
 	m_pRandowmValueTexture = std::make_shared<CTexture>(1, RESOURCE_BUFFER, 0, 1);
-	m_pRandowmValueTexture->CreateBuffer(pd3dDevice, pd3dCommandList, pxmf4RandomValues, 1024, sizeof(XMFLOAT4), DXGI_FORMAT_R32G32B32A32_FLOAT, D3D12_HEAP_TYPE_DEFAULT, D3D12_RESOURCE_STATE_GENERIC_READ, 0);
+	m_pRandowmValueTexture->CreateBuffer(pd3dDevice, pd3dCommandList, pxmf4RandomValues.data(), 1024, sizeof(XMFLOAT4), DXGI_FORMAT_R32G32B32A32_FLOAT, D3D12_HEAP_TYPE_DEFAULT, D3D12_RESOURCE_STATE_GENERIC_READ, 0);
 
 	m_pRandowmValueOnSphereTexture = std::make_shared<CTexture>(1, RESOURCE_TEXTURE1D, 0, 1);
-	m_pRandowmValueOnSphereTexture->CreateBuffer(pd3dDevice, pd3dCommandList, pxmf4RandomValues, 256, sizeof(XMFLOAT4), DXGI_FORMAT_R32G32B32A32_FLOAT, D3D12_HEAP_TYPE_DEFAULT, D3D12_RESOURCE_STATE_GENERIC_READ, 0);
+	m_pRandowmValueOnSphereTexture->CreateBuffer(pd3dDevice, pd3dCommandList, pxmf4RandomValues.data(), 256, sizeof(XMFLOAT4), DXGI_FORMAT_R32G32B32A32_FLOAT, D3D12_HEAP_TYPE_DEFAULT, D3D12_RESOURCE_STATE_GENERIC_READ, 0);
 
 	CreateShaderVariables(pd3dDevice, pd3dCommandList);
 
@@ -1063,7 +1062,7 @@ void CDynamicCubeMappingObject::OnPreRender(ID3D12GraphicsCommandList* pd3dComma
 
 		pd3dCommandList->OMSetRenderTargets(1, &m_pd3dRtvCPUDescriptorHandles[j], TRUE, &m_d3dDsvCPUDescriptorHandle); 
 
-		pScene->Render(pd3dCommandList, m_ppCameras[j]);
+		pScene->Render(pd3dCommandList, m_ppCameras[j], false, true);
 	}
 
 	::SynchronizeResourceTransition(pd3dCommandList, m_ppMaterials[0]->m_pTexture->GetResource(0), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_GENERIC_READ);

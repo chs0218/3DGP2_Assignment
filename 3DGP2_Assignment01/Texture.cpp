@@ -13,35 +13,29 @@ CTexture::CTexture(int nTextures, UINT nTextureType, int nSamplers, int nRootPar
 		m_ppd3dTextureUploadBuffers.resize(m_nTextures);
 		m_ppd3dTextures.resize(m_nTextures);
 
-		m_ppstrTextureNames = new _TCHAR[m_nTextures][64];
-		for (int i = 0; i < m_nTextures; i++) m_ppstrTextureNames[i][0] = '\0';
+		m_ppstrTextureNames.resize(m_nTextures);
+		for (int i = 0; i < m_nTextures; i++) {
+			m_ppstrTextureNames[i].resize(64);
+			m_ppstrTextureNames[i][0] = '\0';
+		}
 
-		m_pd3dSrvGpuDescriptorHandles = new D3D12_GPU_DESCRIPTOR_HANDLE[m_nTextures];
+		m_pd3dSrvGpuDescriptorHandles.resize(m_nTextures);
 		for (int i = 0; i < m_nTextures; i++) m_pd3dSrvGpuDescriptorHandles[i].ptr = NULL;
 
-		m_pnResourceTypes = new UINT[m_nTextures];
-		m_pdxgiBufferFormats = new DXGI_FORMAT[m_nTextures];
-		m_pnBufferElements = new int[m_nTextures];
+		m_pnResourceTypes.resize(m_nTextures);
+		m_pdxgiBufferFormats.resize(m_nTextures);
+		m_pnBufferElements.resize(m_nTextures);
 		for (int i = 0; i < m_nTextures; i++) m_pnBufferElements[i] = 0;
-		m_pnBufferStrides = new int[m_nTextures];
+		m_pnBufferStrides.resize(m_nTextures);
 		for (int i = 0; i < m_nTextures; i++) m_pnBufferStrides[i] = 0;
 	}
 	m_nRootParameters = nRootParameters;
-	if (nRootParameters > 0) m_pnRootParameterIndices = new int[nRootParameters];
+	if (nRootParameters > 0) m_pnRootParameterIndices.resize(nRootParameters);
 	for (int i = 0; i < m_nRootParameters; i++) m_pnRootParameterIndices[i] = -1;
 }
 
 CTexture::~CTexture()
 {
-	if (m_ppstrTextureNames) delete[] m_ppstrTextureNames;
-
-	if (m_pnResourceTypes) delete[] m_pnResourceTypes;
-	if (m_pdxgiBufferFormats) delete[] m_pdxgiBufferFormats;
-	if (m_pnBufferElements) delete[] m_pnBufferElements;
-	if (m_pnBufferStrides) delete[] m_pnBufferStrides;
-
-	if (m_pnRootParameterIndices) delete[] m_pnRootParameterIndices;
-	if (m_pd3dSrvGpuDescriptorHandles) delete[] m_pd3dSrvGpuDescriptorHandles;
 }
 
 void CTexture::SetRootParameterIndex(int nIndex, UINT nRootParameterIndex)
@@ -139,7 +133,7 @@ int CTexture::LoadTextureFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsComman
 		strcpy_s(pstrFilePath + 15 + ((bDuplicated) ? (nStrLength - 1) : nStrLength), 64 - 15 - ((bDuplicated) ? (nStrLength - 1) : nStrLength), ".dds");
 
 		size_t nConverted = 0;
-		mbstowcs_s(&nConverted, m_ppstrTextureNames[nIndex], 64, pstrFilePath, _TRUNCATE);
+		mbstowcs_s(&nConverted, m_ppstrTextureNames[nIndex].data(), 64, pstrFilePath, _TRUNCATE);
 
 #define _WITH_DISPLAY_TEXTURE_NAME
 
@@ -151,7 +145,7 @@ int CTexture::LoadTextureFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsComman
 #endif
 		if (!bDuplicated)
 		{
-			LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, m_ppstrTextureNames[nIndex], RESOURCE_TEXTURE2D, nIndex);
+			LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, m_ppstrTextureNames[nIndex].data(), RESOURCE_TEXTURE2D, nIndex);
 			pShader->CreateShaderResourceView(pd3dDevice, this, nIndex);
 		}
 		else
@@ -165,7 +159,7 @@ int CTexture::LoadTextureFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsComman
 					pRootGameObject = pRootGameObject->m_pParent;
 				}
 				D3D12_GPU_DESCRIPTOR_HANDLE d3dSrvGpuDescriptorHandle;
-				int nParameterIndex = pRootGameObject->FindReplicatedTexture(m_ppstrTextureNames[nIndex], &d3dSrvGpuDescriptorHandle);
+				int nParameterIndex = pRootGameObject->FindReplicatedTexture(m_ppstrTextureNames[nIndex].data(), &d3dSrvGpuDescriptorHandle);
 				if (nParameterIndex >= 0)
 				{
 					m_pd3dSrvGpuDescriptorHandles[nIndex] = d3dSrvGpuDescriptorHandle;

@@ -33,10 +33,11 @@ public:
 	void OnPrepareRender(ID3D12GraphicsCommandList* pd3dCommandList);
 	void PrepareRender(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera = NULL);
 	void OnPreRender(ID3D12Device* pd3dDevice, ID3D12CommandQueue* pd3dCommandQueue);
-	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera = NULL, bool bEdge = false);
+	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera = NULL, bool bEdge = false, bool bRenderPlayer = false);
 
 	CHeightMapTerrain* GetTerrain() { return(m_pTerrain.get()); }
 	void SetPlayer(CPlayer* pPlayer) { m_pPlayer = pPlayer; }
+	void SetParticelPos(CPlayer* pPlayer);
 	void CheckCollision();
 	void RenderParticle(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera);
 	void OnPostRenderParticle();

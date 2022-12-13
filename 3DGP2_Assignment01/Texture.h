@@ -13,22 +13,22 @@ private:
 	std::vector<ComPtr<ID3D12Resource>> m_ppd3dTextures;	// Texture 리소스
 	std::vector<ComPtr<ID3D12Resource>> m_ppd3dTextureUploadBuffers;	//Texture 업로드 버퍼
 
-	UINT* m_pnResourceTypes;		// 각각의 Texture 들의 타입
-	_TCHAR(*m_ppstrTextureNames)[64] = NULL;	// Texture의 이름
+	std::vector<UINT> m_pnResourceTypes;		// 각각의 Texture 들의 타입
+	std::vector<std::vector<_TCHAR>> m_ppstrTextureNames;	// Texture의 이름
 
-	DXGI_FORMAT* m_pdxgiBufferFormats = NULL;	// Texture Dxgi 포맷
-	int* m_pnBufferElements;
-	int* m_pnBufferStrides;
+	std::vector<DXGI_FORMAT> m_pdxgiBufferFormats;	// Texture Dxgi 포맷
+	std::vector<int> m_pnBufferElements;
+	std::vector<int> m_pnBufferStrides;
 
 	int	m_nRootParameters = 0;		// 루트파라미터 번호
-	int* m_pnRootParameterIndices;		// 루트파라미터 인덱스
-	D3D12_GPU_DESCRIPTOR_HANDLE* m_pd3dSrvGpuDescriptorHandles;	// Srv 디스크립터 핸들
+	std::vector<int> m_pnRootParameterIndices;		// 루트파라미터 인덱스
+	std::vector<D3D12_GPU_DESCRIPTOR_HANDLE> m_pd3dSrvGpuDescriptorHandles;	// Srv 디스크립터 핸들
 public:
 	int GetTextures() { return(m_nTextures); }
 	ID3D12Resource* GetResource(int nIndex) { return(m_ppd3dTextures[nIndex].Get()); }
-	_TCHAR* GetTextureName(int nIndex) { return(m_ppstrTextureNames[nIndex]); }
+	_TCHAR* GetTextureName(int nIndex) { return(m_ppstrTextureNames[nIndex].data()); }
 	D3D12_GPU_DESCRIPTOR_HANDLE GetGpuDescriptorHandle(int nIndex) { return(m_pd3dSrvGpuDescriptorHandles[nIndex]); }
-	int GetRootParameter(int nIndex) { return(m_pnRootParameterIndices[nIndex]); }
+	int GetRootParameter(int nIndex) { if (nIndex < m_pnRootParameterIndices.size()) return(m_pnRootParameterIndices[nIndex]); return -1; }
 	int GetRootParameters() { return(m_nRootParameters); }
 	UINT GetTextureType() { return(m_nTextureType); }
 

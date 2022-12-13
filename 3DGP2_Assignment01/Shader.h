@@ -237,7 +237,7 @@ public:
 	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera, int nPipelineState, void* pContext);
 
 protected:
-	CTexture* m_pTexture = NULL;
+	std::unique_ptr<CTexture> m_pTexture = NULL;
 
 	D3D12_CPU_DESCRIPTOR_HANDLE* m_pd3dRtvCPUDescriptorHandles = NULL;
 

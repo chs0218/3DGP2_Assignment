@@ -1104,7 +1104,6 @@ CPostProcessingShader::CPostProcessingShader()
 
 CPostProcessingShader::~CPostProcessingShader()
 {
-	if (m_pTexture) delete m_pTexture;
 	if (m_pd3dRtvCPUDescriptorHandles) delete[] m_pd3dRtvCPUDescriptorHandles;
 }
 
@@ -1171,7 +1170,7 @@ void CPostProcessingShader::Render(ID3D12GraphicsCommandList* pd3dCommandList, C
 
 CTexture* CPostProcessingShader::GetTexture()
 {
-	return(m_pTexture);
+	return(m_pTexture.get());
 }
 
 ID3D12Resource* CPostProcessingShader::GetTextureResource(UINT nIndex)
@@ -1229,7 +1228,7 @@ void CLaplacianEdgeShader::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3d
 
 void CLaplacianEdgeShader::CreateResourcesAndViews(ID3D12Device* pd3dDevice, UINT nResources, DXGI_FORMAT* pdxgiFormats, UINT nWidth, UINT nHeight, D3D12_CPU_DESCRIPTOR_HANDLE d3dRtvCPUDescriptorHandle, UINT nShaderResources)
 {
-	m_pTexture = new CTexture(nResources, RESOURCE_TEXTURE2D, 0, 1);
+	m_pTexture = std::make_unique<CTexture>(nResources, RESOURCE_TEXTURE2D, 0, 1);
 
 	D3D12_CLEAR_VALUE d3dClearValue = { DXGI_FORMAT_R8G8B8A8_UNORM, { 0.0f, 0.0f, 1.0f, 1.0f } };
 	for (UINT i = 0; i < nResources; i++)
@@ -1241,7 +1240,7 @@ void CLaplacianEdgeShader::CreateResourcesAndViews(ID3D12Device* pd3dDevice, UIN
 	CreateCbvSrvDescriptorHeaps(pd3dDevice, 0, nShaderResources);
 
 	CreateShaderVariables(pd3dDevice, NULL);
-	CreateShaderResourceViews(pd3dDevice, m_pTexture, 0, 9);
+	CreateShaderResourceViews(pd3dDevice, m_pTexture.get(), 0, 9);
 
 	D3D12_RENDER_TARGET_VIEW_DESC d3dRenderTargetViewDesc;
 	d3dRenderTargetViewDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;

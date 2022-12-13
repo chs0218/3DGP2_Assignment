@@ -410,6 +410,10 @@ CCamera* CTerrianFlyingPlayer::ChangeCamera(DWORD nNewCameraMode, float fTimeEla
 		m_pCamera->SetScissorRect(0, 0, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT);
 		break;
 	case SPACESHIP_CAMERA:
+		m_pCamera->SetTimeLag(0.0f);
+		m_fPitch = 0.0f;
+		m_fRoll = 0.0f;
+		Update(fTimeElapsed);
 		SetFriction(100.5f);
 		SetGravity(XMFLOAT3(0.0f, 0.0f, 0.0f));
 		SetMaxVelocityXZ(125.0f);
